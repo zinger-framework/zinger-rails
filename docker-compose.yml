@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    command: ./run.sh
+    command: ./docker/run.sh
     volumes:
       - .:/zinger
     ports:
