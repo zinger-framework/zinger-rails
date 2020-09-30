@@ -49,10 +49,8 @@ class V2::Auth::SignupController < V2::AuthController
 
     if invalid_key.class == String
       render status: 400, json: { success: false, message: invalid_key }
-      return
     elsif token['code'] != params['otp']
       render status: 400, json: { success: false, message: I18n.t('user.link_expired', param: 'OTP') }
-      return
     else
       user.save!
       session = user.user_sessions.create!(meta: { type: params['auth_type'] }, login_ip: request.ip, user_agent: params['user_agent'])
