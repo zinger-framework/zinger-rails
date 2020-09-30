@@ -19,8 +19,8 @@ class V2::Auth::SignupController < V2::AuthController
     if invalid_key.class == String
       render status: 400, json: { success: false, message: invalid_key }
     else
-      user.save
-      session = user.user_sessions.create(meta: { type: params['auth_type'] }, login_ip: request.ip, device_os: params['device_os'], device_app: params['device_app'])
+      user.save!
+      session = user.user_sessions.create!(meta: { type: params['auth_type'] }, login_ip: request.ip, user_agent: params['user_agent'])
       render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
     end
   end
@@ -54,8 +54,8 @@ class V2::Auth::SignupController < V2::AuthController
       render status: 400, json: { success: false, message: I18n.t('user.link_expired', param: 'OTP') }
       return
     else
-      user.save
-      session = user.user_sessions.create(meta: { type: params['auth_type'] }, login_ip: request.ip, device_os: params['device_os'], device_app: params['device_app'])
+      user.save!
+      session = user.user_sessions.create!(meta: { type: params['auth_type'] }, login_ip: request.ip, user_agent: params['user_agent'])
       Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] })
       render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
     end
@@ -67,8 +67,8 @@ class V2::Auth::SignupController < V2::AuthController
     if invalid_key.class == String
       render status: 400, json: { success: false, message: invalid_key }
     else
-      user.save
-      session = user.user_sessions.create(meta: { type: params['auth_type'] }, login_ip: request.ip)
+      user.save!
+      session = user.user_sessions.create!(meta: { type: params['auth_type'] }, login_ip: request.ip)
       render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
     end
   end

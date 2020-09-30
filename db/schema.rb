@@ -18,8 +18,7 @@ ActiveRecord::Schema.define(version: 2020_04_13_092244) do
   create_table "user_sessions", primary_key: "token", id: :string, force: :cascade do |t|
     t.jsonb "meta", default: {}
     t.string "login_ip"
-    t.string "device_os"
-    t.string "device_app"
+    t.string "user_agent"
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

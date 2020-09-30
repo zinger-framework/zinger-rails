@@ -4,8 +4,7 @@ class CreateUserSessions < ActiveRecord::Migration[5.2]
       t.string :token, primary_key: true
       t.jsonb :meta, default: {}
       t.string :login_ip
-      t.string :device_os
-      t.string :device_app
+      t.string :user_agent
       t.column :user_id, 'BIGINT'
       t.timestamps
 
