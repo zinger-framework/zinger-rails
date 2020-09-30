@@ -1,6 +1,8 @@
 class V2::Auth::SignupController < V2::AuthController
+  after_action :create_session, if: -> { @user }
+
   def create
-    self.send(@auth_type)
+    self.send(AUTH_TYPES[@auth_type])
   end
 
   private
@@ -12,17 +14,15 @@ class V2::Auth::SignupController < V2::AuthController
       return
     end
 
-    user = User.new(keys_present[0] => params[keys_present[0]], password: params['password'], verified: false, \
-      two_factor_enabled: false)
-    invalid_key = user.send("invalid_#{keys_present[0]}", true) || user.invalid_password
-
-    if invalid_key.class == String
-      render status: 400, json: { success: false, message: invalid_key }
-    else
-      user.save!
-      session = user.user_sessions.create!(meta: { type: params['auth_type'] }, login_ip: request.ip, user_agent: params['user_agent'])
-      render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
+    if params['password'].blank?
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
+      return
+    elsif params['password'].to_s.length < User::PASSWORD_MIN_LENGTH
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { password: [ I18n.t('user.password.invalid', length: User::PASSWORD_MIN_LENGTH) ] } }
+      return
     end
+
+    @user = User.create(keys_present[0] => params[keys_present[0]], password: params['password'], verified: false, two_factor_enabled: false)
   end
 
   def otp_auth
@@ -31,43 +31,38 @@ class V2::Auth::SignupController < V2::AuthController
       return
     end
 
+    if params['otp'].blank?
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { otp: [ I18n.t('validation.required', param: 'OTP') ] } }
+      return
+    end
+
     token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }, { type: Hash }) { nil }
-    if token.blank?
-      render status: 400, json: { success: false, message: I18n.t('user.link_expired', param: 'Authentication token') }
+    if token.blank? || token['code'] != params['otp']
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { otp: [ I18n.t('user.param_expired', param: 'OTP') ] } }
       return
     end
 
-    required_keys = %w(email mobile)
-    keys_present = required_keys.select { |key| token[key].present? }
-    if keys_present.length != 1
-      render status: 400, json: { success: false, message: I18n.t('auth.required', param: required_keys.join(', ')) }
-      return
-    end
-
-    user = User.new(keys_present[0] => token[keys_present[0]], otp: params['otp'], verified: true, two_factor_enabled: false)
-    invalid_key = user.send("invalid_#{keys_present[0]}", true) || user.invalid_otp
-
-    if invalid_key.class == String
-      render status: 400, json: { success: false, message: invalid_key }
-    elsif token['code'] != params['otp']
-      render status: 400, json: { success: false, message: I18n.t('user.link_expired', param: 'OTP') }
-    else
-      user.save!
-      session = user.user_sessions.create!(meta: { type: params['auth_type'] }, login_ip: request.ip, user_agent: params['user_agent'])
-      Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] })
-      render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
-    end
+    keys_present = %w(email mobile).select { |key| token[key].present? }
+    @user = User.create(keys_present[0] => token[keys_present[0]], verified: true, two_factor_enabled: false)
   end
 
   def google_auth
-    user = User.new('email' => params['email'], verified: true, two_factor_enabled: false)
-    invalid_key = user.invalid_email(true)
-    if invalid_key.class == String
-      render status: 400, json: { success: false, message: invalid_key }
-    else
-      user.save!
-      session = user.user_sessions.create!(meta: { type: params['auth_type'] }, login_ip: request.ip)
-      render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
+    if params['email'].blank?
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { email: [ I18n.t('validation.required', param: 'Email address') ] } }
+      return
     end
+
+    @user = User.create(email: params['email'], verified: true, two_factor_enabled: false)
+  end
+
+  def create_session
+    if @user.errors.any?
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: user.errors.messages }
+      return
+    end
+
+    session = @user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
+    Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }) if @auth_type == 'LOGIN_WITH_OTP'
+    render status: 200, json: { success: true, message: I18n.t('user.create_success'), data: { token: session.get_jwt_token } }
   end
 end

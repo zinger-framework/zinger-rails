@@ -37,10 +37,12 @@ en:
     already_taken: "%{param} is already taken"
   user:
     not_found: Unable to find the user
+    create_failed: Unable to create account
+    otp_failed: Unable to send OTP
     password:
-      invalid: Password should contain atleast 6 characters
+      invalid: "Password should contain atleast %{length} characters"
     trigger_success: "%{param} is sent successfully"
-    link_expired: "%{param} is expired or invalid"
+    param_expired: "%{param} is expired or invalid"
     create_success: Account creation is successful
     login_success: Login is successful
     otp_success: Sending OTP is successful

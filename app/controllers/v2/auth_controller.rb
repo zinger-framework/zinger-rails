@@ -9,7 +9,7 @@ class V2::AuthController < ApiController
   before_action :verify_auth_type
 
   def send_otp
-    if @auth_type != 'otp_auth'
+    if @auth_type != 'LOGIN_WITH_OTP'
       render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Authentication type') }
       return
     end
@@ -21,20 +21,21 @@ class V2::AuthController < ApiController
       return
     end
 
-    user = User.new("#{keys_present[0]}" => params[keys_present[0]])
-    invalid_key = user.send("invalid_#{keys_present[0]}", true)
-    if invalid_key.class == String
-      render status: 400, json: { success: false, message: invalid_key }
-    else
-      render status: 200, json: { success: true, message: I18n.t('user.otp_success'), data: { token: user.send_otp(keys_present[0], params[keys_present[0]]) } }
+    user = User.new(keys_present[0] => params[keys_present[0]])
+    user.send("validate_#{keys_present[0]}")
+    if user.errors.any?
+      render status: 400, json: { success: false, message: I18n.t('user.otp_failed'), reason: user.errors.messages }
+      return
     end
+    
+    render status: 200, json: { success: true, message: I18n.t('user.otp_success'), data: { token: user.send_otp(keys_present[0], params[keys_present[0]]) } }
   end
 
   private
   def verify_auth_type
     auth_types = Core::Configuration.get(CoreConfig['auth']['methods'])
     if auth_types.class == String
-      @auth_type = AUTH_TYPES[auth_types]
+      @auth_type = auth_types
     elsif params['auth_type'].blank?
       render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'Authentication type') }
       return
@@ -45,7 +46,7 @@ class V2::AuthController < ApiController
       render status: 400, json: { success: false, message: I18n.t('validation.unconfigured', param: 'Authentication type') }
       return
     else
-      @auth_type = AUTH_TYPES[params['auth_type']]
+      @auth_type = params['auth_type']
     end
   end
 end

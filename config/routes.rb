@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   namespace :v2 do
     namespace :auth, only: :none, constraints: {subdomain: AppConfig['api_subdomain'], format: :json} do
       post :signup, to: 'signup#create'
-      post :login
+      post :login, to: 'login#create'
       delete :logout
 
       post :forgot_password
