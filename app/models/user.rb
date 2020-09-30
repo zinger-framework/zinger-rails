@@ -11,21 +11,31 @@ class User < ApplicationRecord
 
   has_many :user_sessions
 
-  def validate_email
+  def validate_email action
     self.email = email.to_s.strip.downcase
     errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless email.match(EMAIL_REGEX)
-    errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
+
+    if action == 'create'
+      errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
+    elsif action == 'verify'
+      errors.add(:email, I18n.t('user.not_found')) unless User.exists?(email: self.email)
+    end
   end
 
   def validate_mobile
     self.mobile = mobile.to_s.strip
     errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless mobile.match(MOBILE_REGEX)
-    errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
+    
+    if action == 'create'
+      errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
+    elsif action == 'verify'
+      errors.add(:mobile, I18n.t('user.not_found')) unless User.exists?(mobile: self.mobile)   
+    end
   end
 
   def create_validations
-    validate_email if self.email.present?
-    validate_mobile if self.mobile.present?
+    validate_email('create') if self.email.present?
+    validate_mobile('create') if self.mobile.present?
 
     if self.user_name.present?
       self.user_name = user_name.to_s.strip.downcase

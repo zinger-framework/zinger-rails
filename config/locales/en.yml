@@ -39,6 +39,7 @@ en:
     not_found: Unable to find the user
     create_failed: Unable to create account
     otp_failed: Unable to send OTP
+    login_failed: Unable to login
     password:
       invalid: "Password should contain atleast %{length} characters"
     trigger_success: "%{param} is sent successfully"

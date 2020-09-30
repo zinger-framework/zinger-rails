@@ -4,6 +4,8 @@ class V2::AuthController < ApiController
     'LOGIN_WITH_OTP' => 'otp_auth',
     'LOGIN_WITH_GOOGLE' => 'google_auth'
   }
+  OTP_ACTION_TYPES = %w(create verify)
+  OTP_PARAMS = %w(email mobile)
 
   skip_before_action :authenticate_request, :verify_user
   before_action :verify_auth_type
@@ -14,15 +16,22 @@ class V2::AuthController < ApiController
       return
     end
 
-    required_keys = %w(email mobile)
-    keys_present = required_keys.select { |key| params[key].present? }
+    if params['action_type'].blank?
+      render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'Action type') }
+      return
+    elsif !OTP_ACTION_TYPES.include?(params['action_type'])
+      render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Action type') }
+      return
+    end
+
+    keys_present = OTP_PARAMS.select { |key| params[key].present? }
     if keys_present.length != 1
-      render status: 400, json: { success: false, message: I18n.t('auth.required', param: required_keys.join(', ')) }
+      render status: 400, json: { success: false, message: I18n.t('auth.required', param: OTP_PARAMS.join(', ')) }
       return
     end
 
     user = User.new(keys_present[0] => params[keys_present[0]])
-    user.send("validate_#{keys_present[0]}")
+    user.send("validate_#{keys_present[0]}", params['action_type'])
     if user.errors.any?
       render status: 400, json: { success: false, message: I18n.t('user.otp_failed'), reason: user.errors.messages }
       return

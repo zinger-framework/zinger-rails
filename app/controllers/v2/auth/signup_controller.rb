@@ -7,7 +7,7 @@ class V2::Auth::SignupController < V2::AuthController
 
   private
   def password_auth
-    required_keys = %w(email mobile user_name)
+    required_keys = OTP_PARAMS + ['user_name']
     keys_present = required_keys.select { |key| params[key].present? }
     if keys_present.length != 1
       render status: 400, json: { success: false, message: I18n.t('auth.required', param: required_keys.join(', ')) }
@@ -38,11 +38,11 @@ class V2::Auth::SignupController < V2::AuthController
 
     token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }, { type: Hash }) { nil }
     if token.blank? || token['code'] != params['otp']
-      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { otp: [ I18n.t('user.param_expired', param: 'OTP') ] } }
+      render status: 401, json: { success: false, message: I18n.t('user.create_failed'), reason: { otp: [ I18n.t('user.param_expired', param: 'OTP') ] } }
       return
     end
 
-    keys_present = %w(email mobile).select { |key| token[key].present? }
+    keys_present = OTP_PARAMS.select { |key| token[key].present? }
     @user = User.create(keys_present[0] => token[keys_present[0]], verified: true, two_factor_enabled: false)
   end
 
