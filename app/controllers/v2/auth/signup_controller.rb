@@ -1,6 +1,4 @@
 class V2::Auth::SignupController < V2::AuthController
-  after_action :create_session, if: -> { @user }
-
   def create
     self.send(AUTH_TYPES[@auth_type])
   end
@@ -22,7 +20,14 @@ class V2::Auth::SignupController < V2::AuthController
       return
     end
 
-    @user = User.create(keys_present[0] => params[keys_present[0]], password: params['password'], verified: false, two_factor_enabled: false)
+    user = User.create(keys_present[0] => params[keys_present[0]], password: params['password'], verified: false, two_factor_enabled: false)
+    if user.errors.any?
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: user.errors.messages }
+      return
+    end
+
+    session = user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
+    render status: 200, json: { success: true, message: I18n.t('user.create_success'), data: { token: session.get_jwt_token } }
   end
 
   def otp_auth
@@ -43,7 +48,15 @@ class V2::Auth::SignupController < V2::AuthController
     end
 
     keys_present = OTP_PARAMS.select { |key| token[key].present? }
-    @user = User.create(keys_present[0] => token[keys_present[0]], verified: true, two_factor_enabled: false)
+    user = User.create(keys_present[0] => token[keys_present[0]], verified: true, two_factor_enabled: false)
+    if user.errors.any?
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: user.errors.messages }
+      return
+    end
+
+    session = user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
+    Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] })
+    render status: 200, json: { success: true, message: I18n.t('user.create_success'), data: { token: session.get_jwt_token } }
   end
 
   def google_auth
@@ -52,17 +65,13 @@ class V2::Auth::SignupController < V2::AuthController
       return
     end
 
-    @user = User.create(email: params['email'], verified: true, two_factor_enabled: false)
-  end
-
-  def create_session
-    if @user.errors.any?
+    user = User.create(email: params['email'], verified: true, two_factor_enabled: false)
+    if user.errors.any?
       render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: user.errors.messages }
       return
     end
 
-    session = @user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
-    Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }) if @auth_type == 'LOGIN_WITH_OTP'
+    session = user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
     render status: 200, json: { success: true, message: I18n.t('user.create_success'), data: { token: session.get_jwt_token } }
   end
 end
