@@ -36,7 +36,7 @@ en:
     unconfigured: "Unconfigured %{param}"
     already_taken: "%{param} is already taken"
   user:
-    not_found: Unable to find the user
+    not_found: Unable to find the user. Please check the credentials
     create_failed: Unable to create account
     otp_failed: Unable to send OTP
     login_failed: Unable to login

@@ -1,6 +1,4 @@
 class V2::Auth::LoginController < V2::AuthController
-  after_action :create_session, if: -> { @user }
-
   def create
     self.send(AUTH_TYPES[@auth_type])
   end
@@ -22,11 +20,19 @@ class V2::Auth::LoginController < V2::AuthController
       return
     end
 
-    @user = User.where(keys_present[0] => params[keys_present[0]]).first
-    if @user.nil?
+    user = User.where(keys_present[0] => params[keys_present[0]]).first
+    if user.nil?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present[0] => [ I18n.t('user.not_found') ] } }
       return
     end
+
+    if user.authenticate(params['password']) == false
+      render status: 401, json: { success: false, message: I18n.t('user.login_failed'), reason: { password: [ I18n.t('validation.invalid', param: 'Password') ] } }
+      return
+    end
+
+    session = user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
+    render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
   end
 
   def otp_auth
@@ -47,11 +53,15 @@ class V2::Auth::LoginController < V2::AuthController
     end
 
     keys_present = OTP_PARAMS.select { |key| token[key].present? }
-    @user = User.where(keys_present[0] => token[keys_present[0]]).first
-    if @user.nil?
+    user = User.where(keys_present[0] => token[keys_present[0]]).first
+    if user.nil?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present[0] => [ I18n.t('user.not_found') ] } }
       return
     end
+
+    session = user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
+    Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] })
+    render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
   end
 
   def google_auth
@@ -60,21 +70,13 @@ class V2::Auth::LoginController < V2::AuthController
       return
     end
 
-    @user = User.find_by(email: params['email'])
-    if @user.nil?
+    user = User.find_by(email: params['email'])
+    if user.nil?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { email: [ I18n.t('user.not_found') ] } }
       return
     end
-  end
 
-  def create_session
-    if @auth_type == 'LOGIN_WITH_PASSWORD' && @user.authenticate(params['password']) == false
-      render status: 401, json: { success: false, message: I18n.t('user.login_failed'), reason: { password: [ I18n.t('validation.invalid', param: 'Password') ] } }
-      return
-    end
-
-    session = @user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
-    Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }) if @auth_type == 'LOGIN_WITH_OTP'
+    session = user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
     render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
   end
 end
