@@ -49,3 +49,5 @@ en:
     otp_success: Sending OTP is successful
   auth:
     required: Please provide any one of the params - %{param}
+    logout_success: Logout is successful
+    logout_failed: Logout is failed

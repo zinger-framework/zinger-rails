@@ -1,6 +1,8 @@
 module Core
   class Redis
     OTP_VERIFICATION = 'OTP_VERIFICATION:%{token}'
+    USER_SESSIONS_BY_ID = 'USER_SESSIONS_BY_ID:%{id}'
+    USER_BY_ID = 'v1/USER_BY_ID:%{id}'
 
     def self.marshal type, value
       if String == type
