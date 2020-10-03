@@ -7,8 +7,8 @@ class V2::AuthController < ApiController
   OTP_ACTION_TYPES = %w(create verify)
   OTP_PARAMS = %w(email mobile)
 
-  skip_before_action :authenticate_request, :verify_user
-  before_action :verify_auth_type
+  skip_before_action :authenticate_request, except: :logout
+  before_action :verify_auth_type, except: :logout
 
   def send_otp
     if @auth_type != 'LOGIN_WITH_OTP'
@@ -38,6 +38,16 @@ class V2::AuthController < ApiController
     end
     
     render status: 200, json: { success: true, message: I18n.t('user.otp_success'), data: { token: user.send_otp(keys_present[0], params[keys_present[0]]) } }
+  end
+
+  def logout
+    session = User.current.user_sessions.find_by_token(UserSession.extract_token(request.headers['Authorization']))
+    if session.present? && session.destroy
+      render status: 200, json: { success: true, message: I18n.t('auth.logout_success') }
+      return
+    end
+
+    render status: 200, json: { success: false, message: I18n.t('auth.logout_failed') }
   end
 
   private

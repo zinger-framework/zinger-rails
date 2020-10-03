@@ -8,8 +8,14 @@ class User < ApplicationRecord
   has_secure_password(validations: false)
   has_one_time_password length: OTP_LENGTH
   validate :create_validations, on: :create
+  after_commit :clear_cache
+  after_update :clear_sessions
 
   has_many :user_sessions
+
+  def self.fetch_by_id id
+    Core::Redis.fetch(Core::Redis::USER_BY_ID % { id: id }, { type: User }) { User.find_by_id(id) }
+  end
 
   def validate_email action
     self.email = email.to_s.strip.downcase
@@ -33,6 +39,18 @@ class User < ApplicationRecord
     end
   end
 
+  def make_current
+    Thread.current[:user] = self
+  end
+
+  def self.reset_current
+    Thread.current[:user] = nil
+  end
+
+  def self.current
+    Thread.current[:user]
+  end
+
   def create_validations
     validate_email('create') if self.email.present?
     validate_mobile('create') if self.mobile.present?
@@ -51,5 +69,16 @@ class User < ApplicationRecord
     Core::Redis.setex(Core::Redis::OTP_VERIFICATION % { token: token }, { key => value, 'code' => code }, 5.minutes.to_i)
     MailerWorker.perform_async("#{key}_verification", { to: value, code: code })
     return token
+  end
+
+  def clear_cache
+    Core::Redis.delete(Core::Redis::USER_BY_ID % { id: self.id })
+  end
+
+  def clear_sessions
+    if self.saved_change_to_password_digest?
+      UserSession.where(user_id: self.id).delete_all
+      Core::Redis.delete(UserSession.cache_key(self.id))
+    end
   end
 end
