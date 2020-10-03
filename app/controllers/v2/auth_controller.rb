@@ -8,7 +8,9 @@ class V2::AuthController < ApiController
   OTP_PARAMS = %w(email mobile)
 
   skip_before_action :authenticate_request, except: :logout
-  before_action :verify_auth_type, except: :logout
+  before_action :verify_auth_type, except: [:logout, :verify_reset_link]
+  before_action :is_login_with_password, only: [:forgot_password, :reset_password]
+  before_action :load_user_from_token, only: [:verify_reset_link, :reset_password]
 
   def send_otp
     if @auth_type != 'LOGIN_WITH_OTP'
@@ -50,6 +52,40 @@ class V2::AuthController < ApiController
     render status: 200, json: { success: false, message: I18n.t('auth.logout_failed') }
   end
 
+  def forgot_password
+    if params['email'].blank?
+      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { email: [ I18n.t('validation.required', param: 'Email') ] } }
+      return
+    end
+
+    user = User.find_by_email(params['email'])
+    if user.nil?
+      render status: 404, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { email: [ I18n.t('user.not_found') ] } }
+      return
+    end
+
+    user.trigger_password_reset
+    render status: 200, json: { success: true, message: I18n.t('auth.reset_password.trigger_success') }
+  end
+
+  def verify_reset_link
+    render status: 200, json: { success: true, message: 'success' }
+  end
+
+  def reset_password
+    if params['password'].blank?
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
+      return
+    elsif params['password'].to_s.length < User::PASSWORD_MIN_LENGTH
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { password: [ I18n.t('user.password.invalid', length: User::PASSWORD_MIN_LENGTH) ] } }
+      return
+    end
+
+    @user.update_attributes!(password: params['password'])
+    Core::Redis.delete(Core::Redis::RESET_PASSWORD % { token: params['token'] })
+    render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
+  end
+
   private
   def verify_auth_type
     auth_types = Core::Configuration.get(CoreConfig['auth']['methods'])
@@ -66,6 +102,32 @@ class V2::AuthController < ApiController
       return
     else
       @auth_type = params['auth_type']
+    end
+  end
+
+  def load_user_from_token
+    if params['token'].blank?
+      render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'Verification token') }
+      return
+    end
+
+    user_id = Core::Redis.fetch(Core::Redis::RESET_PASSWORD % { token: params['token'] }) { nil }
+    if user_id.blank?
+      render status: 400, json: { success: false, message: I18n.t('user.param_expired', param: 'Verification link') }
+      return
+    end
+
+    @user = User.find_by_id(user_id)
+    if @user.nil?
+      render status: 400, json: { success: false, message: I18n.t('user.not_found') }
+      return
+    end
+  end
+
+  def is_login_with_password
+    if @auth_type != 'LOGIN_WITH_PASSWORD'
+      render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Authentication type') }
+      return
     end
   end
 end

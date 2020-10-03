@@ -7,8 +7,14 @@ Rails.application.routes.draw do
       post :login, to: 'login#create'
       delete :logout
       post :send_otp
+      
+      post :forgot_password
+      post :reset_password
     end
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
+
+  get '/reset_password/:token', to: 'v2/auth#verify_reset_link', as: :verify_reset_link, constraints: { subdomain: AppConfig['api_subdomain'] }
+  get '/*path', to: 'application#home', constraints: { subdomain: AppConfig['api_subdomain'] }
 end
