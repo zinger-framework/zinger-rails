@@ -39,7 +39,7 @@ class UserSession < ApplicationRecord
   private
 
   def set_token
-    self.token = Base64.encode64("#{self.user_id}-#{Time.now.to_f.to_s.gsub(".", "-")}-#{rand(1000..9999)}").strip
+    self.token = Base64.encode64("#{self.user_id}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
   end
 
   def clear_cache

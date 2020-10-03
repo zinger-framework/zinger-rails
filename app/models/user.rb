@@ -17,6 +17,10 @@ class User < ApplicationRecord
     Core::Redis.fetch(Core::Redis::USER_BY_ID % { id: id }, { type: User }) { User.find_by_id(id) }
   end
 
+  def trigger_password_reset
+    MailerWorker.perform_async('reset_password', { email: self.email, user_id: self.id })
+  end
+
   def validate_email action
     self.email = email.to_s.strip.downcase
     errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless email.match(EMAIL_REGEX)
@@ -65,7 +69,7 @@ class User < ApplicationRecord
   def send_otp key, value
     self.otp_regenerate_secret
     code = self.otp_code(time: Time.now)
-    token = Base64.encode64("#{rand(1000)}-#{value}-#{Time.now.to_i}").strip.gsub('=', '')
+    token = Base64.encode64("#{value}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
     Core::Redis.setex(Core::Redis::OTP_VERIFICATION % { token: token }, { key => value, 'code' => code }, 5.minutes.to_i)
     MailerWorker.perform_async("#{key}_verification", { to: value, code: code })
     return token
