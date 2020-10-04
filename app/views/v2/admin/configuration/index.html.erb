@@ -67,24 +67,26 @@
 <h1>Update Operation</h1>
 <br>
 
-<%= form_with(url: "/v2/admin/configuration/:id", method: :patch) do |f| %>
+<%= form_tag(v2_admin_configuration_path(@properties.second), method: :patch) do %>
+    
    
-   <%= f.label :name %>
-   <%= f.text_field :name %>
+   <%= label_tag :name %>
+   <%= text_field_tag :name %>
    
    <br>
    
-   <%= f.label :text %>
-   <%= f.text_field :text %>
+   <%= label_tag :text %>
+   <%= text_field_tag :text %>
   
    <br>
    
-   <%= f.label :default %>
-   <%= f.text_field :default %>
+   <%= label_tag :default %>
+   <%= text_field_tag :default %>
   
    <br>
    
-   <%= f.submit %>
+   
+   <%= submit_tag 'Update' %>
 <% end %>
 
 
@@ -92,14 +94,11 @@
 <br>
 <h1>Delete Operation</h1>
 <br>
-<%= form_with(url: "/v2/admin/configuration/:id", method: :delete) do |f| %>
-   
-   <%= f.label :name %>
-   <%= f.text_field :name %>
-   <br>
-   
-   
-   <%= f.submit %>
+<%= form_tag(v2_admin_configuration_path(@properties.second), method: :delete) do %>  
+   <%= label_tag :id %>
+   <%= text_field_tag :id %>
+   <br> 
+   <%= submit_tag 'Delete'%>
 <% end %>
 
 

@@ -24,51 +24,51 @@ class V2::Admin::ConfigurationController < V2::AdminController
     end
 
     def create
-         
-         #property = Property.new
-         # property.name = params[:name]
-         # property.text = params[:text]
-         # property.default = params[:default]
-         
-         # property.allowed = ["a","b","c"]
-         # property.selected = ["a","b","c"]
-
          resp = Property.create(name: params['name'],text: params['text'],default: params['default'],
-                               allowed: ["a","b","c"],selected: ["a","b","c"]);
+            allowed: ["a","b","c"],selected: ["a","b","c"]);
          
          
          if resp 
             flash['success'] = 'Property creation is successful'
          else
-            flash['warning'] = 'Property creation failed'
+            flash['danger'] = 'Property creation failed'
          end 
 
           redirect_to v2_admin_configuration_index_url
     end
 
-    def show
-    end
-
     def update
-         print "\n\n\n"
-         property = Property.find_by(name: params[:name])
-         property.text = params[:text]
-         property.default = params[:default]
+         property = Property.find_by_id(params['id'])
 
-         if property.save
-            puts "update success"
-         else
-            puts "update failed"
+         if property.blank?
+             flash['danger'] = 'Unable to find property'
+             redirect_to v2_admin_configuration_index_url
          end
+
+         property.update_attributes(name: params['name'], text: params['text'],default: params['default'],selected: ['a','b','c'],allowed: ['a','b','c'])
+
+         if property.errors.any?
+            flash['danger'] = 'Property updation failed'
+         else
+            flash['success'] = 'Property updation is successful'
+         end
+         redirect_to v2_admin_configuration_index_url
     end
 
     def destroy
-        property = Property.find_by(name: params[:name])
-        if property.destroy
-            puts  "Delete success"
-        else
-            puts "Delete failed"
+        property = Property.find_by_id(params['id'])
+        if property.blank?
+             flash['danger'] = 'Unable to find property'
+             redirect_to v2_admin_configuration_index_url
         end
+
+        if property.destroy
+            flash['success'] = 'Property deletion is successful'
+        else
+            flash['danger'] = 'Property deletion failed'
+        end
+        redirect_to v2_admin_configuration_index_url
+
     end
 end
 
