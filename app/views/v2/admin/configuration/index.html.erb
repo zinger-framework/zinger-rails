@@ -1,0 +1,105 @@
+<ul>
+<%
+	current_level=1
+	 @properties.each do |p| 
+	 		level= p.name.split('.').size 
+
+	 		if level<current_level
+	 			(current_level-level).times { 
+
+%>
+				</ul>
+			</li>
+<%}
+	 		end
+	 		current_level = level
+%>
+	
+	<%
+			if p.allowed.size == 0 
+	%>
+			<li> <%= p.name %> 
+			<ul>
+	<%	
+			else
+	%>
+			<li> <%= p.name %></li>
+	<%
+			end
+	%>
+
+	
+
+<% end %>
+</ul>
+
+
+<br>
+<h1>Insert Operation</h1>
+<br>
+
+
+
+<%= form_tag v2_admin_configuration_index_path do %>
+   
+   <%= label_tag :name %>
+   <%= text_field_tag :name %>
+   
+   <br>
+   
+   <%= label_tag :text %>
+   <%= text_field_tag :text %>
+  
+   <br>
+   
+   <%= label_tag :default %>
+   <%= text_field_tag :default %>
+  
+   <br>
+   
+   <%= submit_tag 'Create' %>
+<% end %>
+ 
+
+
+
+<br>
+<h1>Update Operation</h1>
+<br>
+
+<%= form_with(url: "/v2/admin/configuration/:id", method: :patch) do |f| %>
+   
+   <%= f.label :name %>
+   <%= f.text_field :name %>
+   
+   <br>
+   
+   <%= f.label :text %>
+   <%= f.text_field :text %>
+  
+   <br>
+   
+   <%= f.label :default %>
+   <%= f.text_field :default %>
+  
+   <br>
+   
+   <%= f.submit %>
+<% end %>
+
+
+
+<br>
+<h1>Delete Operation</h1>
+<br>
+<%= form_with(url: "/v2/admin/configuration/:id", method: :delete) do |f| %>
+   
+   <%= f.label :name %>
+   <%= f.text_field :name %>
+   <br>
+   
+   
+   <%= f.submit %>
+<% end %>
+
+
