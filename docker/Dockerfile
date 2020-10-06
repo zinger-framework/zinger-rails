@@ -6,6 +6,5 @@ RUN apt-get install -y yarn
 RUN mkdir /zinger
 WORKDIR /zinger
 ADD . /zinger
-RUN yarn add webpack
 RUN yarn install
 RUN bundle install
