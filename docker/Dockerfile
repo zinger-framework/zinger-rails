@@ -5,6 +5,3 @@ RUN mkdir /zinger
 WORKDIR /zinger
 ADD . /zinger
 RUN bundle install
-# Add a script to be executed every time the container starts.
-COPY docker/run.sh /usr/bin/
-RUN chmod +x /usr/bin/run.sh
