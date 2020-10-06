@@ -62,3 +62,42 @@
  
 
 
+
+<br>
+<h1>Update Operation</h1>
+<br>
+
+<%= form_tag(v2_admin_configuration_path(@properties.second), method: :patch) do %>
+
+
+   <%= label_tag :name %>
+   <%= text_field_tag :name %>
+
+   <br>
+
+   <%= label_tag :text %>
+   <%= text_field_tag :text %>
+
+   <br>
+
+   <%= label_tag :default %>
+   <%= text_field_tag :default %>
+
+   <br>
+
+
+   <%= submit_tag 'Update' %>
+<% end %>
+
+
+
+<br>
+<h1>Delete Operation</h1>
+<br>
+<%= form_tag(v2_admin_configuration_path(@properties.second), method: :delete) do %>  
+   <%= label_tag :id %>
+   <%= text_field_tag :id %>
+   <br> 
+   <%= submit_tag 'Delete'%>
+<% end %>
+
