@@ -21,9 +21,13 @@ class User < ApplicationRecord
     MailerWorker.perform_async('reset_password', { email: self.email, user_id: self.id })
   end
 
+  def trigger_email_verification
+    MailerWorker.perform_async('verify_email', { email: self.email, user_id: self.id })
+  end
+
   def validate_email action
-    self.email = email.to_s.strip.downcase
-    errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless email.match(EMAIL_REGEX)
+    self.email = self.email.to_s.strip.downcase
+    errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
 
     if action == 'create'
       errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
@@ -32,9 +36,9 @@ class User < ApplicationRecord
     end
   end
 
-  def validate_mobile
-    self.mobile = mobile.to_s.strip
-    errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless mobile.match(MOBILE_REGEX)
+  def validate_mobile action
+    self.mobile = self.mobile.to_s.strip
+    errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
     
     if action == 'create'
       errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
@@ -71,7 +75,7 @@ class User < ApplicationRecord
     code = self.otp_code(time: Time.now)
     token = Base64.encode64("#{value}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
     Core::Redis.setex(Core::Redis::OTP_VERIFICATION % { token: token }, { key => value, 'code' => code }, 5.minutes.to_i)
-    MailerWorker.perform_async("#{key}_verification", { to: value, code: code })
+    MailerWorker.perform_async('verify_otp', { to: value, code: code, mode: key })
     return token
   end
 
