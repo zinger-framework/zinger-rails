@@ -10,7 +10,6 @@
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*.sqlite3-journal
-/db/*.sqlite3-*
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -18,27 +17,24 @@
 !/log/.keep
 !/tmp/.keep
 
-# Ignore pidfiles, but keep the directory.
-/tmp/pids/*
-
-# Ignore uploaded files in development.
+# Ignore uploaded files in development
 /storage/*
+!/storage/.keep
+
+/node_modules
+/yarn-error.log
 
 /public/assets
 .byebug_history
 
+# Ignore database file
+/docker/*
+!/docker/run.sh
+!/docker/Dockerfile
+
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-# Ignore database file
-/docker/db_data
-/docker/redis_data
-/public/packs
-/public/packs-test
-/node_modules
-/yarn-error.log
-yarn-debug.log*
-.yarn-integrity
-.idea
 */.DS_Store
 .DS_Store
+.idea
