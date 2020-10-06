@@ -5,6 +5,7 @@ set -vx
 bundle install
 
 bundle exec rake db:migrate
+bundle exec rails webpacker:install
 bundle exec rails webpacker:compile
 bundle exec rails assets:precompile
 
