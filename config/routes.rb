@@ -27,3 +27,4 @@ Rails.application.routes.draw do
   get '/email_verification/:token', to: 'v2/auth#email_verification', as: :verify_email_link, constraints: { subdomain: AppConfig['api_subdomain'] }
   get '/*path', to: 'application#home', constraints: { subdomain: AppConfig['api_subdomain'] }
 end
+
