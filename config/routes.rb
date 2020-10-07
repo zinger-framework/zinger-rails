@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   root to: 'application#home'
-  
+
   namespace :v2 do
     namespace :auth, constraints: { subdomain: AppConfig['api_subdomain'], format: :json } do
       post :signup, to: 'signup#create'
