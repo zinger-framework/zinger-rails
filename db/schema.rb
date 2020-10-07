@@ -10,19 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_03_135505) do
+ActiveRecord::Schema.define(version: 2020_04_13_092244) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "properties", force: :cascade do |t|
-    t.string "name"
-    t.string "text"
-    t.string "allowed", array: true
-    t.string "default"
-    t.string "selected", array: true
-    t.index ["name"], name: "index_properties_on_name"
-  end
 
   create_table "user_sessions", primary_key: "token", id: :string, force: :cascade do |t|
     t.jsonb "meta", default: {}
