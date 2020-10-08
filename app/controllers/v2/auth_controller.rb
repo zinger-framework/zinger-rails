@@ -7,11 +7,11 @@ class V2::AuthController < ApiController
   OTP_ACTION_TYPES = %w(create verify)
   OTP_PARAMS = %w(email mobile)
 
-  skip_before_action :authenticate_request, except: [:logout, :verify_email]
-  skip_before_action :check_origin, only: [:verify_reset_link, :email_verification]
-  before_action :verify_auth_type, except: [:logout, :verify_reset_link, :verify_email, :email_verification]
+  skip_before_action :authenticate_request, except: :logout
+  skip_before_action :check_origin, only: :verify_reset_link
+  before_action :verify_auth_type, except: [:logout, :verify_reset_link]
   before_action :is_login_with_password, only: [:forgot_password, :reset_password]
-  before_action :load_user_from_token, only: [:verify_reset_link, :reset_password, :email_verification]
+  before_action :load_user_from_token, only: [:verify_reset_link, :reset_password]
 
   def send_otp
     if @auth_type != 'LOGIN_WITH_OTP'
@@ -87,26 +87,6 @@ class V2::AuthController < ApiController
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
   end
 
-  def verify_email
-    if User.current.verified
-      render status: 400, json: { success: false, message: I18n.t('user.already_verified') }
-      return
-    end
-
-    User.current.trigger_email_verification
-    render status: 200, json: { success: true, message: I18n.t('auth.verify_email.trigger_success') }
-  end
-
-  def email_verification
-    if @user.verified
-      render status: 400, json: { success: false, message: I18n.t('user.already_verified') }
-    else
-      @user.update!(verified: true)
-      render status: 200, json: { success: true, message: I18n.t('auth.verify_email.verify_success') }
-    end
-    Core::Redis.delete(Core::Redis::VERIFY_EMAIL % { token: params['token'] })
-  end
-
   private
   def verify_auth_type
     auth_types = Core::Configuration.get(CoreConfig['auth']['methods'])
@@ -132,12 +112,7 @@ class V2::AuthController < ApiController
       return
     end
 
-    user_id = if params['action'] == 'email_verification'
-      Core::Redis.fetch(Core::Redis::VERIFY_EMAIL % { token: params['token'] }) { nil }
-    else
-      Core::Redis.fetch(Core::Redis::RESET_PASSWORD % { token: params['token'] }) { nil }
-    end
-    
+    user_id = Core::Redis.fetch(Core::Redis::RESET_PASSWORD % { token: params['token'] }) { nil }    
     if user_id.blank?
       render status: 400, json: { success: false, message: I18n.t('user.param_expired', param: 'Verification link') }
       return

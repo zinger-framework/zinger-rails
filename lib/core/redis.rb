@@ -4,7 +4,6 @@ module Core
     USER_SESSIONS_BY_ID = 'USER_SESSIONS_BY_ID:%{id}'
     USER_BY_ID = 'v1/USER_BY_ID:%{id}'
     RESET_PASSWORD = 'RESET_PASSWORD:%{token}'
-    VERIFY_EMAIL = 'VERIFY_EMAIL:%{token}'
 
     def self.marshal type, value
       if String == type

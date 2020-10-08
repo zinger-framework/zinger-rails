@@ -21,10 +21,6 @@ class User < ApplicationRecord
     MailerWorker.perform_async('reset_password', { email: self.email, user_id: self.id })
   end
 
-  def trigger_email_verification
-    MailerWorker.perform_async('verify_email', { email: self.email, user_id: self.id })
-  end
-
   def validate_email action
     self.email = self.email.to_s.strip.downcase
     errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)

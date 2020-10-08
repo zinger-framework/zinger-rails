@@ -46,7 +46,6 @@ en:
     create_success: Account creation is successful
     login_success: Login is successful
     otp_success: Sending OTP is successful
-    already_verified: User has been already verified
   auth:
     required: Please provide any one of the params - %{param}
     logout_success: Logout is successful
@@ -55,6 +54,3 @@ en:
       trigger_failed: Request to reset password failed
       trigger_success: Please check your email for reset password instructions
       reset_success: Password reset is successful
-    verify_email:
-      trigger_success: Please check your email for email verification
-      verify_success: Email verification is successful

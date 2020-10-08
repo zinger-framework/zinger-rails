@@ -7,7 +7,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.string :mobile
       t.string :otp_secret_key
       t.boolean :two_factor_enabled
-      t.boolean :verified
+      t.boolean :deleted, default: false
       t.column :status, 'SMALLINT', default: 1
 
       t.timestamps
