@@ -4,8 +4,8 @@ class V2::Admin::ConfigurationController < V2::AdminController
   end
 
   def create
-    resp = Property.create(name: params['name'], text: params['text'], default: params['default'],
-      allowed: params['allowed'], selected: params['selected'])
+    resp = Property.create(name: params['name'],text: params['text'],default: params['default'],
+            allowed: ["a","b","c"],selected: ["a","b","c"]);
 
     if resp
       flash['success'] = 'Property creation is successful'
@@ -23,8 +23,8 @@ class V2::Admin::ConfigurationController < V2::AdminController
       redirect_to v2_admin_configuration_index_url
     end
 
-    property.update_attributes(name: params['name'], text: params['text'], default: params['default'],
-      allowed: params['allowed'], selected: params['selected'])
+    property.update(name: params['name'], text: params['text'], default: params['default'],
+      allowed: ['a'], selected: ['a'])
     if property.errors.any?
       flash['danger'] = 'Property updation failed'
     else
