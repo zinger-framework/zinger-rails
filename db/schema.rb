@@ -21,6 +21,8 @@ ActiveRecord::Schema.define(version: 2020_10_03_135505) do
     t.string "allowed", array: true
     t.string "default"
     t.string "selected", array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["name"], name: "index_properties_on_name"
   end
 
@@ -43,8 +45,8 @@ ActiveRecord::Schema.define(version: 2020_10_03_135505) do
     t.boolean "two_factor_enabled"
     t.boolean "verified"
     t.integer "status", limit: 2, default: 1
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["mobile"], name: "index_users_on_mobile"
     t.index ["user_name"], name: "index_users_on_user_name"
