@@ -3,9 +3,12 @@ class User < ApplicationRecord
   OTP_LENGTH = 6
   EMAIL_REGEX = /\S+@\S+\.[a-z]+/i
   MOBILE_REGEX = /^[0-9]{10}$/
+  STATUSES = { 'ACTIVE' => 1, 'BLOCKED' => 2 }
 
   has_secure_password(validations: false)
   has_one_time_password length: OTP_LENGTH
+  default_scope { where(deleted: false) }
+  
   validate :create_validations, on: :create
   after_commit :clear_cache
   after_update :clear_sessions
@@ -27,7 +30,9 @@ class User < ApplicationRecord
     if action == 'create'
       errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
     elsif action == 'verify'
-      errors.add(:email, I18n.t('user.not_found')) unless User.exists?(email: self.email)
+      user = User.find_by_email(self.email)
+      errors.add(:email, I18n.t('user.not_found')) if user.blank?
+      errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
     end
   end
 
@@ -38,8 +43,15 @@ class User < ApplicationRecord
     if action == 'create'
       errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
     elsif action == 'verify'
-      errors.add(:mobile, I18n.t('user.not_found')) unless User.exists?(mobile: self.mobile)   
+      errors.add(:mobile, I18n.t('user.not_found')) unless User.exists?(mobile: self.mobile) 
+      user = User.find_by_mobile(self.mobile)
+      errors.add(:mobile, I18n.t('user.not_found')) if user.blank?
+      errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
     end
+  end
+
+  def is_blocked?
+    self.status != STATUSES['ACTIVE']
   end
 
   def make_current

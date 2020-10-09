@@ -59,6 +59,9 @@ class V2::AuthController < ApiController
     if user.nil?
       render status: 404, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { email: [ I18n.t('user.not_found') ] } }
       return
+    elsif user.is_blocked?
+      render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }
+      return
     end
 
     user.trigger_password_reset
@@ -117,6 +120,9 @@ class V2::AuthController < ApiController
     @user = User.find_by_id(user_id)
     if @user.nil?
       render status: 400, json: { success: false, message: I18n.t('user.not_found') }
+      return
+    elsif @user.is_blocked?
+      render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }
       return
     end
   end

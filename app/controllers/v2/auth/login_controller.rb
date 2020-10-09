@@ -24,6 +24,9 @@ class V2::Auth::LoginController < V2::AuthController
     if user.nil?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present => [ I18n.t('user.not_found') ] } }
       return
+    elsif user.is_blocked?
+      render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }
+      return
     end
 
     if user.authenticate(params['password']) == false
@@ -57,6 +60,9 @@ class V2::Auth::LoginController < V2::AuthController
     if user.nil?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present => [ I18n.t('user.not_found') ] } }
       return
+    elsif user.is_blocked?
+      render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }
+      return
     end
 
     session = user.user_sessions.create!(meta: { type: @auth_type }, login_ip: request.ip, user_agent: params['user_agent'])
@@ -73,6 +79,9 @@ class V2::Auth::LoginController < V2::AuthController
     user = User.find_by(email: params['email'])
     if user.nil?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { email: [ I18n.t('user.not_found') ] } }
+      return
+    elsif user.is_blocked?
+      render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }
       return
     end
 
