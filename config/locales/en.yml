@@ -54,3 +54,8 @@ en:
       trigger_failed: Request to reset password failed
       trigger_success: Please check your email for reset password instructions
       reset_success: Password reset is successful
+  ratelimit:
+    exceeded: You have exceeded the number of attempts. Please try again after sometime
+    login: You have exceeded the number of login attempts. Please try again after sometime
+    reset_password: You have exceeded the number of reset password attempts. Please try again after sometime
+    registration: You have exceeded the number of registration attempts. Please try again after sometime

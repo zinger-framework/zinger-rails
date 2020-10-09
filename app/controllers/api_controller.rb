@@ -16,6 +16,11 @@ class ApiController < ApplicationController
   end
 
   def check_limit
+    resp = Core::Ratelimit.reached?(request)
+    if resp
+      render status: 429, json: { success: false, message: resp }
+      return
+    end
   end
 
   def check_origin
