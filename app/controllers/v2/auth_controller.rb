@@ -5,7 +5,7 @@ class V2::AuthController < ApiController
     'LOGIN_WITH_GOOGLE' => 'google_auth'
   }
   OTP_ACTION_TYPES = %w(create verify)
-  OTP_PARAMS = %w(email mobile)
+  AUTH_PARAMS = %w(email mobile)
 
   skip_before_action :authenticate_request, except: :logout
   skip_before_action :check_origin, only: :verify_reset_link
@@ -14,11 +14,6 @@ class V2::AuthController < ApiController
   before_action :load_user_from_token, only: [:verify_reset_link, :reset_password]
 
   def send_otp
-    if @auth_type != 'LOGIN_WITH_OTP'
-      render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Authentication type') }
-      return
-    end
-
     if params['action_type'].blank?
       render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'Action type') }
       return
@@ -27,20 +22,21 @@ class V2::AuthController < ApiController
       return
     end
 
-    keys_present = OTP_PARAMS.select { |key| params[key].present? }
+    keys_present = AUTH_PARAMS.select { |key| params[key].present? }
     if keys_present.length != 1
-      render status: 400, json: { success: false, message: I18n.t('auth.required', param: OTP_PARAMS.join(', ')) }
+      render status: 400, json: { success: false, message: I18n.t('auth.required', param: AUTH_PARAMS.join(', ')) }
       return
     end
 
-    user = User.new(keys_present[0] => params[keys_present[0]])
-    user.send("validate_#{keys_present[0]}", params['action_type'])
+    keys_present = keys_present.first
+    user = User.new(keys_present => params[keys_present])
+    user.send("validate_#{keys_present}", params['action_type'])
     if user.errors.any?
       render status: 400, json: { success: false, message: I18n.t('user.otp_failed'), reason: user.errors.messages }
       return
     end
     
-    render status: 200, json: { success: true, message: I18n.t('user.otp_success'), data: { token: user.send_otp(keys_present[0], params[keys_present[0]]) } }
+    render status: 200, json: { success: true, message: I18n.t('user.otp_success'), data: { token: user.send_otp(keys_present, params[keys_present]) } }
   end
 
   def logout

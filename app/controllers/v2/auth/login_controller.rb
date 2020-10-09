@@ -5,13 +5,13 @@ class V2::Auth::LoginController < V2::AuthController
 
   private
   def password_auth
-    required_keys = OTP_PARAMS + ['user_name']
-    keys_present = required_keys.select { |key| params[key].present? }
+    keys_present = AUTH_PARAMS.select { |key| params[key].present? }
     if keys_present.length != 1
-      render status: 400, json: { success: false, message: I18n.t('auth.required', param: required_keys.join(', ')) }
+      render status: 400, json: { success: false, message: I18n.t('auth.required', param: AUTH_PARAMS.join(', ')) }
       return
     end
 
+    keys_present = keys_present.first
     if params['password'].blank?
       render status: 400, json: { success: false, message: I18n.t('user.login_failed'), reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
       return
@@ -20,9 +20,9 @@ class V2::Auth::LoginController < V2::AuthController
       return
     end
 
-    user = User.where(keys_present[0] => params[keys_present[0]]).first
+    user = User.where(keys_present => params[keys_present]).first
     if user.nil?
-      render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present[0] => [ I18n.t('user.not_found') ] } }
+      render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present => [ I18n.t('user.not_found') ] } }
       return
     end
 
@@ -52,10 +52,10 @@ class V2::Auth::LoginController < V2::AuthController
       return
     end
 
-    keys_present = OTP_PARAMS.select { |key| token[key].present? }
-    user = User.where(keys_present[0] => token[keys_present[0]]).first
+    keys_present = AUTH_PARAMS.select { |key| token[key].present? }.first
+    user = User.where(keys_present => token[keys_present]).first
     if user.nil?
-      render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present[0] => [ I18n.t('user.not_found') ] } }
+      render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present => [ I18n.t('user.not_found') ] } }
       return
     end
 

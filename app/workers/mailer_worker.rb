@@ -21,6 +21,6 @@ class MailerWorker
 
     link = Rails.application.routes.url_helpers.verify_reset_link_url(host: AppConfig['endpoint'], token: token)
     UserMailer.reset_password({ 'to' => options['email'], 'link' => link }).deliver!
-    Rails.logger.debug "==== Verification email sent to #{options['to']} ===="
+    Rails.logger.debug "==== Verification email sent to #{options['email']} ===="
   end
 end

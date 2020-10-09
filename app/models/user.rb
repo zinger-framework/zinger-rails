@@ -3,7 +3,6 @@ class User < ApplicationRecord
   OTP_LENGTH = 6
   EMAIL_REGEX = /\S+@\S+\.[a-z]+/i
   MOBILE_REGEX = /^[0-9]{10}$/
-  USER_NAME_REGEX = /^[a-z0-9]{5,}$/i
 
   has_secure_password(validations: false)
   has_one_time_password length: OTP_LENGTH
@@ -58,12 +57,6 @@ class User < ApplicationRecord
   def create_validations
     validate_email('create') if self.email.present?
     validate_mobile('create') if self.mobile.present?
-
-    if self.user_name.present?
-      self.user_name = user_name.to_s.strip.downcase
-      errors.add(:user_name, I18n.t('validation.invalid', param: 'User name')) unless user_name.match(USER_NAME_REGEX)
-      errors.add(:user_name, I18n.t('validation.already_taken', param: self.user_name)) if User.exists?(user_name: self.user_name)
-    end
   end
 
   def send_otp key, value

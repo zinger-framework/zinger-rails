@@ -1,10 +1,9 @@
 class CreateUsers < ActiveRecord::Migration[6.0]
   def change
     create_table :users do |t|
-      t.string :user_name
-      t.string :password_digest
       t.string :email
       t.string :mobile
+      t.string :password_digest
       t.string :otp_secret_key
       t.boolean :two_factor_enabled
       t.boolean :deleted, default: false
@@ -13,7 +12,6 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.timestamps
 
       t.index :email
-      t.index :user_name
       t.index :mobile
     end
   end
