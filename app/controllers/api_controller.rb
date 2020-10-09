@@ -1,5 +1,4 @@
 class ApiController < ApplicationController
-  protect_from_forgery
   before_action :authenticate_request, :check_limit, :check_origin
 
   LIMIT = 20
