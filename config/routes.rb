@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     end
 
     namespace :admin, constraints: { subdomain: AppConfig['admin_subdomain'] } do 
+      get :dashboard
       resources :configuration, only: [:index, :create, :update, :destroy]
     end
   end
@@ -22,5 +23,6 @@ Rails.application.routes.draw do
 
   get '/reset_password/:token', to: 'v2/auth#verify_reset_link', as: :verify_reset_link, constraints: { subdomain: AppConfig['api_subdomain'] }
   get '/email_verification/:token', to: 'v2/auth#email_verification', as: :verify_email_link, constraints: { subdomain: AppConfig['api_subdomain'] }
+  get '/*path', to: 'v2/admin#dashboard', constraints: { subdomain: AppConfig['admin_subdomain'] }
   get '/*path', to: 'application#home', constraints: { subdomain: AppConfig['api_subdomain'] }
 end

@@ -21,6 +21,8 @@ ActiveRecord::Schema.define(version: 2020_10_03_135505) do
     t.string "allowed", array: true
     t.string "default"
     t.string "selected", array: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["name"], name: "index_properties_on_name"
   end
 
