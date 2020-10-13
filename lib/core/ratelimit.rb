@@ -6,8 +6,6 @@ class Core::Ratelimit
       'limit' => 5, 'window' => 600, 'message' => 'registration' },
     { 'path' => '/v[0-9]+/auth/login', 'methods' => %w(POST), 'params' => %w(email mobile),
       'limit' => 5, 'window' => 600, 'message' => 'login' },
-    { 'path' => '/v[0-9]+/auth/forgot_password', 'methods' => %w(POST), 'per_ip' => true,
-      'limit' => 5, 'window' => 1800, 'message' => 'reset_password' },
     { 'path' => '/v[0-9]+/auth/reset_password', 'methods' => %w(POST), 'per_ip' => true,
       'limit' => 5, 'window' => 600, 'message' => 'reset_password' }
   ]
