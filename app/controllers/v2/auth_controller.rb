@@ -2,7 +2,7 @@ class V2::AuthController < ApiController
   AUTH_TYPES = {
     'LOGIN_WITH_PASSWORD' => 'password_auth',
     'LOGIN_WITH_OTP' => 'otp_auth',
-    'LOGIN_WITH_GOOGLE' => 'google_ auth'
+    'LOGIN_WITH_GOOGLE' => 'google_auth'
   }
   OTP_ACTION_TYPES = %w(create verify)
   AUTH_PARAMS = %w(email mobile)
@@ -11,7 +11,7 @@ class V2::AuthController < ApiController
   before_action :verify_auth_type, except: [:logout, :verify_reset_link]
 
   def send_otp
-    if @auth_type != 'LOGIN_WITH_GOOGLE'
+    if @auth_type == 'LOGIN_WITH_GOOGLE'
       render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Authentication type') }
       return 
     end

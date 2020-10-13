@@ -21,7 +21,7 @@ class User < ApplicationRecord
 
   def validate_email action
     self.email = self.email.to_s.strip.downcase
-    errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
+    return errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
 
     if action == 'create'
       return errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
@@ -34,12 +34,12 @@ class User < ApplicationRecord
 
   def validate_mobile action
     self.mobile = self.mobile.to_s.strip
-    errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
+    return errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
     
     if action == 'create'
       return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
     elsif action == 'verify'
-      errors.add(:mobile, I18n.t('user.not_found')) unless User.exists?(mobile: self.mobile) 
+      return errors.add(:mobile, I18n.t('user.not_found')) unless User.exists?(mobile: self.mobile) 
       user = User.find_by_mobile(self.mobile)
       return errors.add(:mobile, I18n.t('user.not_found')) if user.blank?
       return errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
