@@ -8,7 +8,7 @@ class V2::AuthController < ApiController
   AUTH_PARAMS = %w(email mobile)
 
   skip_before_action :authenticate_request, except: :logout
-  before_action :verify_auth_type, except: [:logout, :verify_reset_link]
+  before_action :verify_auth_type, except: :logout
 
   def send_otp
     if @auth_type == 'LOGIN_WITH_GOOGLE'
@@ -98,6 +98,7 @@ class V2::AuthController < ApiController
 
   private
   def verify_auth_type
+    # TODO: Replace the CoreConfig.yml
     auth_types = Core::Configuration.get(CoreConfig['auth']['methods'])
     if auth_types.class == String
       @auth_type = auth_types
