@@ -2,7 +2,7 @@ class V2::AuthController < ApiController
   AUTH_TYPES = {
     'LOGIN_WITH_PASSWORD' => 'password_auth',
     'LOGIN_WITH_OTP' => 'otp_auth',
-    'LOGIN_WITH_GOOGLE' => 'google_auth'
+    'LOGIN_WITH_GOOGLE' => 'google_ auth'
   }
   OTP_ACTION_TYPES = %w(create verify)
   AUTH_PARAMS = %w(email mobile)
@@ -11,7 +11,7 @@ class V2::AuthController < ApiController
   before_action :verify_auth_type, except: [:logout, :verify_reset_link]
 
   def send_otp
-    if @auth_type != 'LOGIN_WITH_PASSWORD' and @auth_type != 'LOGIN_WITH_OTP'
+    if @auth_type != 'LOGIN_WITH_GOOGLE'
       render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Authentication type') }
       return 
     end
@@ -50,17 +50,10 @@ class V2::AuthController < ApiController
 
     render status: 200, json: { success: false, message: I18n.t('auth.logout_failed') }
   end
-
- 
-   
+  
   def reset_password
     if @auth_type != 'LOGIN_WITH_PASSWORD'
       render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Authentication type') }
-      return
-    end
-
-    if params['otp'].blank?
-      render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'OTP') }
       return
     end
 
@@ -69,9 +62,8 @@ class V2::AuthController < ApiController
       return
     end
 
-    token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }, { type: Hash }) { nil }
-    if token.blank? || token['code'] != params['otp']
-      render status: 401, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { otp: [ I18n.t('user.param_expired', param: 'OTP') ] } }
+    if params['otp'].blank?
+      render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'OTP') }
       return
     end
 
@@ -80,6 +72,12 @@ class V2::AuthController < ApiController
       return
     elsif params['password'].to_s.length < User::PASSWORD_MIN_LENGTH
       render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { password: [ I18n.t('user.password.invalid', length: User::PASSWORD_MIN_LENGTH) ] } }
+      return
+    end
+
+    token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }, { type: Hash }) { nil }
+    if token.blank? || token['code'] != params['otp']
+      render status: 401, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { otp: [ I18n.t('user.param_expired', param: 'OTP') ] } }
       return
     end
     

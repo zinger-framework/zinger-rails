@@ -53,7 +53,6 @@ en:
     logout_failed: Logout failed
     reset_password:
       trigger_failed: Request to reset password failed
-      trigger_success: Please check your email for reset password instructions
       reset_success: Password reset is successful
   ratelimit:
     exceeded: You have exceeded the number of attempts. Please try again after sometime

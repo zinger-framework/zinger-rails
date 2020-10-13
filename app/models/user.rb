@@ -24,7 +24,7 @@ class User < ApplicationRecord
     errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
 
     if action == 'create'
-      errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
+      return errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
     elsif action == 'verify'
       user = User.find_by_email(self.email)
       return errors.add(:email, I18n.t('user.not_found')) if user.blank?
@@ -37,7 +37,7 @@ class User < ApplicationRecord
     errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
     
     if action == 'create'
-      errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
+      return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
     elsif action == 'verify'
       errors.add(:mobile, I18n.t('user.not_found')) unless User.exists?(mobile: self.mobile) 
       user = User.find_by_mobile(self.mobile)
@@ -54,7 +54,7 @@ class User < ApplicationRecord
     Thread.current[:user] = self
   end
 
-  def self.reset_current 
+  def self.reset_current
     Thread.current[:user] = nil
   end
 
