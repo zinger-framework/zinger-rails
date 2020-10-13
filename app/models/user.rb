@@ -39,7 +39,6 @@ class User < ApplicationRecord
     if action == 'create'
       return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
     elsif action == 'verify'
-      return errors.add(:mobile, I18n.t('user.not_found')) unless User.exists?(mobile: self.mobile) 
       user = User.find_by_mobile(self.mobile)
       return errors.add(:mobile, I18n.t('user.not_found')) if user.blank?
       return errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?

@@ -50,7 +50,7 @@ class V2::AuthController < ApiController
 
     render status: 200, json: { success: false, message: I18n.t('auth.logout_failed') }
   end
-  
+
   def reset_password
     if @auth_type != 'LOGIN_WITH_PASSWORD'
       render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Authentication type') }
@@ -63,7 +63,7 @@ class V2::AuthController < ApiController
     end
 
     if params['otp'].blank?
-      render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'OTP') }
+      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { otp: [ I18n.t('validation.required', param: 'OTP') ] } }
       return
     end
 
@@ -98,7 +98,7 @@ class V2::AuthController < ApiController
 
   private
   def verify_auth_type
-    # TODO: Replace the CoreConfig.yml
+    # TODO: Replace CoreConfig.yml with Property table records - Logesh
     auth_types = Core::Configuration.get(CoreConfig['auth']['methods'])
     if auth_types.class == String
       @auth_type = auth_types

@@ -12,5 +12,6 @@ Rails.application.routes.draw do
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
+  
   get '/*path', to: 'application#home', constraints: { subdomain: AppConfig['api_subdomain'] }
 end
