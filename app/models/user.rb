@@ -19,10 +19,6 @@ class User < ApplicationRecord
     Core::Redis.fetch(Core::Redis::USER_BY_ID % { id: id }, { type: User }) { User.find_by_id(id) }
   end
 
-  def trigger_password_reset
-    MailerWorker.perform_async('reset_password', { email: self.email, user_id: self.id })
-  end
-
   def validate_email action
     self.email = self.email.to_s.strip.downcase
     errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
@@ -31,8 +27,8 @@ class User < ApplicationRecord
       errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
     elsif action == 'verify'
       user = User.find_by_email(self.email)
-      errors.add(:email, I18n.t('user.not_found')) if user.blank?
-      errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
+      return errors.add(:email, I18n.t('user.not_found')) if user.blank?
+      return errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
     end
   end
 
@@ -45,8 +41,8 @@ class User < ApplicationRecord
     elsif action == 'verify'
       errors.add(:mobile, I18n.t('user.not_found')) unless User.exists?(mobile: self.mobile) 
       user = User.find_by_mobile(self.mobile)
-      errors.add(:mobile, I18n.t('user.not_found')) if user.blank?
-      errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
+      return errors.add(:mobile, I18n.t('user.not_found')) if user.blank?
+      return errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
     end
   end
 
@@ -58,7 +54,7 @@ class User < ApplicationRecord
     Thread.current[:user] = self
   end
 
-  def self.reset_current
+  def self.reset_current 
     Thread.current[:user] = nil
   end
 
@@ -76,7 +72,7 @@ class User < ApplicationRecord
     code = self.otp_code(time: Time.now)
     token = Base64.encode64("#{value}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
     Core::Redis.setex(Core::Redis::OTP_VERIFICATION % { token: token }, { key => value, 'code' => code }, 5.minutes.to_i)
-    MailerWorker.perform_async('verify_otp', { to: value, code: code, mode: key })
+    MailerWorker.perform_async('send_otp', { to: value, code: code, mode: key })
     return token
   end
 

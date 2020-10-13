@@ -5,13 +5,13 @@ class V2::Auth::LoginController < V2::AuthController
 
   private
   def password_auth
-    keys_present = AUTH_PARAMS.select { |key| params[key].present? }
-    if keys_present.length != 1
+    params_present = AUTH_PARAMS.select { |key| params[key].present? }
+    if params_present.length != 1
       render status: 400, json: { success: false, message: I18n.t('auth.required', param: AUTH_PARAMS.join(', ')) }
       return
     end
 
-    keys_present = keys_present.first
+    params_present = params_present.first
     if params['password'].blank?
       render status: 400, json: { success: false, message: I18n.t('user.login_failed'), reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
       return
@@ -20,9 +20,9 @@ class V2::Auth::LoginController < V2::AuthController
       return
     end
 
-    user = User.where(keys_present => params[keys_present]).first
+    user = User.where(params_present => params[params_present]).first
     if user.nil?
-      render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present => [ I18n.t('user.not_found') ] } }
+      render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { params_present => [ I18n.t('user.not_found') ] } }
       return
     elsif user.is_blocked?
       render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }
@@ -55,10 +55,10 @@ class V2::Auth::LoginController < V2::AuthController
       return
     end
 
-    keys_present = AUTH_PARAMS.select { |key| token[key].present? }.first
-    user = User.where(keys_present => token[keys_present]).first
+    params_present = AUTH_PARAMS.select { |key| token[key].present? }.first
+    user = User.where(params_present => token[params_present]).first
     if user.nil?
-      render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { keys_present => [ I18n.t('user.not_found') ] } }
+      render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { params_present => [ I18n.t('user.not_found') ] } }
       return
     elsif user.is_blocked?
       render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }

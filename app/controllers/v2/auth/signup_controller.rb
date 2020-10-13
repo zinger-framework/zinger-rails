@@ -24,8 +24,8 @@ class V2::Auth::SignupController < V2::AuthController
       return
     end
 
-    keys_present = AUTH_PARAMS.select { |key| token[key].present? }.first
-    user = User.create(keys_present => token[keys_present], password: params['password'], two_factor_enabled: false)
+    params_present = AUTH_PARAMS.select { |key| token[key].present? }.first
+    user = User.create(params_present => token[params_present], password: params['password'], two_factor_enabled: false)
     if user.errors.any?
       render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: user.errors.messages }
       return
@@ -48,8 +48,8 @@ class V2::Auth::SignupController < V2::AuthController
       return
     end
 
-    keys_present = AUTH_PARAMS.select { |key| token[key].present? }.first
-    user = User.create(keys_present => token[keys_present], two_factor_enabled: false)
+    params_present = AUTH_PARAMS.select { |key| token[key].present? }.first
+    user = User.create(params_present => token[params_present], two_factor_enabled: false)
     if user.errors.any?
       render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: user.errors.messages }
       return
