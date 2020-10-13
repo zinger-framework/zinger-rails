@@ -84,7 +84,7 @@ class V2::AuthController < ApiController
     params_present = AUTH_PARAMS.select { |key| token[key].present? }.first
     @user = User.where(params_present => token[params_present]).first
     if @user.nil?
-      render status: 400, json: { success: false, message: I18n.t('user.not_found') }
+      render status: 404, json: { success: false, message: I18n.t('user.not_found') }
       return
     elsif @user.is_blocked?
       render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }
