@@ -19,32 +19,6 @@ class User < ApplicationRecord
     Core::Redis.fetch(Core::Redis::USER_BY_ID % { id: id }, { type: User }) { User.find_by_id(id) }
   end
 
-  def validate_email action
-    self.email = self.email.to_s.strip.downcase
-    return errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
-
-    if action == 'create'
-      return errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
-    elsif action == 'verify'
-      user = User.find_by_email(self.email)
-      return errors.add(:email, I18n.t('user.not_found')) if user.blank?
-      return errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
-    end
-  end
-
-  def validate_mobile action
-    self.mobile = self.mobile.to_s.strip
-    return errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
-    
-    if action == 'create'
-      return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile) 
-    elsif action == 'verify'
-      user = User.find_by_mobile(self.mobile)
-      return errors.add(:mobile, I18n.t('user.not_found')) if user.blank?
-      return errors.add(:status, I18n.t('user.account_blocked')) if user.is_blocked?
-    end
-  end
-
   def is_blocked?
     self.status != STATUSES['ACTIVE']
   end
@@ -61,18 +35,45 @@ class User < ApplicationRecord
     Thread.current[:user]
   end
 
+  def self.send_otp options
+    case options[:action]
+    when 'signup'
+      return I18n.t('validation.already_taken', param: options[:value]) if self.exists?(options[:param] => options[:value])
+    when 'login'
+    when 'forgot_password'
+      user = self.where(options[:param] => options[:value]).first
+      return I18n.t('user.not_found') if user.blank?
+      return I18n.t('user.account_blocked') if user.is_blocked?
+    end
+
+    token = Base64.encode64("#{options[:value]}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
+    options.merge!({ code: self.otp, token: token }).except!(:action)
+    MailerWorker.perform_async(options.to_json)
+
+    return { token: token }
+  end
+
+  private
+
+  def validate_email action = nil
+    self.email = self.email.to_s.strip.downcase
+    return errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
+    return errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if User.exists?(email: self.email)
+  end
+
+  def validate_mobile action = nil
+    self.mobile = self.mobile.to_s.strip
+    return errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
+    return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if User.exists?(mobile: self.mobile)
+  end
+
   def create_validations
     validate_email('create') if self.email.present?
     validate_mobile('create') if self.mobile.present?
   end
 
-  def send_otp key, value
-    self.otp_regenerate_secret
-    code = self.otp_code(time: Time.now)
-    token = Base64.encode64("#{value}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
-    Core::Redis.setex(Core::Redis::OTP_VERIFICATION % { token: token }, { key => value, 'code' => code }, 5.minutes.to_i)
-    MailerWorker.perform_async('send_otp', { to: value, code: code, mode: key })
-    return token
+  def self.otp
+    rand(10**(OTP_LENGTH - 1)..10**OTP_LENGTH - 1).to_s
   end
 
   def clear_cache
