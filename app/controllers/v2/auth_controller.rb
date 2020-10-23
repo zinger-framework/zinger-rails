@@ -2,6 +2,7 @@ class V2::AuthController < ApiController
   AUTH_PARAMS = %w(email mobile)
 
   skip_before_action :authenticate_request, except: :logout
+  before_action :verify_auth_token, only: :google
 
   def logout
     session = User.current.user_sessions.find_by_token(UserSession.extract_token(request.headers['Authorization']))
@@ -50,5 +51,22 @@ class V2::AuthController < ApiController
     user.update!(password: params['password'])
     Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] })
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
+  end
+
+  private
+  def verify_auth_token
+    if Core::Redis.fetch(Core::Redis::ID_TOKEN_VERIFICATION % { id_token: params['id_token'] }) { false }
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: I18n.t('user.param_expired', param: 'Token') }
+      return
+    end
+    Core::Redis.setex(Core::Redis::ID_TOKEN_VERIFICATION % { id_token: params['id_token'] }, true, 1.hour.to_i)
+
+    validator = GoogleIDToken::Validator.new
+    begin
+      @payload = validator.check(params['id_token'], AppConfig['google_client_id'], AppConfig['google_client_id'])
+    rescue GoogleIDToken::ValidationError => e
+      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: e }
+      return
+    end
   end
 end

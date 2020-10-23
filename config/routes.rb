@@ -7,6 +7,7 @@ Rails.application.routes.draw do
         collection do
           post :password
           post :otp
+          post :google
         end
       end
 
@@ -14,6 +15,7 @@ Rails.application.routes.draw do
         collection do
           post :password
           post :otp
+          post :google
         end
       end
 
@@ -31,8 +33,5 @@ Rails.application.routes.draw do
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
-  
-  post '/auth/google_signup/callback' => 'v2/auth/signup#google', :as => :google_signup_callback, constraints: { subdomain: AppConfig['api_subdomain'] }
-  post '/auth/google_login/callback' => 'v2/auth/login#google', :as => :google_login_callback, constraints: { subdomain: AppConfig['api_subdomain'] }
   get '/*path', to: 'application#home', constraints: { subdomain: AppConfig['api_subdomain'] }
 end

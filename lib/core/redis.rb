@@ -1,6 +1,7 @@
 module Core
   class Redis
     OTP_VERIFICATION = 'OTP_VERIFICATION:%{token}'
+    ID_TOKEN_VERIFICATION = 'ID_TOKEN_VERIFICATION:%{id_token}'
     USER_SESSIONS_BY_ID = 'USER_SESSIONS_BY_ID:%{id}'
     USER_BY_ID = 'v1/USER_BY_ID:%{id}'
 

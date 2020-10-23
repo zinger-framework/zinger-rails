@@ -10,12 +10,7 @@ class V2::Auth::SignupController < V2::AuthController
   end
 
   def google
-    if request.env['omniauth.auth'].blank?
-      render status: 401, json: { success: false, message: I18n.t('validation.invalid', param: 'Authorization') }
-      return
-    end
-    
-    user = User.create(email: request.env['omniauth.auth'].info.email, two_factor_enabled: false)
+    user = User.create(email: @payload['email'], two_factor_enabled: false)
     if user.errors.any?
       render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: user.errors.messages }
       return

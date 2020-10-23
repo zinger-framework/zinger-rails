@@ -5,16 +5,16 @@ class V2::Auth::LoginController < V2::AuthController
       render status: 400, json: { success: false, message: I18n.t('auth.required', param: AUTH_PARAMS.join(', ')) }
       return
     end
-    key = params_present.first
 
     if params['password'].blank?
-      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
+      render status: 400, json: { success: false, message: I18n.t('user.login_failed'), reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
       return
     elsif params['password'].to_s.length < User::PASSWORD_MIN_LENGTH
-      render status: 400, json: { success: false, message: I18n.t('user.create_failed'), reason: { password: [ I18n.t('user.password.invalid', length: User::PASSWORD_MIN_LENGTH) ] } }
+      render status: 400, json: { success: false, message: I18n.t('user.login_failed'), reason: { password: [ I18n.t('user.password.invalid', length: User::PASSWORD_MIN_LENGTH) ] } }
       return
     end
     
+    key = params_present.first
     user = User.where(key => params[key]).first
     if user.nil?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { key => [ I18n.t('user.not_found') ] } }
@@ -37,9 +37,7 @@ class V2::Auth::LoginController < V2::AuthController
     if params['auth_token'].blank?
       render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'Authentication token') }
       return
-    end
-
-    if params['otp'].blank?
+    elsif params['otp'].blank?
       render status: 400, json: { success: false, message: I18n.t('user.login_failed'), reason: { otp: [ I18n.t('validation.required', param: 'OTP') ] } }
       return
     end
@@ -65,12 +63,7 @@ class V2::Auth::LoginController < V2::AuthController
   end
 
   def google
-    if request.env['omniauth.auth'].blank?
-      render status: 401, json: { success: false, message: I18n.t('validation.invalid', param: 'Authorization') }
-      return
-    end
-    
-    user = User.find_by(email: params['email'])
+    user = User.where(email: @payload['email']).first
     if user.nil?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { email: [ I18n.t('user.not_found') ] } }
       return
@@ -80,6 +73,6 @@ class V2::Auth::LoginController < V2::AuthController
     end
 
     session = user.user_sessions.create!(login_ip: request.ip, user_agent: params['user_agent'])
-    render status: 200, json: { success: true, message: I18n.t('user.create_success'), data: { token: session.get_jwt_token } }
+    render status: 200, json: { success: true, message: I18n.t('user.login_success'), data: { token: session.get_jwt_token } }
   end
 end
