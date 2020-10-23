@@ -4,9 +4,7 @@ class V2::Auth::LoginController < V2::AuthController
     if params_present.length != 1
       render status: 400, json: { success: false, message: I18n.t('auth.required', param: AUTH_PARAMS.join(', ')) }
       return
-    end
-
-    if params['password'].blank?
+    elsif params['password'].blank?
       render status: 400, json: { success: false, message: I18n.t('user.login_failed'), reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
       return
     elsif params['password'].to_s.length < User::PASSWORD_MIN_LENGTH
@@ -22,9 +20,7 @@ class V2::Auth::LoginController < V2::AuthController
     elsif user.is_blocked?
       render status: 400, json: { success: false, message: I18n.t('user.login_failed'), reason: { key => [ I18n.t('user.account_blocked') ] } }
       return
-    end
-
-    if user.authenticate(params['password']) == false
+    elsif user.authenticate(params['password']) == false
       render status: 401, json: { success: false, message: I18n.t('user.login_failed'), reason: { password: [ I18n.t('validation.invalid', param: 'Password') ] } }
       return
     end

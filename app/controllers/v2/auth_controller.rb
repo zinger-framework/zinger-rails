@@ -18,14 +18,10 @@ class V2::AuthController < ApiController
     if params['auth_token'].blank?
       render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'Authentication token') }
       return
-    end
-
-    if params['otp'].blank?
+    elsif params['otp'].blank?
       render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { otp: [ I18n.t('validation.required', param: 'OTP') ] } }
       return
-    end
-
-    if params['password'].blank?
+    elsif params['password'].blank?
       render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
       return
     elsif params['password'].to_s.length < User::PASSWORD_MIN_LENGTH
