@@ -40,7 +40,7 @@ class User < ApplicationRecord
     when 'signup'
       return I18n.t('validation.already_taken', param: options[:value]) if self.exists?(options[:param] => options[:value])
     when 'login'
-    when 'forgot_password'
+    when 'reset_password'
       user = self.where(options[:param] => options[:value]).first
       return I18n.t('user.not_found') if user.blank?
       return I18n.t('user.account_blocked') if user.is_blocked?

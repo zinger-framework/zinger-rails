@@ -1,10 +1,10 @@
 class Core::Ratelimit
   CONFIGS = [
-    { 'path' => '/v[0-9]+/auth/send_otp', 'methods' => %w(POST), 'per_ip' => true,
+    { 'path' => '/v[0-9]+/auth/otp/.*', 'methods' => %w(POST), 'per_ip' => true,
       'limit' => 5, 'window' => 1800, 'message' => 'exceeded' },
-    { 'path' => '/v[0-9]+/auth/signup', 'methods' => %w(POST), 'per_ip' => true,
+    { 'path' => '/v[0-9]+/auth/signup/.*', 'methods' => %w(POST), 'per_ip' => true,
       'limit' => 5, 'window' => 600, 'message' => 'registration' },
-    { 'path' => '/v[0-9]+/auth/login', 'methods' => %w(POST), 'params' => %w(email mobile),
+    { 'path' => '/v[0-9]+/auth/login/.*', 'methods' => %w(POST), 'params' => %w(email mobile),
       'limit' => 5, 'window' => 600, 'message' => 'login' },
     { 'path' => '/v[0-9]+/auth/reset_password', 'methods' => %w(POST), 'per_ip' => true,
       'limit' => 5, 'window' => 600, 'message' => 'reset_password' }

@@ -2,7 +2,8 @@ Rails.application.routes.draw do
   root to: 'application#home'
 
   namespace :v2 do
-    namespace :auth, constraints: { subdomain: AppConfig['api_subdomain'], format: :json } do
+    # Modify CONFIGS in ratelimit.rb when any action is added/changed
+    namespace :auth, constraints: { subdomain: AppConfig['api_subdomain'] } do
       resources :signup, only: :none do
         collection do
           post :password
