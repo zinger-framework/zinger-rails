@@ -49,7 +49,6 @@ en:
   auth:
     required: Please provide any one of the params - %{param}
     logout_success: Logout is successful
-    logout_failed: Logout failed
     reset_password:
       trigger_failed: Request to reset password failed
       reset_success: Password reset is successful

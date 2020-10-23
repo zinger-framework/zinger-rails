@@ -5,13 +5,8 @@ class V2::AuthController < ApiController
   before_action :verify_auth_token, only: :google
 
   def logout
-    session = User.current.user_sessions.find_by_token(UserSession.extract_token(request.headers['Authorization']))
-    if session.present? && session.destroy
-      render status: 200, json: { success: true, message: I18n.t('auth.logout_success') }
-      return
-    end
-
-    render status: 200, json: { success: false, message: I18n.t('auth.logout_failed') }
+    User.current.user_sessions.find_by_token(UserSession.extract_token(request.headers['Authorization'])).destroy!
+    render status: 200, json: { success: true, message: I18n.t('auth.logout_success') }
   end
 
   def reset_password
