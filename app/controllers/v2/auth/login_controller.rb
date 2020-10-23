@@ -16,7 +16,7 @@ class V2::Auth::LoginController < V2::AuthController
     
     key = params_present.first
     user = User.where(key => params[key]).first
-    if user.nil?
+    if user.nil? || user.password_digest.blank?
       render status: 404, json: { success: false, message: I18n.t('user.login_failed'), reason: { key => [ I18n.t('user.not_found') ] } }
       return
     elsif user.is_blocked?
