@@ -1,21 +1,26 @@
 class ApiController < ApplicationController
-  protect_from_forgery
   before_action :authenticate_request, :check_limit, :check_origin
 
   LIMIT = 20
 
   private
+
   def authenticate_request
-    user = UserSession.fetch_user(request.headers['Authorization'])
-    if user.nil?
-      render status: 401, json: { success: false, message: 'Invalid Authorization', reason: 'UNAUTHORIZED' }
-      return
-    elsif user.is_blocked?
-      render status: 400, json: { success: false, message: I18n.t('user.account_blocked') }
+    error_msg = ''
+    customer = CustomerSession.fetch_customer(request.headers['Authorization'])
+
+    if customer.nil?
+      error_msg = I18n.t('validation.invalid', param: 'Authorization')
+    elsif customer.is_blocked?
+      error_msg = I18n.t('customer.account_blocked')
+    end
+
+    if error_msg.present?
+      render status: 401, json: { success: false, message: error_msg, reason: 'UNAUTHORIZED' }
       return
     end
 
-    user.make_current
+    customer.make_current
   end
 
   def check_limit
