@@ -42,7 +42,7 @@ class Customer < ApplicationRecord
     when 'reset_password'
       customer = Customer.where(options[:param] => options[:value]).first
       return I18n.t('customer.not_found') if customer.blank?
-      return I18n.t('customer.account_blocked') if customer.is_blocked?
+      return I18n.t('customer.account_blocked', platform: PlatformConfig['name']) if customer.is_blocked?
     end
 
     token = Base64.encode64("#{options[:value]}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')

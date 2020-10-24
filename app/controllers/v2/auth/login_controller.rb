@@ -22,7 +22,7 @@ class V2::Auth::LoginController < V2::AuthController
       return
     elsif customer.is_blocked?
       render status: 400, json: { success: false, message: I18n.t('customer.login_failed'), 
-        reason: { key => [ I18n.t('customer.account_blocked') ] } }
+        reason: { key => [ I18n.t('customer.account_blocked', platform: PlatformConfig['name']) ] } }
       return
     elsif customer.authenticate(params['password']) == false
       render status: 401, json: { success: false, message: I18n.t('customer.login_failed'), 
@@ -58,7 +58,7 @@ class V2::Auth::LoginController < V2::AuthController
       return
     elsif customer.is_blocked?
       render status: 400, json: { success: false, message: I18n.t('customer.login_failed'), 
-        reason: { key => [ I18n.t('customer.account_blocked') ] } }
+        reason: { key => [ I18n.t('customer.account_blocked', platform: PlatformConfig['name']) ] } }
       return
     end
 
@@ -75,7 +75,7 @@ class V2::Auth::LoginController < V2::AuthController
       return
     elsif customer.is_blocked?
       render status: 400, json: { success: false, message: I18n.t('customer.login_failed'), 
-        reason: { email: [ I18n.t('customer.account_blocked') ] } }
+        reason: { email: [ I18n.t('customer.account_blocked', platform: PlatformConfig['name']) ] } }
       return
     end
 

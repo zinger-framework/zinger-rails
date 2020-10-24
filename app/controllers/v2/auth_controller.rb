@@ -39,7 +39,7 @@ class V2::AuthController < ApiController
       render status: 404, json: { success: false, message: I18n.t('customer.not_found') }
       return
     elsif customer.is_blocked?
-      render status: 400, json: { success: false, message: I18n.t('customer.account_blocked') }
+      render status: 400, json: { success: false, message: I18n.t('customer.account_blocked', platform: PlatformConfig['name']) }
       return
     end
 
