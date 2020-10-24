@@ -4,13 +4,16 @@ class V2::Auth::LoginController < V2::AuthController
     if params_present.length != 1
       render status: 400, json: { success: false, message: I18n.t('auth.required', param: AUTH_PARAMS.join(', ')) }
       return
-    elsif params['password'].blank?
-      render status: 400, json: { success: false, message: I18n.t('customer.login_failed'), 
-        reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
-      return
+    end
+
+    error_msg = if params['password'].blank?
+      I18n.t('validation.required', param: 'Password')
     elsif params['password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
-      render status: 400, json: { success: false, message: I18n.t('customer.login_failed'), 
-        reason: { password: [ I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) ] } }
+      I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH)
+    end
+
+    if error_msg.present?
+      render status: 400, json: { success: false, message: I18n.t('customer.login_failed'), reason: { password: [error_msg] } }
       return
     end
     
@@ -21,7 +24,7 @@ class V2::Auth::LoginController < V2::AuthController
         reason: { key => [ I18n.t('customer.not_found') ] } }
       return
     elsif customer.is_blocked?
-      render status: 400, json: { success: false, message: I18n.t('customer.login_failed'), 
+      render status: 401, json: { success: false, message: I18n.t('customer.login_failed'), 
         reason: { key => [ I18n.t('customer.account_blocked', platform: PlatformConfig['name']) ] } }
       return
     elsif customer.authenticate(params['password']) == false

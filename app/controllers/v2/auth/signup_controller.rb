@@ -10,7 +10,7 @@ class V2::Auth::SignupController < V2::AuthController
   end
 
   def google
-    customer = Customer.create(email: @payload['email'], two_factor_enabled: false)
+    customer = Customer.create(email: @payload['email'])
     if customer.errors.any?
       render status: 400, json: { success: false, message: I18n.t('customer.create_failed'), reason: customer.errors.messages }
       return
@@ -34,13 +34,14 @@ class V2::Auth::SignupController < V2::AuthController
   end
 
   def validate_password
-    if params['password'].blank?
-      render status: 400, json: { success: false, message: I18n.t('customer.create_failed'), 
-        reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
-      return
+    error_msg = if params['password'].blank?
+      I18n.t('validation.required', param: 'Password')
     elsif params['password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
-      render status: 400, json: { success: false, message: I18n.t('customer.create_failed'), 
-        reason: { password: [ I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) ] } }
+      I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH)
+    end
+
+    if error_msg.present?
+      render status: 400, json: { success: false, message: I18n.t('customer.create_failed'), reason: { password: [error_msg] } }
       return
     end
   end
@@ -53,7 +54,7 @@ class V2::Auth::SignupController < V2::AuthController
       return
     end
 
-    customer = Customer.new(token['param'] => token['value'], two_factor_enabled: false)
+    customer = Customer.new(token['param'] => token['value'])
     customer.password = params['password'] if params['action'] == 'password'
     customer.save
     if customer.errors.any?
