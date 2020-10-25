@@ -1,0 +1,44 @@
+<div class="component">
+  <div class="left"><a href="" class="red-title-700 large left-50">Zinger</a></div>
+  <div class="right pad-10">
+    <a href="" class="nav-item nav-link">Logout</a>
+  </div>
+  <div class="medium center-text pad-10 title-600">Dashboard</span></div>
+</div>
+
+<style type="text/css">
+  .nav-item {
+    color: var(--grey);
+    font-weight: var(--font-400);
+    font-size: var(--small);
+    margin: 10px;
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+  }
+
+  .nav-item::before {
+    transition: 300ms;
+    height: 5px;
+    content: "";
+    position: absolute;
+    background-color: var(--red);
+  }
+
+  .nav-item + .active:before {
+    width: 100%;
+  }
+
+  .nav-link::before {
+    width: 0;
+    top: 30px;
+  }
+
+  .nav-link:not(.active):not(.inactive):hover:before {
+    width: 100%;
+  }
+
+  .nav-item i:hover {
+    color: var(--red);
+  }
+</style>

@@ -31,8 +31,14 @@ Rails.application.routes.draw do
         end
       end
     end
+
+    namespace :admin, constraints: { subdomain: AppConfig['admin_subdomain'] } do 
+      get :login
+      get :dashboard
+    end
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
+  get '/*path', to: 'v2/admin#dashboard', constraints: { subdomain: AppConfig['admin_subdomain'] }
   get '/*path', to: 'application#home', constraints: { subdomain: AppConfig['api_subdomain'] }
 end
