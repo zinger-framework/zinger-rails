@@ -28,9 +28,19 @@ Rails.application.routes.draw do
           post :signup
           post :login
           post :reset_password
+          post :reset_profile
         end
       end
     end
+
+    resources :customer, only: :none do 
+      collection do
+        get 'profile', to: 'customer#profile'
+        put 'profile', to: 'customer#update_profile'
+        put 'password', to: 'customer#update_password'
+      end
+    end
+
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
