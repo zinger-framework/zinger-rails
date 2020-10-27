@@ -52,18 +52,12 @@ class Customer < ApplicationRecord
     return { token: token }
   end
 
-
-  def self.filter_json(key="")
-    if key.blank?
-      return ""
-    elsif key=="profile"
-      return {
-				:name => self.name.to_s,
-				:email => self.email.to_s,
-				:mobile => self.mobile.to_s
-			}
-    else 
-      return ""
+  def filter_json(key='')
+    case key
+      when 'profile'
+        return { :name => self.name, :email => self.email, :mobile => self.mobile }
+      else 
+        return ''
     end
   end
 

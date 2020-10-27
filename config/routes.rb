@@ -28,7 +28,6 @@ Rails.application.routes.draw do
           post :signup
           post :login
           post :reset_password
-          post :reset_profile
         end
       end
     end
