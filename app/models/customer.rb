@@ -52,6 +52,13 @@ class Customer < ApplicationRecord
     return { token: token }
   end
 
+  def as_json(key = '')
+    case key
+    when 'profile'
+      return { name: self.name, email: self.email, mobile: self.mobile }
+    end
+  end
+
   private
 
   def validate_email action = nil
