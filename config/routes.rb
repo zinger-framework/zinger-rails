@@ -34,11 +34,10 @@ Rails.application.routes.draw do
 
     resources :customer, only: :none do 
       collection do
-        get 'profile'
-        put 'profile', to: 'customer#update_profile'
+        get :profile
+        put :profile, to: 'customer#update_profile'
       end
     end
-
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
