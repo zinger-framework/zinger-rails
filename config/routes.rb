@@ -34,9 +34,8 @@ Rails.application.routes.draw do
 
     resources :customer, only: :none do 
       collection do
-        get 'profile', to: 'customer#profile'
+        get 'profile'
         put 'profile', to: 'customer#update_profile'
-        put 'password', to: 'customer#update_password'
       end
     end
 

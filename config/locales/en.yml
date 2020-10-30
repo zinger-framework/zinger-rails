@@ -47,6 +47,7 @@ en:
     login_success: Login is successful
     otp_success: Sending OTP is successful
   profile:
+    update_success: Profile update is successful
     update_failed: Profile update failed
   auth:
     required: Please provide any one of the params - %{param}
