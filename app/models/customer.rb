@@ -8,7 +8,7 @@ class Customer < ApplicationRecord
   has_secure_password(validations: false)
   default_scope { where(deleted: false) }
   
-  validate :create_validations, on: :create
+  validate :validate_email_mobile
   after_commit :clear_cache
   after_update :clear_sessions
 
@@ -42,6 +42,9 @@ class Customer < ApplicationRecord
   end
 
   def self.send_otp options
+    return I18n.t('validation.invalid', param: 'Email address') if options[:param] == 'email' && !options[:value].match(EMAIL_REGEX)
+    return I18n.t('validation.invalid', param: 'Mobile number') if options[:param] == 'mobile' && !options[:value].match(MOBILE_REGEX)
+
     case options[:action]
     when 'signup'
       return I18n.t('validation.already_taken', param: options[:value]) if Customer.exists?(options[:param] => options[:value])
@@ -64,21 +67,18 @@ class Customer < ApplicationRecord
 
   private
 
-  def validate_email action = nil
-    self.email = self.email.to_s.strip.downcase
-    return errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
-    return errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if Customer.exists?(email: self.email)
-  end
+  def validate_email_mobile
+    if self.email.present?
+      self.email = self.email.to_s.strip.downcase
+      return errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
+      return errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if Customer.exists?(email: self.email)
+    end
 
-  def validate_mobile action = nil
-    self.mobile = self.mobile.to_s.strip
-    return errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
-    return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if Customer.exists?(mobile: self.mobile)
-  end
-
-  def create_validations
-    validate_email('create') if self.email.present?
-    validate_mobile('create') if self.mobile.present?
+    if self.mobile.present?
+      self.mobile = self.mobile.to_s.strip
+      return errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
+      return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if Customer.exists?(mobile: self.mobile)
+    end
   end
 
   def self.otp
