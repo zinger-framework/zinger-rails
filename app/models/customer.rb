@@ -15,6 +15,14 @@ class Customer < ApplicationRecord
 
   has_many :customer_sessions
 
+  def as_json(key = '')
+    case key
+    when 'admin_profile'
+      return { id: self.id, name: self.name, email: self.email, mobile: self.mobile, status: self.status, deleted: self.deleted,
+      updated_at: self.updated_at.in_time_zone(PlatformConfig['time_zone']).strftime('%d-%m-%Y %H:%M') }
+    end
+  end
+
   def self.fetch_by_id id
     Core::Redis.fetch(Core::Redis::CUSTOMER_BY_ID % { id: id }, { type: Customer }) { Customer.find_by_id(id) }
   end

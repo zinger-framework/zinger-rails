@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     namespace :admin, constraints: { subdomain: AppConfig['admin_subdomain'] } do 
       get :login
       get :dashboard
+      resources :customer, only: [:index, :update, :destroy]
     end
   end
 

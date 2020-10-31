@@ -14,7 +14,7 @@
  *= require_self
  */
 
- * {
+* {
   font-family: 'Poppins', sans-serif;
   font-weight: 400;
   color: black;
@@ -89,6 +89,10 @@
 
 .right {
   float: right;
+}
+
+.left-40 {
+  margin-left: 42px;
 }
 
 .left-50 {
@@ -236,7 +240,14 @@ input:not([type=submit]) {
 }
 
 input[type=submit] {
-  width: 100%
+  width: 100%;
+}
+
+select {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--grey);
+  padding: 6px 0;
 }
 
 *:focus {
@@ -250,6 +261,7 @@ input[type=submit] {
   border: 2px solid var(--red);
   border-radius: 18px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .active {
@@ -259,6 +271,89 @@ input[type=submit] {
 
 .chip:not(.active):hover {
   box-shadow: 0 0 7px 3px rgba(255, 65, 65, 0.25);
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table td, table th {
+  border-bottom: 1px solid #ddd;
+  padding: 8px 16px;
+  color: inherit;
+}
+
+table th {
+  color: var(--red);
+  font-weight: var(--font-600);
+}
+
+table tr:hover {
+  background-color: var(--light-grey);
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.bt_icon {
+  background: none;
+  border: none;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  padding: 0 35%;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 30%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  position: relative;
+  background-color: white;
+  margin: 0 auto;
+  padding: 2px 16px;
+  border: 1px solid #ddd;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.close {
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.alert {
+  position: relative;
+  padding: 12px;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.alert-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.close-alert {
+  float: right;
+  font-size: 24px;
+  opacity: .2;
+  line-height: 1;
+  text-decoration: none;
 }
 
 @media screen and (orientation: portrait) {

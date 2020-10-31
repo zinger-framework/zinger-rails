@@ -1,9 +1,7 @@
 <div class="component">
-  <div class="left"><a href="" class="red-title-700 large left-50">Zinger</a></div>
-  <div class="right pad-10">
-    <a href="" class="nav-item nav-link">Logout</a>
-  </div>
-  <div class="medium center-text pad-10 title-600">Dashboard</span></div>
+  <%= link_to 'Zinger', v2_admin_dashboard_path, :class => 'left red-title-700 large left-50' %>
+  <div class="right pad-10"><%= link_to 'Logout', v2_admin_dashboard_path, :class => 'nav-item nav-link' %></div>
+  <div class="medium center-text pad-10 title-600"><%= @title %></div>
 </div>
 
 <style type="text/css">
