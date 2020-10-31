@@ -49,6 +49,8 @@ en:
   profile:
     update_success: Profile update is successful
     update_failed: Profile update failed
+    reset_success: Profile reset is successful
+    reset_failed: Profile reset failed
   auth:
     required: Please provide any one of the params - %{param}
     logout_success: Logout is successful

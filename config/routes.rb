@@ -28,14 +28,17 @@ Rails.application.routes.draw do
           post :signup
           post :login
           post :reset_password
+          post :reset_profile
         end
       end
     end
 
-    resources :customer, only: :none do 
+    resources :customer, only: :none do
       collection do
         get :profile
         put :profile, to: 'customer#update_profile'
+        put :reset_profile
+        put :password
       end
     end
   end

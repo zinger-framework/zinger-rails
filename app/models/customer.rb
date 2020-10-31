@@ -14,6 +14,13 @@ class Customer < ApplicationRecord
 
   has_many :customer_sessions
 
+  def as_json(key = '')
+    case key
+    when 'ui_profile'
+      return { name: self.name, email: self.email, mobile: self.mobile }
+    end
+  end
+
   def self.fetch_by_id id
     Core::Redis.fetch(Core::Redis::CUSTOMER_BY_ID % { id: id }, { type: Customer }) { Customer.find_by_id(id) }
   end
@@ -43,6 +50,9 @@ class Customer < ApplicationRecord
       customer = Customer.where(options[:param] => options[:value]).first
       return I18n.t('customer.not_found') if customer.blank?
       return I18n.t('customer.account_blocked', platform: PlatformConfig['name']) if customer.is_blocked?
+    when 'reset_profile'
+      return I18n.t('validation.already_taken', param: options[:value]) if Customer.exists?(options[:param] => options[:value])
+      options[:customer_id] = Customer.current.id
     end
 
     token = Base64.encode64("#{options[:value]}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
@@ -50,13 +60,6 @@ class Customer < ApplicationRecord
     MailerWorker.perform_async(options.to_json)
 
     return { token: token }
-  end
-
-  def as_json(key = '')
-    case key
-    when 'profile'
-      return { name: self.name, email: self.email, mobile: self.mobile }
-    end
   end
 
   private
