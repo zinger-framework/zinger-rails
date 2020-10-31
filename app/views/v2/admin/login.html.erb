@@ -6,15 +6,13 @@
     <span class="title-100">An Open Source Framework for building Hyperlocal Delivery Mobile and Web applications</span>
   </div>
   <div class="top-50 mid-small center">
-    <form action="">
-      <label>Email</label><br>
-      <input type="email" name="email" placeholder="hello@example.com" />
-      <br><br>
-      <label>Password</label><br>
-      <input type="password" name="password" placeholder="Abc123" />
-      <br><br>
-      <input class="chip mid-small active weight-600" type="submit" value="Login" />
-    </form>
+    <%= form_tag '' do %>
+      <%= label_tag :email, 'Email' %><br>
+      <%= email_field_tag :email, nil, placeholder: 'hello@example.com' %><br><br>
+      <%= label_tag :password, 'Password' %><br>
+      <%= password_field_tag :password, nil, placeholder: 'Abc123' %><br><br>
+      <%= submit_tag 'Login', class: 'chip mid-small active weight-600' %>
+    <% end %>
   </div>
 </div>
 

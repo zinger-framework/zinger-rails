@@ -15,7 +15,10 @@
   <body>
     <%= render 'layouts/header' %>
     <% flash.each do |type, message| %>
-      <div class="alert alert-<%= type %>"><%= message %><a href="" class="close-alert" data-dismiss="alert">&times;</a></div>
+      <div class="alert alert-<%= type %>">
+        <%= message %>
+        <a href="" class="close-alert" data-dismiss="alert">&times;</a>
+      </div>
     <% end %>
     <%= yield %>
   </body>
