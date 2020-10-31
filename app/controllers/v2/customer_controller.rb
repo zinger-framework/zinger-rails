@@ -29,12 +29,9 @@ class V2::CustomerController < ApiController
     end
 
     token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }, { type: Hash }) { nil }
-    if token.blank? || params['auth_token'] != token['token'] || token['code'] != params['otp']
+    if token.blank? || params['auth_token'] != token['token'] || token['customer_id'] != Customer.current.id || token['code'] != params['otp']
       render status: 401, json: { success: false, message: I18n.t('profile.reset_failed'),
         reason: { otp: [ I18n.t('customer.param_expired', param: 'OTP') ] } }
-      return
-    elsif token['customer_id'] != Customer.current.id
-      render status: 401, json: { success: false, message: I18n.t('validation.invalid', param: 'Authorization'), reason: 'UNAUTHORIZED' }
       return
     end
 
@@ -53,29 +50,27 @@ class V2::CustomerController < ApiController
      { current_password: I18n.t('validation.required', param: 'Current password') }
     elsif params['new_password'].blank?
      { new_password: I18n.t('validation.required', param: 'New password') }
-    elsif params['current_password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
-     { current_password: I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) }
     elsif params['new_password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
      { new_password: I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) }
     end
 
     if reason_msg.present?
-      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: reason_msg  }
+      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: reason_msg }
       return
     end
 
     if Customer.current.authenticate(params['current_password']) == false
       render status: 401, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'),
-        reason: { password: [ I18n.t('validation.invalid', param: 'Password') ] } }
+        reason: { current_password: [ I18n.t('validation.invalid', param: 'Password') ] } }
       return
     end
 
-    Customer.current.update_attributes(password: params['new_password'])
+    Customer.current.update(password: params['new_password'])
     if Customer.current.errors.any?
       render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: Customer.current.errors.messages }
       return
     end
+
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
   end
 end
-
