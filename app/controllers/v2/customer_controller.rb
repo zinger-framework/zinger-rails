@@ -75,3 +75,4 @@ class V2::CustomerController < ApiController
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
   end
 end
+
