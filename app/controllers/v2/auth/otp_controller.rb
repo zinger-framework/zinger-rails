@@ -32,3 +32,4 @@ class V2::Auth::OtpController < V2::AuthController
     render status: 200, json: { success: true, message: I18n.t('customer.otp_success'), data: resp }
   end
 end
+
