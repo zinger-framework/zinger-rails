@@ -47,11 +47,11 @@ class V2::CustomerController < ApiController
 
   def password
     reason_msg = if params['current_password'].blank?
-     { current_password: I18n.t('validation.required', param: 'Current password') }
+     { current_password: [ I18n.t('validation.required', param: 'Current password') ] }
     elsif params['new_password'].blank?
-     { new_password: I18n.t('validation.required', param: 'New password') }
+     { new_password: [ I18n.t('validation.required', param: 'New password') ] }
     elsif params['new_password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
-     { new_password: I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) }
+     { new_password: [ I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) ] }
     end
 
     if reason_msg.present?
