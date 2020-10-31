@@ -5,6 +5,15 @@ class CustomerSession < ApplicationRecord
   after_create :clear_cache
   after_destroy_commit :clear_cache
 
+  def as_json(key = '')
+    case key
+    when 'session'
+      device_info = extract_device_info(self.user_agent)
+      session_info = { token: self.token, login_ip: self.login_ip, created_at: self.created_at, updated_at: self.updated_at }
+      return session_info.merge(device_info)
+    end
+  end
+
   def get_jwt_token
     return JWT.encode({ 'customer_id' => self.customer_id, 'iat' => Time.now.to_i, 'token' => self.token }, AppConfig['api_auth'])
   end
@@ -44,5 +53,13 @@ class CustomerSession < ApplicationRecord
 
   def clear_cache
     Core::Redis.delete(CustomerSession.cache_key(self.customer_id))
+  end
+
+  def extract_device_info(user_agent='')
+    browser = Browser.new(user_agent)
+    return { 'device_os' => "#{[:mac, :linux].include?(browser.platform.id) ? browser.platform.id.to_s.capitalize : browser.platform.name} \
+    #{browser.platform.version if browser.platform.version != '0'}".strip, 'device_app' => browser.name } if browser.known?
+
+    return { 'device_os' => '-', 'device_app' => '-' }
   end
 end

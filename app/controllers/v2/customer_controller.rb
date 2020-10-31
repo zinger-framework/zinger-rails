@@ -73,4 +73,11 @@ class V2::CustomerController < ApiController
 
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
   end
+
+  def sessions
+    session_data = CustomerSession.where(customer_id: Customer.current.id)
+    processed_session_data =[ ]
+    session_data.each { |session|  processed_session_data.append(session.as_json('session')) }
+    render status: 200, json: { success: true, message: 'success', data: processed_session_data }
+  end
 end

@@ -39,6 +39,7 @@ Rails.application.routes.draw do
         put :profile, to: 'customer#update_profile'
         put :reset_profile
         put :password
+        get :sessions
       end
     end
   end
