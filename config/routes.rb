@@ -40,6 +40,8 @@ Rails.application.routes.draw do
         put :reset_profile
         put :password
         get :sessions
+        delete 'sessions/:id', to: 'customer#delete_session'
+        delete :sessions, to: 'customer#delete_sessions'
       end
     end
   end
