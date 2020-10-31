@@ -10,6 +10,9 @@ class V2::Auth::OtpController < V2::AuthController
   def reset_password
   end
 
+  def reset_profile
+  end
+
   private
 
   def send_otp
