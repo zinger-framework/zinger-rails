@@ -14,6 +14,13 @@ class Customer < ApplicationRecord
 
   has_many :customer_sessions
 
+  def as_json(key = '')
+    case key
+    when 'ui_profile'
+      return { name: self.name, email: self.email, mobile: self.mobile }
+    end
+  end
+
   def self.fetch_by_id id
     Core::Redis.fetch(Core::Redis::CUSTOMER_BY_ID % { id: id }, { type: Customer }) { Customer.find_by_id(id) }
   end
@@ -53,13 +60,6 @@ class Customer < ApplicationRecord
     MailerWorker.perform_async(options.to_json)
 
     return { token: token }
-  end
-
-  def as_json(key = '')
-    case key
-    when 'profile'
-      return { name: self.name, email: self.email, mobile: self.mobile }
-    end
   end
 
   private
