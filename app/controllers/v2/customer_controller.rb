@@ -33,9 +33,12 @@ class V2::CustomerController < ApiController
       render status: 401, json: { success: false, message: I18n.t('profile.reset_failed'),
         reason: { otp: [ I18n.t('customer.param_expired', param: 'OTP') ] } }
       return
+    elsif token['customer_id'] != Customer.current.id
+      render status: 401, json: { success: false, message: I18n.t('validation.invalid', param: 'Authorization'), reason: 'UNAUTHORIZED' }
+      return
     end
 
-    Customer.current.update_attributes(token['param'] => token['value'])
+    Customer.current.update(token['param'] => token['value'])
     if Customer.current.errors.any?
       render status: 400, json: { success: false, message: I18n.t('profile.reset_failed'), reason: Customer.current.errors.messages }
       return
@@ -47,13 +50,13 @@ class V2::CustomerController < ApiController
 
   def password
     reason_msg = if params['current_password'].blank?
-     { 'Current Password': I18n.t('validation.required', param: 'Current password') }
+     { current_password: I18n.t('validation.required', param: 'Current password') }
     elsif params['new_password'].blank?
-     { 'New Password': I18n.t('validation.required', param: 'New password') }
+     { new_password: I18n.t('validation.required', param: 'New password') }
     elsif params['current_password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
-     { 'Current Password': I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) }
+     { current_password: I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) }
     elsif params['new_password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
-     { 'New Password': I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) }
+     { new_password: I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) }
     end
 
     if reason_msg.present?

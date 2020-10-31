@@ -14,7 +14,6 @@ class V2::Auth::OtpController < V2::AuthController
   end
 
   private
-
   def send_otp
     params_present = AUTH_PARAMS.select { |key| params[key].present? }
     if params_present.length != 1
