@@ -8,11 +8,11 @@ class V2::Api::SessionController < ApiController
   def destroy
     session = Customer.current.customer_sessions.find_by_token(params['id'])
     if session.blank?
-      render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'Session token') }
+      render status: 400, json: { success: false, message: I18n.t('validation.invalid', param: 'Session token') }
       return
     end
 
-    if params['token'] == CustomerSession.extract_token(request.headers['Authorization'])
+    if params['id'] == CustomerSession.extract_token(request.headers['Authorization'])
       render status: 400, json: { success: false, message: I18n.t('session.delete_failed') }
       return
     end
