@@ -4,12 +4,6 @@ class V2::Api::CustomerController < ApiController
   end
 
   def update_profile
-    if params['name'].blank?
-      render status: 400, json: { success: false, message: I18n.t('profile.update_failed'),
-        reason: { name: [ I18n.t('validation.required', param: 'Name') ] } }
-      return
-    end
-
     Customer.current.update(name: params['name'])
     if Customer.current.errors.any?
       render status: 400, json: { success: false, message: I18n.t('profile.update_failed'), reason: Customer.current.errors.messages }
@@ -46,26 +40,24 @@ class V2::Api::CustomerController < ApiController
   end
 
   def password
-    reason_msg = if params['current_password'].blank?
-     { current_password: [ I18n.t('validation.required', param: 'Current password') ] }
-    elsif params['new_password'].blank?
-     { new_password: [ I18n.t('validation.required', param: 'New password') ] }
-    elsif params['new_password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
-     { new_password: [ I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) ] }
-    end
-
-    if reason_msg.present?
-      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: reason_msg }
+    if params['current_password'].blank?
+      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), 
+        reason: { current_password: [ I18n.t('validation.required', param: 'Current password') ] } }
       return
     end
 
-    if Customer.current.authenticate(params['current_password']) == false
+    if Customer.current.auth_mode != Customer::AUTH_MODE['PASSWORD_AUTH'] || Customer.current.authenticate(params['current_password']) == false
       render status: 401, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'),
-        reason: { current_password: [ I18n.t('validation.invalid', param: 'Password') ] } }
+        reason: { current_password: [ I18n.t('validation.invalid', param: 'current password') ] } }
       return
     end
 
-    Customer.current.update!(password: params['new_password'])
+    Customer.current.update(password: params['password'])
+    if Customer.current.errors.any?
+      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: Customer.current.errors.messages }
+      return
+    end
+
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
   end
 end

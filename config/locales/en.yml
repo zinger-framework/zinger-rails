@@ -63,5 +63,6 @@ en:
   ratelimit:
     exceeded: You have exceeded the number of attempts. Please try again after sometime
     login: You have exceeded the number of login attempts. Please try again after sometime
-    reset_password: You have exceeded the number of reset password attempts. Please try again after sometime
+    reset_password: You have exceeded the number of password reset attempts. Please try again after sometime
+    reset_profile: You have exceeded the number of email or mobile reset attempts. Please try again after sometime
     registration: You have exceeded the number of registration attempts. Please try again after sometime

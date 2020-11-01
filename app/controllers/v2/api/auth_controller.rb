@@ -17,14 +17,6 @@ class V2::Api::AuthController < ApiController
       render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), 
         reason: { otp: [ I18n.t('validation.required', param: 'OTP') ] } }
       return
-    elsif params['password'].blank?
-      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), 
-        reason: { password: [ I18n.t('validation.required', param: 'Password') ] } }
-      return
-    elsif params['password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
-      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), 
-        reason: { password: [ I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) ] } }
-      return
     end
 
     token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }, { type: Hash }) { nil }
@@ -43,7 +35,12 @@ class V2::Api::AuthController < ApiController
       return
     end
 
-    customer.update!(password: params['password'])
+    customer.update(password: params['password'])
+    if customer.errors.any?
+      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: customer.errors.messages }
+      return
+    end
+
     Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] })
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
   end

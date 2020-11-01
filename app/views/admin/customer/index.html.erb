@@ -1,5 +1,5 @@
 <div class="component top-30 center">
-  <%= form_tag v2_admin_customer_index_path, method: :get do %>
+  <%= form_tag customer_index_path, method: :get do %>
     <%= text_field_tag :q, params['q'], placeholder: 'Search by id, email or mobile', required: true, pattern: '(\S+@\S+\.[a-z]+)|([0-9]+)', title: 'Please provide a valid id, email or mobile' %>
     <br><br>
     <%= submit_tag 'Search', class: 'chip mid-small active weight-600' %>
@@ -32,7 +32,7 @@
             <td></td>
           <% else %>
             <td onclick="edit(<%= customer.as_json('admin_profile').to_json %>)" class="pointer">✏️</td>
-            <td><%= button_to '❌', v2_admin_customer_path(customer), method: :delete, :class => 'bt_icon pointer' %></td>
+            <td><%= button_to '❌', customer_path(customer), method: :delete, :class => 'bt_icon pointer' %></td>
           <% end %>
         </tr>
       <% end %>
@@ -61,7 +61,7 @@
 
 <%= javascript_tag do %>
   function edit(customer) {
-    document.getElementById("update").action = "<%= v2_admin_customer_index_path %>/" + customer.id;
+    document.getElementById("update").action = "<%= customer_index_path %>/" + customer.id;
     document.getElementById("name").value = customer.name;
     document.getElementById("email").value = customer.email;
     document.getElementById("mobile").value = customer.mobile;
