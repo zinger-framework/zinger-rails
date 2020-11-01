@@ -36,7 +36,7 @@ class V2::Api::CustomerController < ApiController
     end
 
     Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] })
-    render status: 200, json: { success: true, message: I18n.t('profile.reset_success'), data: { token: Customer.current.as_json('ui_profile') } }
+    render status: 200, json: { success: true, message: I18n.t('profile.reset_success'), data: Customer.current.as_json('ui_profile') }
   end
 
   def password

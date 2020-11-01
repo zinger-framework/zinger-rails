@@ -7,11 +7,11 @@ class CustomerSession < ApplicationRecord
   after_destroy_commit :clear_cache
 
   def as_json purpose = nil, options = {}
-    resp = self.extract_device_info
+    resp = extract_device_info
     case purpose
     when 'ui_profile'
       return { 'token' => self.token, 'login_ip' => self.login_ip, 'login_time' => self.created_at.strftime('%Y-%m-%d %H:%M:%S'), 
-        'device_os' => resp['device_os'], 'device_app' => resp['device_app'], 'current_session' => self.token == options['token'].to_s }
+        'device_os' => resp['device_os'], 'browser' => resp['browser'], 'current_session' => self.token == options['token'].to_s }
     end
   end
 
@@ -60,8 +60,8 @@ class CustomerSession < ApplicationRecord
     browser = Browser.new(self.user_agent)
     return { 'device_os' => "#{[:mac, :linux].include?(browser.platform.id) ? browser.platform.id.to_s.capitalize : browser.platform.name} \
 #{browser.platform.version if browser.platform.version != '0'}".strip,
-      'device_app' => browser.name } if browser.known?
+      'browser' => browser.name } if browser.known?
 
-    return { 'device_os' => '-', 'device_app' => '-' }
+    return { 'device_os' => '-', 'browser' => '-' }
   end
 end
