@@ -23,10 +23,10 @@ gem 'jwt', '2.2.1'
 gem 'bootstrap-sass', '3.4.1'
 gem 'searchkick', '4.4.1'
 gem 'google-id-token', '1.4.2'
+gem 'browser', '5.1.0'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
-gem 'browser'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

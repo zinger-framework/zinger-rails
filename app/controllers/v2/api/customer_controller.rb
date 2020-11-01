@@ -1,4 +1,4 @@
-class V2::CustomerController < ApiController
+class V2::Api::CustomerController < ApiController
   def profile
     render status: 200, json: { success: true, message: 'success', data: Customer.current.as_json('ui_profile') }
   end
@@ -72,24 +72,5 @@ class V2::CustomerController < ApiController
     end
 
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
-  end
-
-  def sessions
-    session_data = CustomerSession.where(customer_id: Customer.current.id)
-    processed_session_data =[ ]
-    session_data.each { |session|  processed_session_data.append(session.as_json('session')) }
-    render status: 200, json: { success: true, message: 'success', data: processed_session_data }
-  end
-
-  def delete_sessions
-    CustomerSession.where(customer_id: Customer.current.id).delete_all
-    # Delete all session in redis and check whether delete_all operation is successful
-    render status: 200, json: { success: true, message: 'success' }
-  end
-
-  def delete_session
-    CustomerSession.where(token: params[:id]).delete_all
-    # Delete the respective session in redis and check whether delete_all operation is successful
-    render status: 200, json: { success: true, message: 'success2' }
   end
 end

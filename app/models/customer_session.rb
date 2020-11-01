@@ -5,12 +5,12 @@ class CustomerSession < ApplicationRecord
   after_create :clear_cache
   after_destroy_commit :clear_cache
 
-  def as_json(key = '')
-    case key
-    when 'session'
-      device_info = extract_device_info(self.user_agent)
-      session_info = { token: self.token, login_ip: self.login_ip, created_at: self.created_at, updated_at: self.updated_at }
-      return session_info.merge(device_info)
+  def as_json purpose = nil, options = {}
+    resp = self.extract_device_info
+    case purpose
+    when 'ui_profile'
+      return { 'token' => self.token, 'login_ip' => self.login_ip, 'login_time' => self.created_at.strftime('%Y-%m-%d %H:%M:%S'), 
+        'device_os' => resp['device_os'], 'device_app' => resp['device_app'], 'current_session' => self.token == options['token'].to_s }
     end
   end
 
@@ -55,10 +55,11 @@ class CustomerSession < ApplicationRecord
     Core::Redis.delete(CustomerSession.cache_key(self.customer_id))
   end
 
-  def extract_device_info(user_agent='')
-    browser = Browser.new(user_agent)
+  def extract_device_info
+    browser = Browser.new(self.user_agent)
     return { 'device_os' => "#{[:mac, :linux].include?(browser.platform.id) ? browser.platform.id.to_s.capitalize : browser.platform.name} \
-    #{browser.platform.version if browser.platform.version != '0'}".strip, 'device_app' => browser.name } if browser.known?
+#{browser.platform.version if browser.platform.version != '0'}".strip,
+      'device_app' => browser.name } if browser.known?
 
     return { 'device_os' => '-', 'device_app' => '-' }
   end
