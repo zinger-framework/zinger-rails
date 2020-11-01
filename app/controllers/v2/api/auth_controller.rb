@@ -1,7 +1,7 @@
-class V2::AuthController < ApiController
+class V2::Api::AuthController < ApiController
   AUTH_PARAMS = %w(email mobile)
 
-  skip_before_action :authenticate_request, except: :logout
+  skip_before_action :authenticate_request, except: [:logout, :reset_profile]
   before_action :verify_auth_token, only: :google
 
   def logout
@@ -49,6 +49,7 @@ class V2::AuthController < ApiController
   end
 
   private
+  
   def verify_auth_token
     if params['id_token'].blank?
       render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'id_token') }

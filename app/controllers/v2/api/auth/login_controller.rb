@@ -1,4 +1,4 @@
-class V2::Auth::LoginController < V2::AuthController
+class V2::Api::Auth::LoginController < V2::Api::AuthController
   before_action :validate_user_agent
 
   def password
