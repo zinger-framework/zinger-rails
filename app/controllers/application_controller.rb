@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  protect_from_forgery
   before_action :reset_thread
 
   def home
@@ -6,7 +7,8 @@ class ApplicationController < ActionController::Base
   end
 
   private
+  
   def reset_thread
-    User.reset_current
+    Customer.reset_current
   end
 end
