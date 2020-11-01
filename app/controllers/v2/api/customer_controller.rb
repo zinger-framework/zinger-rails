@@ -65,12 +65,7 @@ class V2::Api::CustomerController < ApiController
       return
     end
 
-    Customer.current.update(password: params['new_password'])
-    if Customer.current.errors.any?
-      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: Customer.current.errors.messages }
-      return
-    end
-
+    Customer.current.update!(password: params['new_password'])
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
   end
 end

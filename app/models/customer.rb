@@ -94,6 +94,8 @@ class Customer < ApplicationRecord
       return errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
       return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if Customer.exists?(mobile: self.mobile)
     end
+
+    self.name = self.name.to_s.strip if self.saved_change_to_name?
   end
 
   def self.otp
