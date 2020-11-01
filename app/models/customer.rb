@@ -8,14 +8,15 @@ class Customer < ApplicationRecord
   has_secure_password(validations: false)
   default_scope { where(deleted: false) }
   
-  validate :validate_email_mobile
+  validate :create_validations, on: :create
+  validate :update_validations, on: :update
   after_commit :clear_cache
   after_update :clear_sessions
 
   has_many :customer_sessions
 
-  def as_json(key = '')
-    case key
+  def as_json purpose = nil
+    case purpose
     when 'ui_profile'
       return { name: self.name, email: self.email, mobile: self.mobile }
     end
@@ -67,7 +68,7 @@ class Customer < ApplicationRecord
 
   private
 
-  def validate_email_mobile
+  def create_validations
     if self.email.present?
       self.email = self.email.to_s.strip.downcase
       return errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
@@ -79,6 +80,22 @@ class Customer < ApplicationRecord
       return errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
       return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if Customer.exists?(mobile: self.mobile)
     end
+  end
+
+  def update_validations
+    if self.saved_change_to_email?
+      self.email = self.email.to_s.strip.downcase
+      return errors.add(:email, I18n.t('validation.invalid', param: 'Email address')) unless self.email.match(EMAIL_REGEX)
+      return errors.add(:email, I18n.t('validation.already_taken', param: self.email)) if Customer.exists?(email: self.email)
+    end
+
+    if self.saved_change_to_mobile?
+      self.mobile = self.mobile.to_s.strip
+      return errors.add(:mobile, I18n.t('validation.invalid', param: 'Mobile number')) unless self.mobile.match(MOBILE_REGEX)
+      return errors.add(:mobile, I18n.t('validation.already_taken', param: self.mobile)) if Customer.exists?(mobile: self.mobile)
+    end
+
+    self.name = self.name.to_s.strip if self.saved_change_to_name?
   end
 
   def self.otp

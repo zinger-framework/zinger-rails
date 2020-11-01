@@ -1,4 +1,4 @@
-class V2::Auth::LoginController < V2::AuthController
+class V2::Api::Auth::LoginController < V2::Api::AuthController
   def password
     params_present = AUTH_PARAMS.select { |key| params[key].present? }
     if params_present.length != 1

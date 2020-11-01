@@ -1,4 +1,4 @@
-class V2::Auth::OtpController < V2::AuthController
+class V2::Api::Auth::OtpController < V2::Api::AuthController
   before_action :send_otp
 
   def signup

@@ -1,4 +1,4 @@
-class V2::CustomerController < ApiController
+class V2::Api::CustomerController < ApiController
   def profile
     render status: 200, json: { success: true, message: 'success', data: Customer.current.as_json('ui_profile') }
   end
@@ -65,12 +65,7 @@ class V2::CustomerController < ApiController
       return
     end
 
-    Customer.current.update(password: params['new_password'])
-    if Customer.current.errors.any?
-      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: Customer.current.errors.messages }
-      return
-    end
-
+    Customer.current.update!(password: params['new_password'])
     render status: 200, json: { success: true, message: I18n.t('auth.reset_password.reset_success') }
   end
 end
