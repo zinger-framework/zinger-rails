@@ -19,4 +19,14 @@ class V2::Api::ShopController < ApiController
     render status: 200, json: { success: true, message: 'success', data: { shops: shops.map { |shop| shop.as_json('ui_shop') },
       total: shops.total_count, per_page: LIMIT } }
   end
+
+  def show
+    shop = Shop.find_by_id(params['id'])
+    if shop.nil?
+      render status: 200, json: { success: false, message: I18n.t('shop.not_found') }
+      return
+    end
+
+    render status: 200, json: { success: true, message: 'success', data: shop.as_json('ui_shop_detail') }
+  end
 end
