@@ -11,7 +11,7 @@ class V2::Api::ShopController < ApiController
     shops = if params['name'].to_s.length > 3
       Shop.search(params['name'], options.merge({ fields: [:name], match: :word_start }))
     elsif params['tag'].present?
-      Shop.search(params['tag'], options.merge({ fields: [:tag], misspellings: false }))
+      Shop.search(params['tag'], options.merge({ fields: [:tags], misspellings: false }))
     else
       Shop.search(options)
     end

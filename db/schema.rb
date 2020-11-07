@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(version: 2020_11_05_184303) do
     t.decimal "lat", precision: 10, scale: 8
     t.decimal "lng", precision: 11, scale: 8
     t.string "icon"
-    t.string "tag"
+    t.string "tags"
     t.integer "status", limit: 2, default: 1
     t.boolean "deleted", default: false
     t.datetime "created_at", precision: 6, null: false
