@@ -32,6 +32,7 @@
 en:
   validation:
     required: "%{param} cannot be empty"
+    many_not_allowed: Please provide any one of the params - %{param}
     invalid: "Invalid %{param}"
   customer:
     not_found: Unable to find the user. Please check the credentials
