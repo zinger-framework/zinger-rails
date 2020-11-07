@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     get :login
     get :dashboard
     resources :customer, only: [:index, :update, :destroy]
+    resources :auth
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
