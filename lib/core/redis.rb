@@ -3,7 +3,9 @@ module Core
     OTP_VERIFICATION = 'OTP_VERIFICATION:%{token}'
     ID_TOKEN_VERIFICATION = 'ID_TOKEN_VERIFICATION:%{id_token}'
     CUSTOMER_SESSIONS_BY_ID = 'CUSTOMER_SESSIONS_BY_ID:%{id}'
+    EMPLOYEE_SESSIONS_BY_ID = 'EMPLOYEE_SESSIONS_BY_ID:%{id}'
     CUSTOMER_BY_ID = 'v1/CUSTOMER_BY_ID:%{id}'
+    EMPLOYEE_BY_ID = 'v1/EMPLOYEE_BY_ID:%{id}'
 
     def self.marshal type, value
       if String == type

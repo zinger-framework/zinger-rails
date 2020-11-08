@@ -10,6 +10,13 @@ class AdminController < ApplicationController
   private
 
   def authenticate_request
+    employee = !session[:authorization].nil? ? EmployeeSession.fetch_employee(session[:authorization]) : nil
+    if employee.nil?
+      session.delete(:authorization)
+      redirect_to auth_index_path
+      return
+    end
+    employee.make_current
   end
 
   def check_limit
