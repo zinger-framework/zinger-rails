@@ -11,7 +11,10 @@ class Core::Ratelimit
     { 'path' => '/v[0-9]+/auth/reset_password', 'methods' => %w(POST), 'per_ip' => true,
       'limit' => 5, 'window' => 600, 'message' => 'reset_password' },
     { 'path' => '/v[0-9]+/customer/reset_profile', 'methods' => %w(PUT), 'per_customer' => true,
-      'limit' => 5, 'window' => 600, 'message' => 'reset_profile' }
+      'limit' => 5, 'window' => 600, 'message' => 'reset_profile' },
+    # TODO check if this rate limiting is correct
+    { 'path' => '/auth/.*', 'methods' => %w(POST), 'params' => %w(email mobile),
+      'limit' => 5, 'window' => 600, 'message' => 'login' },
   ]
   
   def self.reached? request

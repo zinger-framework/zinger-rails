@@ -60,13 +60,15 @@ ActiveRecord::Schema.define(version: 2020_11_07_083221) do
   create_table "employees", force: :cascade do |t|
     t.string "name"
     t.string "email"
+    t.string "mobile"
     t.string "password_digest"
-    t.string "otp_secret_key"
+    t.boolean "two_fa_enabled", default: false
     t.integer "status", limit: 2, default: 1
     t.boolean "deleted", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["email"], name: "index_employees_on_email"
+    t.index ["mobile"], name: "index_employees_on_mobile"
   end
 
 end

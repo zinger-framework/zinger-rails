@@ -53,6 +53,9 @@ Rails.application.routes.draw do
     resources :auth, only: [:index] do
       collection do
         get :otp
+        post :login
+        post :otp_login
+        post :resend_otp
       end
     end
   end

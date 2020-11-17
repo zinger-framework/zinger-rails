@@ -3,13 +3,15 @@ class CreateEmployees < ActiveRecord::Migration[6.0]
     create_table :employees do |t|
       t.string :name
       t.string :email
+      t.string :mobile
       t.string :password_digest
-      t.string :otp_secret_key
+      t.boolean :two_fa_enabled, default: false
       t.column :status, 'SMALLINT', default: 1
       t.boolean :deleted, default: false
       t.timestamps
 
       t.index :email
+      t.index :mobile
     end
   end
 end
