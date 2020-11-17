@@ -59,3 +59,4 @@ class Admin::AuthController < AdminController
     session[:auth_token] = Employee.send_otp({ param: 'mobile', value: employee.mobile, action: 'admin_otp_login' })
   end
 end
+

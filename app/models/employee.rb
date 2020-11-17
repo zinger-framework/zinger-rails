@@ -13,10 +13,6 @@ class Employee < ApplicationRecord
     return token
   end
 
-  def self.otp
-    rand(10**(OTP_LENGTH - 1)..10**OTP_LENGTH - 1).to_s
-  end
-
   def self.fetch_by_id id
     Core::Redis.fetch(Core::Redis::EMPLOYEE_BY_ID % { id: id }, { type: Employee }) { Employee.find_by_id(id) }
   end
@@ -35,6 +31,12 @@ class Employee < ApplicationRecord
 
   def self.current
     Thread.current[:employee]
+  end
+
+  private
+
+  def self.otp
+    rand(10**(OTP_LENGTH - 1)..10**OTP_LENGTH - 1).to_s
   end
 end
 
