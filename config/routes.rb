@@ -52,6 +52,13 @@ Rails.application.routes.draw do
     get :login
     get :dashboard
     resources :customer, only: [:index, :update, :destroy]
+    resources :shop, only: [:index, :create, :update, :destroy] do
+      collection do 
+        get :add_shop
+        put :location
+        put :shop_detail
+      end
+    end
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
