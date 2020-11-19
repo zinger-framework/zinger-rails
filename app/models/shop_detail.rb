@@ -8,13 +8,19 @@ class ShopDetail < ApplicationRecord
       time = Time.now.in_time_zone(PlatformConfig['time_zone']).strftime('%H:%M')
       opening_time = self.opening_time.in_time_zone(PlatformConfig['time_zone'])
       closing_time = self.closing_time.in_time_zone(PlatformConfig['time_zone'])
-      return { 'address' => self.address, 'landline' => self.landline, 'mobile' => self.mobile, 'cover_photos' => self.cover_photos,
+      return { 'address' => self.address, 'landline' => self.landline, 'mobile' => self.mobile, 
+        'cover_photos' => aws_key_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) },
         'opening_time' => opening_time.strftime('%I:%M %p'), 'closing_time' => closing_time.strftime('%I:%M %p'),
         'open_now' => opening_time.strftime('%H:%M') <= time && time < closing_time.strftime('%H:%M') }
     when 'admin_shop_detail'
       return { 'mobile' => self.mobile, 'opening_time' => self.opening_time.in_time_zone(PlatformConfig['time_zone']).strftime('%H:%M'), 
         'closing_time' => self.closing_time.in_time_zone(PlatformConfig['time_zone']).strftime('%H:%M') }
     end
+  end
+
+  def aws_key_path index = nil
+    return "shop-cover/#{self.shop_id}/#{self.cover_photos.to_a[index]}" if index.present?
+    return self.cover_photos.to_a.map { |cover_photo| "shop-cover/#{self.shop_id}/#{cover_photo}" }
   end
 
   private

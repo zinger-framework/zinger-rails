@@ -37,49 +37,75 @@
         <% end %>
       </tr>
     </table>
-    
-    <%= form_tag location_shop_index_path, method: :put, class: 'center top-50' do %>
-      <div>
-        <div class="left">
-          <%= label_tag :number, 'No.' %><br>
-          <%= text_field_tag :number, @shop.shop_detail.address['number'], style: 'width: 50px', required: true, placeholder: '23' %><br><br>
-        </div>
-        <div class="right">
-          <%= label_tag :street, 'Street' %><br>
-          <%= text_field_tag :street, @shop.shop_detail.address['street'], style: 'width: 170px', required: true, placeholder: 'Anbu Street' %><br><br>
-        </div>
-        <br><br><br>
 
-        <div class="left">
-          <%= label_tag :city, 'City' %><br>
-          <%= text_field_tag :city, @shop.shop_detail.address['city'], style: 'width: 120px', required: true, placeholder: 'Chennai' %><br><br>
-        </div>
-        <div class="right">
-          <%= label_tag :pincode, 'Pincode' %><br>
-          <%= text_field_tag :pincode, @shop.shop_detail.address['pincode'], style: 'width: 100px', required: true, placeholder: '600077' %><br><br>
-        </div>
-        <br><br><br>
+    <div class="center">
+      <%= form_tag location_shop_index_path, method: :put, class: 'top-50 left' do %>
+        <div>
+          <div class="left">
+            <%= label_tag :number, 'No.' %><br>
+            <%= text_field_tag :number, @shop.shop_detail.address['number'], style: 'width: 50px', required: true, placeholder: '23' %><br><br>
+          </div>
+          <div class="right">
+            <%= label_tag :street, 'Street' %><br>
+            <%= text_field_tag :street, @shop.shop_detail.address['street'], style: 'width: 170px', required: true, placeholder: 'Anbu Street' %><br><br>
+          </div>
+          <br><br><br>
 
-        <%= label_tag :area, 'Area' %><br>
-        <%= text_field_tag :area, @shop.shop_detail.address['area'], required: true, placeholder: 'Nungambakkam' %><br><br>
+          <div class="left">
+            <%= label_tag :city, 'City' %><br>
+            <%= text_field_tag :city, @shop.shop_detail.address['city'], style: 'width: 120px', required: true, placeholder: 'Chennai' %><br><br>
+          </div>
+          <div class="right">
+            <%= label_tag :pincode, 'Pincode' %><br>
+            <%= text_field_tag :pincode, @shop.shop_detail.address['pincode'], style: 'width: 100px', required: true, placeholder: '600077' %><br><br>
+          </div>
+          <br><br><br>
 
-        <div class="left">
-          <%= label_tag :lat, 'Latitude' %><br>
-          <%= text_field_tag :lat, @shop.lat, style: 'width: 110px', required: true, placeholder: '27.5330' %><br><br>
-        </div>
-        <div class="right">
-          <%= label_tag :lng, 'Longitude' %><br>
-          <%= text_field_tag :lng, @shop.lng, style: 'width: 110px', required: true, placeholder: '88.5122' %><br><br>
-        </div>
-        <br><br><br>
+          <%= label_tag :area, 'Area' %><br>
+          <%= text_field_tag :area, @shop.shop_detail.address['area'], required: true, placeholder: 'Nungambakkam' %><br><br>
 
-        <%= label_tag :landline, 'Landline' %><br>
-        <%= phone_field_tag :landline, @shop.shop_detail.landline, placeholder: '04425545880' %><br><br>
-        
-        <%= hidden_field_tag :id, @shop.id %>
-        <%= submit_tag 'Update Location', class: "chip mid-small #{@shop.deleted ? '' : 'active '}weight-600", disabled: @shop.deleted %>
+          <div class="left">
+            <%= label_tag :lat, 'Latitude' %><br>
+            <%= text_field_tag :lat, @shop.lat, style: 'width: 110px', required: true, placeholder: '27.5330' %><br><br>
+          </div>
+          <div class="right">
+            <%= label_tag :lng, 'Longitude' %><br>
+            <%= text_field_tag :lng, @shop.lng, style: 'width: 110px', required: true, placeholder: '88.5122' %><br><br>
+          </div>
+          <br><br><br>
+
+          <%= label_tag :landline, 'Landline' %><br>
+          <%= phone_field_tag :landline, @shop.shop_detail.landline, placeholder: '04425545880' %><br><br>
+          
+          <%= hidden_field_tag :id, @shop.id %>
+          <%= submit_tag 'Update Location', class: "chip mid-small #{@shop.deleted ? '' : 'active '}weight-600", disabled: @shop.deleted %>
+        </div>
+      <% end %>
+
+      <div class="top-50 left-40 right" style="border-left: 1px solid var(--grey); padding-left: 40px;">
+        <div style="max-width: 360px;">
+          <%= label_tag 'Icon' %><br>
+          <%= image_tag Core::Storage.fetch_url(@shop.aws_key_path), size: '100x100' %>
+          <br><br>
+
+          <%= label_tag :cover_photos, 'Cover Photos' %><br>
+          <% if @shop.shop_detail.cover_photos.blank? %>
+            <p class="grey-title-100">Sorry, no photos available</p>
+          <% else %>
+            <% @shop.shop_detail.aws_key_path.each do |cover_photo_key| %>
+              <%= image_tag Core::Storage.fetch_url(cover_photo_key), size: '160x100' %>&nbsp;&nbsp;
+            <% end %>
+            <br><br>
+          <% end %>
+
+          <%= label_tag 'Payment' %><br>
+          <pre class="smallest"><%= sanitize JSON.pretty_generate(@shop.shop_detail.payment).html_safe %></pre>
+
+          <%= label_tag 'Meta' %><br>
+          <pre class="smallest"><%= sanitize JSON.pretty_generate(@shop.shop_detail.meta).html_safe %></pre>
+        </div>
       </div>
-    <% end %>
+    </div>
     
     <div id="modal" class="modal">
       <div class="modal-content">

@@ -15,9 +15,9 @@ class Shop < ApplicationRecord
   def as_json purpose = nil
     case purpose
     when 'ui_shop'
-      return { id: self.id, name: self.name, icon: self.icon, tags: self.tags.split(' '), area: self.shop_detail.address['area'] }
+      return { id: self.id, name: self.name, icon: Core::Storage.fetch_url(aws_key_path), tags: self.tags.split(' '), area: self.shop_detail.address['area'] }
     when 'ui_shop_detail'
-      return { id: self.id, name: self.name, icon: self.icon, tags: self.tags.split(' ') }.merge(self.shop_detail.as_json('ui_shop_detail'))
+      return { id: self.id, name: self.name, icon: Core::Storage.fetch_url(aws_key_path), tags: self.tags.split(' ') }.merge(self.shop_detail.as_json('ui_shop_detail'))
     when 'admin_shop'
       return { id: self.id, name: self.name, tags: self.tags, status: self.status }.merge(self.shop_detail.as_json('admin_shop_detail'))
     end

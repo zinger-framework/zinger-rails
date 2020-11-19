@@ -74,10 +74,6 @@ class Admin::ShopController < AdminController
     redirect_to shop_index_path(q: params['id'])
   end
 
-  def shop_detail
-    
-  end
-
   def destroy
     @shop.update!(deleted: true)
     flash[:success] = 'Deletion is successful'

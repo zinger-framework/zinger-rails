@@ -56,7 +56,6 @@ Rails.application.routes.draw do
       collection do 
         get :add_shop
         put :location
-        put :shop_detail
       end
     end
   end
