@@ -1,5 +1,6 @@
 class AdminController < ApplicationController
-  before_action :authenticate_request, :check_limit
+  # before_action :authenticate_request, :check_limit
+  before_action :authenticate_request
 
   LIMIT = 20
 
@@ -22,7 +23,8 @@ class AdminController < ApplicationController
   def check_limit
     resp = Core::Ratelimit.reached?(request)
     if resp
-      render status: 429, json: { success: false, message: resp }
+      flash[:error] = resp
+      render html: 'Welcome to Zinger - Hyperlocal Delivery Framework'
       return
     end
   end

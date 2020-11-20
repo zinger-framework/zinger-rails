@@ -1,5 +1,6 @@
 class Admin::AuthController < AdminController
   skip_before_action :authenticate_request
+  before_action :verify_auth_token, except: [:index,:login]
 
   def index
   end
@@ -14,12 +15,12 @@ class Admin::AuthController < AdminController
       else
         flash.discard
         if employee.two_fa_enabled
-          session[:auth_token] = Employee.send_otp({ param: 'mobile', value: employee.mobile, action: 'admin_otp_login' })
+          session[:auth_token] = Employee.send_otp({ param: 'mobile', value: employee.mobile, action: params['action'] })
           redirect_to otp_auth_index_path
         else
           employee_session_data = employee.employee_sessions.create!( login_ip: request.ip, user_agent: request.headers['User-Agent'] )
           session[:authorization] = employee_session_data.get_jwt_token
-          redirect_to customer_index_path
+          redirect_to dashboard_path
         end
       end
     else
@@ -28,35 +29,38 @@ class Admin::AuthController < AdminController
   end
 
   def otp
-    if session[:auth_token].blank?
-      redirect_to auth_index_path
-      return
-    end
+    # rate limiting check once
   end
 
   def otp_login
-    token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: session[:auth_token] }, { type: Hash }) { nil }
-    if token.blank? || session[:auth_token] != token['token'] || token['code'] != params['otp']
+    if @token['code'] != params['otp']
       flash[:error] = 'Invalid OTP'
-      redirect_to auth_index_path
+      redirect_to otp_auth_index_path
     else
-      employee = Employee.where(token['param'] => token['value']).first
+      employee = Employee.where(@token['param'] => @token['value']).first
       employee_session_data = employee.employee_sessions.create!( login_ip: request.ip, user_agent: request.headers['User-Agent'] )
       session[:authorization] = employee_session_data.get_jwt_token
       Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: session[:auth_token] })
-      redirect_to customer_index_path
+      session.delete(:auth_token)
+      redirect_to dashboard_path
     end
-    session.delete(:auth_token)
   end
 
   def resend_otp
-    token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: session[:auth_token] }, { type: Hash }) { nil }
-    if token.blank? || session[:auth_token] != token['token']
+    employee = Employee.where(@token['param'] => @token['value']).first
+    session[:auth_token] = Employee.send_otp({ param: 'mobile', value: employee.mobile, action: 'admin_otp_login' })
+  end
+
+  def verify_auth_token
+    return redirect_to dashboard_path if !session[:authorization].blank?
+    return redirect_to auth_index_path if session[:auth_token].blank?
+    @token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: session[:auth_token] }, { type: Hash }) { nil }
+
+    if @token.blank? || session[:auth_token] != @token['token']
       flash[:error] = 'Invalid OTP'
+      session.delete(:auth_token)
       redirect_to auth_index_path
     end
-    employee = Employee.where(token['param'] => token['value']).first
-    session[:auth_token] = Employee.send_otp({ param: 'mobile', value: employee.mobile, action: 'admin_otp_login' })
   end
 end
 

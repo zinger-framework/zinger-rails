@@ -50,11 +50,11 @@ Rails.application.routes.draw do
     get :login
     get :dashboard
     resources :customer, only: [:index, :update, :destroy]
-    resources :auth, only: [:index] do
+    resources :auth, only: :index do
       collection do
-        get :otp
         post :login
-        post :otp_login
+        get :otp
+        post :otp, to: 'auth#otp_login'
         post :resend_otp
       end
     end

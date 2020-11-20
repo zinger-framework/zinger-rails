@@ -6,7 +6,7 @@
     <span class="title-100">An Open Source Framework for building Hyperlocal Delivery Mobile and Web applications</span>
   </div>
   <div class="top-50 mid-small center">
-    <%= form_tag otp_login_auth_index_path, method: :post do %>
+    <%= form_tag otp_auth_index_path, method: :post do %>
       <%= label_tag :otp, 'OTP' %><br>
       <%= password_field_tag :otp, nil, placeholder: '239987' %><br><br>
       <%= submit_tag 'Login', class: 'chip mid-small active weight-600' %>
