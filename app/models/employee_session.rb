@@ -13,8 +13,8 @@ class EmployeeSession < ApplicationRecord
     end
   end
 
-  def get_jwt_token otp_verified
-    return JWT.encode({ 'employee_id' => self.employee_id, 'expiry_time' => Time.now.next_day.to_i, 'token' => self.token, 'otp_verified' => otp_verified }, AppConfig['api_auth'])
+  def get_jwt_token two_fa = {}
+    return JWT.encode({ 'employee_id' => self.employee_id, 'expiry_time' => Time.now.next_day.to_i, 'token' => self.token, 'two_fa' => two_fa }, AppConfig['api_auth'])
   end
 
   def self.decode_jwt_token jwt_token
