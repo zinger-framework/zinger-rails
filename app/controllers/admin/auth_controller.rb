@@ -30,7 +30,6 @@ class Admin::AuthController < AdminController
   end
 
   def otp
-    # rate limiting check once
   end
 
   def otp_login
