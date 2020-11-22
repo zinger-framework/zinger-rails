@@ -57,6 +57,14 @@ Rails.application.routes.draw do
         get :add_shop
         put :location
       end
+      member do
+        put :icon
+        put :cover_photo
+        put :payment
+        put :meta
+        delete :icon, to: 'shop#delete_icon'
+        delete :cover_photo, to: 'shop#delete_cover_photo'
+      end
     end
   end
 

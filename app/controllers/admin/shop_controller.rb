@@ -1,6 +1,6 @@
 class Admin::ShopController < AdminController
   before_action :set_title
-  before_action :load_shop, only: [:update, :location, :shop_detail, :destroy]
+  before_action :load_shop, except: [:index, :create, :add_shop]
 
   def index
     @header[:title] = 'Shops'
@@ -77,6 +77,50 @@ class Admin::ShopController < AdminController
   def destroy
     @shop.update!(deleted: true)
     flash[:success] = 'Deletion is successful'
+    redirect_to shop_index_path(q: params['id'])
+  end
+
+  def icon
+    @shop.update!(icon: "shop-icon-#{Time.now.to_i}#{File.extname(params['file'].path)}")
+    File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(@shop.aws_key_path, file) }
+    flash[:success] = 'Icon upload is successful'
+    redirect_to shop_index_path(q: params['id'])
+  end
+
+  def cover_photo
+    @shop.shop_detail.update!(cover_photos: @shop.shop_detail.cover_photos.to_a << "shop-cover-#{Time.now.to_i}#{File.extname(params['file'].path)}")
+    File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(@shop.shop_detail.aws_key_path(@shop.shop_detail.cover_photos.size - 1), file) }
+    flash[:success] = 'Cover photo upload is successful'
+    redirect_to shop_index_path(q: params['id'])
+  end
+
+  def payment
+    @shop.shop_detail.update!(payment: JSON.parse(params['payment']))
+    flash[:success] = 'Payment update is successful'
+    redirect_to shop_index_path(q: params['id'])
+  end
+
+  def meta
+    @shop.shop_detail.update!(meta: JSON.parse(params['meta']))
+    flash[:success] = 'Meta update is successful'
+    redirect_to shop_index_path(q: params['id'])
+  end
+
+  def delete_icon
+    @shop.update!(icon: nil)
+    flash[:success] = 'Icon deletion is successful'
+    redirect_to shop_index_path(q: params['id'])
+  end
+
+  def delete_cover_photo
+    if @shop.shop_detail.cover_photos.blank?
+      flash[:error] = 'Cover photo is already empty'
+      redirect_to shop_index_path(q: params['id'])
+    end
+    
+    @shop.shop_detail.cover_photos.delete_at(params['index'].to_i)
+    @shop.shop_detail.update!(cover_photos: @shop.shop_detail.cover_photos)
+    flash[:success] = 'Cover photo deletion is successful'
     redirect_to shop_index_path(q: params['id'])
   end
 
