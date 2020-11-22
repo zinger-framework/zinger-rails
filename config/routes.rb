@@ -55,9 +55,9 @@ Rails.application.routes.draw do
     resources :shop, only: [:index, :create, :update, :destroy] do
       collection do 
         get :add_shop
-        put :location
       end
       member do
+        put :location
         put :icon
         put :cover_photo
         put :payment

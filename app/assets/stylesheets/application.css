@@ -209,7 +209,7 @@ label, .red-title-600 {
   vertical-align: middle;
 }
 
-input:not([type=submit]), textarea {
+input:not([type=submit]) {
   border-style: none none solid none;
   border-color: var(--grey);
   width: 250px;

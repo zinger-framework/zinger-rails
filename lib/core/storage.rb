@@ -5,7 +5,6 @@ class Core::Storage
 
   def self.fetch_url key, options = {}
     return $s3_signer.presigned_url(:get_object, bucket: options[:bucket] || AwsConfig['asset_bucket'], key: key) if Rails.env.production?
-    return "https://i.imgur.com/Jmy0GK5.jpg" # For testing
     return "https://dev.#{AwsConfig['region']}.amazonaws.com/#{options[:bucket] || AwsConfig['asset_bucket']}/#{key}"
   end
 

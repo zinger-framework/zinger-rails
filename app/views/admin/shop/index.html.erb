@@ -39,7 +39,7 @@
     </table>
 
     <div class="center">
-      <%= form_tag location_shop_index_path, method: :put, class: 'top-50 left' do %>
+      <%= form_tag location_shop_path(@shop), method: :put, class: 'top-50 left' do %>
         <div>
           <div class="left">
             <%= label_tag :number, 'No.' %><br>
@@ -77,7 +77,6 @@
           <%= label_tag :landline, 'Landline' %><br>
           <%= phone_field_tag :landline, @shop.shop_detail.landline, placeholder: '04425545880' %><br><br>
           
-          <%= hidden_field_tag :id, @shop.id %>
           <%= submit_tag 'Update Location', class: "chip mid-small #{@shop.deleted ? '' : 'active '}weight-600", disabled: @shop.deleted %>
         </div>
       <% end %>
