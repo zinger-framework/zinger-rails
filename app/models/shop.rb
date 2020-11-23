@@ -1,7 +1,7 @@
 class Shop < ApplicationRecord
   STATUSES = { 'ACTIVE' => 1, 'BLOCKED' => 2 }
 
-  default_scope { where(status: STATUSES['ACTIVE'], deleted: false) }
+  default_scope { where(deleted: false) }
   searchkick word_start: ['name'], locations: ['location'], default_fields: ['status', 'deleted']
 
   has_one :shop_detail

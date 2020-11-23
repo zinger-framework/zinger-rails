@@ -130,7 +130,7 @@ class Admin::ShopController < AdminController
   def load_shop
     @shop = Shop.fetch_by_id(params['id'])
     if @shop.nil?
-      flash[:error] = 'Active shop is not found'
+      flash[:error] = 'Shop is not found'
       return redirect_to shop_index_path(q: params['id'])
     end
   end

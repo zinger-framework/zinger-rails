@@ -33,7 +33,7 @@
           <td></td>
         <% else %>
           <td onclick="edit(<%= @shop.as_json('admin_shop').to_json %>)" class="pointer">✏️</td>
-          <td><%= button_to '❌', shop_path(@shop), method: :delete, :class => 'bt_icon pointer' %></td>
+          <td><%= button_to '❌', shop_path(@shop), method: :delete, class: 'bt_icon pointer' %></td>
         <% end %>
       </tr>
     </table>
@@ -85,7 +85,7 @@
         <%= label_tag 'Icon' %><br>
         <div style="position: relative; width: 100px">
           <% if @shop.icon.present? %>
-            <%= link_to '❌', icon_shop_path(@shop), method: :delete, :class => 'pointer very-small', :style => 'position: absolute; right: 0; text-decoration: none;' %>
+            <%= link_to '❌', icon_shop_path(@shop), method: :delete, class: 'pointer very-small', style: 'position: absolute; right: 0; text-decoration: none;' %>
             <%= image_tag Core::Storage.fetch_url(@shop.aws_key_path), size: '100x100' %>
           <% else %>
             <%= image_tag 'img_upload.png', onclick: "upload_image(#{@shop.id}, 'icon')", size: '100x100', class: 'pointer', style: 'opacity: 0.5;' %>
@@ -97,7 +97,7 @@
         <% @shop.shop_detail.cover_photos.to_a.each_with_index do |cover_photo_key, index| %>
           <div class="left right-20">
             <div style="position: relative; width: 160px;">
-              <%= link_to '❌', cover_photo_shop_path({ id: @shop.id, index: index }), method: :delete, :class => 'pointer very-small', :style => 'position: absolute; right: 0; text-decoration: none;' %>
+              <%= link_to '❌', cover_photo_shop_path({ id: @shop.id, index: index }), method: :delete, class: 'pointer very-small', style: 'position: absolute; right: 0; text-decoration: none;' %>
               <%= image_tag Core::Storage.fetch_url(@shop.shop_detail.aws_key_path(index)), size: '160x100' %>&nbsp;&nbsp;
             </div>
           </div>
@@ -115,7 +115,7 @@
     <div id="modal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="hide_modal()">&times;</span><br>
-        <%= form_tag '', :id => 'update', method: :put do %>
+        <%= form_tag '', id: 'update', method: :put do %>
           <div class="left-40 right-50">
             <%= label_tag :name, 'Name' %><br>
             <%= text_field_tag :name %><br><br>
@@ -147,7 +147,7 @@
     <div id="upload_modal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="hide_modal()">&times;</span><br>
-        <%= form_tag '', :id => 'update_icon', method: :put, :multipart => true do %>
+        <%= form_tag '', id: 'update_icon', method: :put, multipart: true do %>
           <div class="left-40 right-50">
             <%= hidden_field_tag :purpose %><br>
             <%= label_tag :file, 'Upload Image' %><br>
