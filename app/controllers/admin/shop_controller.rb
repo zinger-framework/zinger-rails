@@ -40,11 +40,10 @@ class Admin::ShopController < AdminController
   end
 
   def update
-    @shop.update(name: params['name'], status: params['status'], tags: params['tags'])
+    @shop.update(name: params['name'], status: params['status'], tags: params['tags'], updated_at: Time.now.utc)
     shop_detail = @shop.shop_detail
     shop_detail.update(mobile: params['mobile'], opening_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['opening_time'], '%H:%M').utc, 
       closing_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['closing_time'], '%H:%M').utc)
-    @shop.update(updated_at: Time.now.utc)
 
     if @shop.errors.any? || shop_detail.errors.any?
       flash[:error] = @shop.errors.messages.values.flatten.first || shop_detail.errors.messages.values.flatten.first
@@ -56,11 +55,10 @@ class Admin::ShopController < AdminController
   end
 
   def location
-    @shop.update(lat: params['lat'], lng: params['lng'])
+    @shop.update(lat: params['lat'], lng: params['lng'], updated_at: Time.now.utc)
     shop_detail = @shop.shop_detail
     shop_detail.update(address: { number: params['number'], street: params['street'], area: params['area'],
       city: params['city'], pincode: params['pincode'] }, telephone: params['telephone'])
-    @shop.update(updated_at: Time.now.utc)
 
     if @shop.errors.any? || shop_detail.errors.any?
       flash[:error] = @shop.errors.messages.values.flatten.first || shop_detail.errors.messages.values.flatten.first
@@ -86,6 +84,7 @@ class Admin::ShopController < AdminController
 
   def cover_photo
     @shop.shop_detail.update!(cover_photos: @shop.shop_detail.cover_photos.to_a << "shop-cover-#{Time.now.to_i}#{File.extname(params['file'].path)}")
+    @shop.update!(updated_at: Time.now.utc)
     File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(@shop.shop_detail.aws_key_path(@shop.shop_detail.cover_photos.size - 1), file) }
     flash[:success] = 'Cover photo upload is successful'
     redirect_to shop_index_path(q: params['id'])
@@ -93,12 +92,14 @@ class Admin::ShopController < AdminController
 
   def payment
     @shop.shop_detail.update!(payment: JSON.parse(params['payment']))
+    @shop.update!(updated_at: Time.now.utc)
     flash[:success] = 'Payment update is successful'
     redirect_to shop_index_path(q: params['id'])
   end
 
   def meta
     @shop.shop_detail.update!(meta: JSON.parse(params['meta']))
+    @shop.update!(updated_at: Time.now.utc)
     flash[:success] = 'Meta update is successful'
     redirect_to shop_index_path(q: params['id'])
   end
@@ -117,6 +118,7 @@ class Admin::ShopController < AdminController
     
     @shop.shop_detail.cover_photos.delete_at(params['index'].to_i)
     @shop.shop_detail.update!(cover_photos: @shop.shop_detail.cover_photos)
+    @shop.update!(updated_at: Time.now.utc)
     flash[:success] = 'Cover photo deletion is successful'
     redirect_to shop_index_path(q: params['id'])
   end
