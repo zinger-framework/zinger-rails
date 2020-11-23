@@ -23,10 +23,9 @@ class Admin::ShopController < AdminController
       shop.save unless shop_detail.errors.any?
     end
 
-    if shop_detail.errors.any?
+    if shop.errors.any? || shop_detail.errors.any?
       flash[:error] = shop.errors.messages.values.flatten.first || shop_detail.errors.messages.values.flatten.first
-      redirect_to add_shop_shop_index_path
-      return
+      return redirect_to add_shop_shop_index_path
     end
 
     File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(shop.aws_key_path, file) }
@@ -49,8 +48,7 @@ class Admin::ShopController < AdminController
 
     if @shop.errors.any? || shop_detail.errors.any?
       flash[:error] = @shop.errors.messages.values.flatten.first || shop_detail.errors.messages.values.flatten.first
-      redirect_to shop_index_path(q: params['id'])
-      return
+      return redirect_to shop_index_path(q: params['id'])
     end
 
     flash[:success] = 'Shop update is successful'
@@ -66,8 +64,7 @@ class Admin::ShopController < AdminController
 
     if @shop.errors.any? || shop_detail.errors.any?
       flash[:error] = @shop.errors.messages.values.flatten.first || shop_detail.errors.messages.values.flatten.first
-      redirect_to shop_index_path(q: params['id'])
-      return
+      return redirect_to shop_index_path(q: params['id'])
     end
 
     flash[:success] = 'Shop location update is successful'
@@ -115,7 +112,7 @@ class Admin::ShopController < AdminController
   def delete_cover_photo
     if @shop.shop_detail.cover_photos.blank?
       flash[:error] = 'Cover photo is already empty'
-      redirect_to shop_index_path(q: params['id'])
+      return redirect_to shop_index_path(q: params['id'])
     end
     
     @shop.shop_detail.cover_photos.delete_at(params['index'].to_i)
@@ -134,8 +131,7 @@ class Admin::ShopController < AdminController
     @shop = Shop.fetch_by_id(params['id'])
     if @shop.nil?
       flash[:error] = 'Active shop is not found'
-      redirect_to shop_index_path(q: params['id'])
-      return
+      return redirect_to shop_index_path(q: params['id'])
     end
   end
 end
