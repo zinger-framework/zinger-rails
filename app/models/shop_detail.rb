@@ -8,7 +8,7 @@ class ShopDetail < ApplicationRecord
       time = Time.now.in_time_zone(PlatformConfig['time_zone']).strftime('%H:%M')
       opening_time = self.opening_time.in_time_zone(PlatformConfig['time_zone'])
       closing_time = self.closing_time.in_time_zone(PlatformConfig['time_zone'])
-      return { 'address' => self.address, 'landline' => self.landline, 'mobile' => self.mobile, 
+      return { 'address' => self.address, 'telephone' => self.telephone, 'mobile' => self.mobile, 
         'cover_photos' => aws_key_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) },
         'opening_time' => opening_time.strftime('%I:%M %p'), 'closing_time' => closing_time.strftime('%I:%M %p'),
         'open_now' => opening_time.strftime('%H:%M') <= time && time < closing_time.strftime('%H:%M') }
@@ -44,7 +44,7 @@ class ShopDetail < ApplicationRecord
     return errors.add(:pincode, I18n.t('validation.required', param: 'Pincode')) if self.address['pincode'].blank?
     return errors.add(:pincode, I18n.t('validation.invalid', param: 'pincode')) if self.address['pincode'].length != 6
 
-    self.landline = self.landline.to_s.strip
+    self.telephone = self.telephone.to_s.strip
     self.mobile = self.mobile.to_s.strip
     return errors.add(:mobile, I18n.t('validation.invalid', param: 'mobile number')) unless self.mobile.match(MOBILE_REGEX)
   end

@@ -51,6 +51,9 @@
           </div>
           <br><br><br>
 
+          <%= label_tag :area, 'Area' %><br>
+          <%= text_field_tag :area, @shop.shop_detail.address['area'], required: true, placeholder: 'Nungambakkam' %><br><br>
+
           <div class="left">
             <%= label_tag :city, 'City' %><br>
             <%= text_field_tag :city, @shop.shop_detail.address['city'], style: 'width: 120px', required: true, placeholder: 'Chennai' %><br><br>
@@ -60,9 +63,6 @@
             <%= text_field_tag :pincode, @shop.shop_detail.address['pincode'], style: 'width: 100px', required: true, placeholder: '600077' %><br><br>
           </div>
           <br><br><br>
-
-          <%= label_tag :area, 'Area' %><br>
-          <%= text_field_tag :area, @shop.shop_detail.address['area'], required: true, placeholder: 'Nungambakkam' %><br><br>
 
           <div class="left">
             <%= label_tag :lat, 'Latitude' %><br>
@@ -74,8 +74,8 @@
           </div>
           <br><br><br>
 
-          <%= label_tag :landline, 'Landline' %><br>
-          <%= phone_field_tag :landline, @shop.shop_detail.landline, placeholder: '04425545880' %><br><br>
+          <%= label_tag :telephone, 'Telephone' %><br>
+          <%= phone_field_tag :telephone, @shop.shop_detail.telephone, placeholder: '04425545880' %><br><br>
           
           <%= submit_tag 'Update Location', class: "chip mid-small #{@shop.deleted ? '' : 'active '}weight-600", disabled: @shop.deleted %>
         </div>

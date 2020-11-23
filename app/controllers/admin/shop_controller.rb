@@ -16,7 +16,7 @@ class Admin::ShopController < AdminController
       shop = Shop.new(name: params['name'], lat: params['lat'], lng: params['lng'], tags: params['tags'],
         icon: "shop-icon-#{Time.now.to_i}#{File.extname(params['file'].path)}")
       shop_detail = shop.build_shop_detail(address: { number: params['number'], street: params['street'], area: params['area'],
-        city: params['city'], pincode: params['pincode'] }, landline: params['landline'], mobile: params['mobile'],
+        city: params['city'], pincode: params['pincode'] }, telephone: params['telephone'], mobile: params['mobile'],
         opening_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['opening_time'], '%H:%M').utc, 
         closing_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['closing_time'], '%H:%M').utc)
       shop_detail.validate
@@ -61,7 +61,7 @@ class Admin::ShopController < AdminController
     @shop.update(lat: params['lat'], lng: params['lng'])
     shop_detail = @shop.shop_detail
     shop_detail.update(address: { number: params['number'], street: params['street'], area: params['area'],
-      city: params['city'], pincode: params['pincode'] }, landline: params['landline'])
+      city: params['city'], pincode: params['pincode'] }, telephone: params['telephone'])
     @shop.update(updated_at: Time.now.utc)
 
     if @shop.errors.any? || shop_detail.errors.any?
