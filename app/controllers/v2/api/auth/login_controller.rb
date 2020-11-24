@@ -4,13 +4,13 @@ class V2::Api::Auth::LoginController < V2::Api::AuthController
   def password
     params_present = AUTH_PARAMS.select { |key| params[key].present? }
     if params_present.length != 1
-      render status: 400, json: { success: false, message: I18n.t('auth.required', param: AUTH_PARAMS.join(', ')) }
+      render status: 400, json: { success: false, message: I18n.t('validation.too_many_params', param: AUTH_PARAMS.join(', ')) }
       return
     end
 
-    if params['password'].to_s.length < Customer::PASSWORD_MIN_LENGTH
+    if params['password'].to_s.length < PASSWORD_MIN_LENGTH
       render status: 400, json: { success: false, message: I18n.t('customer.login_failed'), 
-        reason: { password: [ I18n.t('customer.password.invalid', length: Customer::PASSWORD_MIN_LENGTH) ] } }
+        reason: { password: [ I18n.t('customer.password.invalid', length: PASSWORD_MIN_LENGTH) ] } }
       return
     end
     

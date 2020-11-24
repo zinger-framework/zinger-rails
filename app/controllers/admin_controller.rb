@@ -1,5 +1,5 @@
 class AdminController < ApplicationController
-  before_action :authenticate_request, :check_limit
+  before_action :set_title, :authenticate_request, :check_limit
 
   def dashboard
     @title = 'Dashboard'
@@ -30,6 +30,10 @@ class AdminController < ApplicationController
       flash[:error] = resp
       return redirect_to request.referrer
     end
+  end
+
+  def set_title
+    @header = { links: [] }
   end
 end
 

@@ -69,5 +69,31 @@ ActiveRecord::Schema.define(version: 2020_11_07_083221) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["email"], name: "index_employees_on_email"
   end
+  
+  create_table "shop_details", primary_key: "shop_id", id: :bigint, default: nil, force: :cascade do |t|
+    t.json "address", default: {}
+    t.string "telephone"
+    t.string "mobile"
+    t.time "opening_time"
+    t.time "closing_time"
+    t.string "cover_photos", array: true
+    t.jsonb "payment", default: {}
+    t.jsonb "meta", default: {}
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "shops", force: :cascade do |t|
+    t.string "name"
+    t.decimal "lat", precision: 10, scale: 8
+    t.decimal "lng", precision: 11, scale: 8
+    t.string "icon"
+    t.string "tags"
+    t.integer "status", limit: 2, default: 1
+    t.boolean "deleted", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["email"], name: "index_employees_on_email"
+  end
 
 end
