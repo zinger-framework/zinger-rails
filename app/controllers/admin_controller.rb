@@ -15,7 +15,7 @@ class AdminController < ApplicationController
       return redirect_to auth_index_path
     end
 
-    if payload['two_fa']['status'] == Employee::TWO_FA_STATUSES['UNVERIFIED']
+    if payload['two_fa']['status'] == Employee::TWO_FA_STATUSES['UNVERIFIED'] && payload['two_fa']['auth_token'].present?
       return redirect_to otp_auth_index_path
     elsif !AUTHORIZED_2FA_STATUSES.include? payload['two_fa']['status']
       session.delete(:authorization)
