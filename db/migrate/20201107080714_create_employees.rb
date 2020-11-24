@@ -11,7 +11,6 @@ class CreateEmployees < ActiveRecord::Migration[6.0]
       t.timestamps
 
       t.index :email
-      t.index :mobile
     end
   end
 end

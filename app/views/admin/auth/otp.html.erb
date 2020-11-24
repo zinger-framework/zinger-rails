@@ -1,10 +1,5 @@
 <div class="component intro">
-  <div class="top-50 large center-text width-60">
-    <span class="title-600">Welcome to <span class="red-title-600">Zinger-Admin</span> Console</span>
-  </div>
-  <div class="top-10 very-small center-text width-60">
-    <span class="title-100">An Open Source Framework for building Hyperlocal Delivery Mobile and Web applications</span>
-  </div>
+  <%= render 'admin/auth/header' %>
   <div class="top-50 mid-small center">
     <%= form_tag otp_auth_index_path, method: :post do %>
       <%= label_tag :otp, 'OTP' %><br>
@@ -17,8 +12,8 @@
 </div>
 
 <style type="text/css">
-    .intro {
-        padding-top: 30px;
-    }
+  .intro {
+      padding-top: 30px;
+  }
 </style>
 

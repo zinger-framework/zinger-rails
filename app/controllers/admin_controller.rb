@@ -6,18 +6,18 @@ class AdminController < ApplicationController
   end
 
   private
+  AUTHORIZED_2FA_STATUSES = [ Employee::TWO_FA_STATUSES['NOT_APPLICABLE'], Employee::TWO_FA_STATUSES['VERIFIED'] ]
 
   def authenticate_request
-    employee = !session[:authorization].nil? ? EmployeeSession.fetch_employee(session[:authorization]) : nil
+    employee,payload = session[:authorization].present? ? EmployeeSession.fetch_employee(session[:authorization]) : nil
     if employee.nil?
       session.delete(:authorization)
-      redirect_to auth_index_path
-      return
+      return redirect_to auth_index_path
     end
-    payload = EmployeeSession.decode_jwt_token(session[:authorization])
-    if payload['two_fa']['verified'] == 1
+
+    if payload['two_fa']['status'] == Employee::TWO_FA_STATUSES['UNVERIFIED']
       return redirect_to otp_auth_index_path
-    elsif payload['two_fa']['verified'] != 0 && payload['two_fa']['verified'] != 2
+    elsif !AUTHORIZED_2FA_STATUSES.include? payload['two_fa']['status']
       session.delete(:authorization)
       return redirect_to auth_index_path
     end
@@ -27,8 +27,8 @@ class AdminController < ApplicationController
   def check_limit
     resp = Core::Ratelimit.reached?(request)
     if resp
-      render html: resp
-      return
+      flash[:error] = resp
+      return redirect_to request.referrer
     end
   end
 end

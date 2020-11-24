@@ -1,6 +1,6 @@
 class Employee < ApplicationRecord
   STATUSES = { 'ACTIVE' => 1, 'BLOCKED' => 2 }
-  VERIFIED = { '2FA_DISABLED_VERIFIED' => 0, '2FA_ENABLED_UNVERIFIED' => 1, '2FA_ENABLED_VERIFIED' => 2 }
+  TWO_FA_STATUSES = { 'NOT_APPLICABLE' => 0, 'UNVERIFIED' => 1, 'VERIFIED' => 2 }
   OTP_LENGTH = PlatformConfig['otp_length']
 
   has_secure_password(validations: false)

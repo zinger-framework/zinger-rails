@@ -68,8 +68,6 @@ ActiveRecord::Schema.define(version: 2020_11_07_083221) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["email"], name: "index_employees_on_email"
-    t.index ["mobile"], name: "index_employees_on_mobile"
   end
 
 end
-
