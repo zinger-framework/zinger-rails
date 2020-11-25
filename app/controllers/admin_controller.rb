@@ -1,13 +1,12 @@
 class AdminController < ApplicationController
   before_action :set_title, :authenticate_request, :check_limit
+  AUTHORIZED_2FA_STATUSES = [ Employee::TWO_FA_STATUSES['NOT_APPLICABLE'], Employee::TWO_FA_STATUSES['VERIFIED'] ]
 
   def dashboard
     @title = 'Dashboard'
   end
 
   private
-  AUTHORIZED_2FA_STATUSES = [ Employee::TWO_FA_STATUSES['NOT_APPLICABLE'], Employee::TWO_FA_STATUSES['VERIFIED'] ]
-
   def authenticate_request
     employee,payload = session[:authorization].present? ? EmployeeSession.fetch_employee(session[:authorization]) : nil
     if employee.nil?
