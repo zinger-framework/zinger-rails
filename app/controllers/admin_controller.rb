@@ -20,7 +20,7 @@ class AdminController < ApplicationController
       return redirect_to auth_index_path
     end
 
-    if payload['two_fa']['status'] == Employee::TWO_FA_STATUSES['UNVERIFIED']
+    if employee.two_fa_enabled && payload['two_fa']['status'] != Employee::TWO_FA_STATUSES['VERIFIED']
       flash[:warn] = 'Please verify OTP to continue'
       return redirect_to otp_auth_index_path
     end
