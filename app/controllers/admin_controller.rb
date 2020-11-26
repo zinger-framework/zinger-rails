@@ -26,7 +26,6 @@ class AdminController < ApplicationController
   end
 
   def check_limit
-    return
     resp = Core::Ratelimit.reached?(request)
     if resp
       flash[:error] = resp
