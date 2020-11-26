@@ -24,10 +24,10 @@ class Admin::ShopController < AdminController
           closing_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['closing_time'], '%H:%M').utc)
         raise shop_detail.errors.messages.values.flatten.first if shop_detail.errors.any?
       end
-   rescue => e
+    rescue => e
       flash[:error] = e
       return redirect_to add_shop_shop_index_path
-    end 
+    end
 
     File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(shop.aws_key_path, file) }
     flash[:success] = 'Shop creation is successful'
