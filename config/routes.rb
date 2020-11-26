@@ -49,7 +49,6 @@ Rails.application.routes.draw do
   end
 
   scope module: 'admin', constraints: { subdomain: AppConfig['admin_subdomain'] } do
-    get :login
     get :dashboard
     resources :customer, only: [:index, :update, :destroy]
     resources :auth, only: :index do

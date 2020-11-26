@@ -1,10 +1,13 @@
 class Employee < ApplicationRecord
   STATUSES = { 'ACTIVE' => 1, 'BLOCKED' => 2 }
-  TWO_FA_STATUSES = { 'NOT_APPLICABLE' => 0, 'UNVERIFIED' => 1, 'VERIFIED' => 2 }
-  OTP_LENGTH = PlatformConfig['otp_length']
+  TWO_FA_STATUSES = { 'NOT_APPLICABLE' => 1, 'UNVERIFIED' => 2, 'VERIFIED' => 3 }
 
   has_secure_password(validations: false)
   default_scope { where(deleted: false) }
+
+  after_commit :clear_cache
+  after_update :clear_sessions
+
   has_many :employee_sessions
 
   def self.send_otp options
@@ -39,5 +42,15 @@ class Employee < ApplicationRecord
   def self.otp
     rand(10**(OTP_LENGTH - 1)..10**OTP_LENGTH - 1).to_s
   end
-end
 
+  def clear_cache
+    Core::Redis.delete(Core::Redis::EMPLOYEE_BY_ID % { id: self.id })
+  end
+
+  def clear_sessions
+    if self.saved_change_to_password_digest?
+      EmployeeSession.where(employee_id: self.id).delete_all
+      Core::Redis.delete(EmployeeSession.cache_key(self.id))
+    end
+  end
+end

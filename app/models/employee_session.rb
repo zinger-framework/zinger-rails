@@ -1,11 +1,13 @@
 class EmployeeSession < ApplicationRecord
   belongs_to :employee
+
   before_create :set_token
   after_create :clear_cache
   after_destroy_commit :clear_cache
 
-  def get_jwt_token two_fa = {}
-    return JWT.encode({ 'employee_id' => self.employee_id, 'expiry_time' => Time.now.next_day.to_i, 'token' => self.token, 'two_fa' => two_fa }, AppConfig['api_auth'])
+  def get_jwt_token two_fa
+    return JWT.encode({ 'employee_id' => self.employee_id, 'expiry_time' => Time.now.next_day.to_i, 'token' => self.token, 
+      'two_fa' => two_fa }, AppConfig['api_auth'])
   end
 
   def self.decode_jwt_token jwt_token
@@ -26,12 +28,13 @@ class EmployeeSession < ApplicationRecord
 
   def self.fetch_employee jwt_token
     payload = EmployeeSession.decode_jwt_token(jwt_token)
-    return nil if payload.blank?
-    return nil if Time.now.to_i > payload['expiry_time']
+    return nil if payload.blank? || Time.now.to_i > payload['expiry_time']
+
     sessions = Core::Redis.fetch(EmployeeSession.cache_key(payload['employee_id']), { type: Array }) do
       EmployeeSession.where(employee_id: payload['employee_id']).map(&:token)
     end
-    return sessions.include?(payload['token']) ? [ Employee.fetch_by_id(payload['employee_id']), payload ]: nil
+    employee = sessions.include?(payload['token']) ? Employee.fetch_by_id(payload['employee_id']) : nil
+    return employee, payload
   end
 
   private
@@ -44,4 +47,3 @@ class EmployeeSession < ApplicationRecord
     Core::Redis.delete(EmployeeSession.cache_key(self.employee_id))
   end
 end
-

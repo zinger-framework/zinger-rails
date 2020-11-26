@@ -5,8 +5,7 @@ class CreateEmployeeDetails < ActiveRecord::Migration[6.0]
       t.column :shop_id, 'BIGINT'
       t.timestamps
 
-      t.index [:employee_id,:shop_id]
+      t.index [:employee_id, :shop_id]
     end
   end
 end
-
