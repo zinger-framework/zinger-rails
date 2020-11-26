@@ -11,6 +11,7 @@ class Admin::ShopController < AdminController
   end
 
   def create
+    shop = nil
     begin
       ActiveRecord::Base.transaction do
         shop = Shop.create(name: params['name'], lat: params['lat'], lng: params['lng'], tags: params['tags'],
