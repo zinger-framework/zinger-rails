@@ -1,7 +1,7 @@
 class Admin::AuthController < AdminController
   skip_before_action :authenticate_request, except: :logout
-  before_action :go_to_dashboard, only: [:index, :login]
-  before_action :verify_jwt_token, except: [:index, :login, :logout]
+  before_action :go_to_dashboard, only: [:index, :login, :register, :signup, :forgot_password, :reset_password]
+  before_action :verify_jwt_token, only: [:otp, :otp_login, :resend_otp]
 
   def index
   end
@@ -66,6 +66,18 @@ class Admin::AuthController < AdminController
     session[:authorization] = @employee.employee_sessions.find_by_token(@payload['token']).get_jwt_token(@payload['two_fa'])
     flash[:success] = I18n.t('employee.otp_success')
     redirect_to otp_auth_index_path
+  end
+
+  def register
+  end
+
+  def signup
+  end
+
+  def forgot_password
+  end
+
+  def reset_password
   end
 
   def logout

@@ -2,12 +2,20 @@
   <div class="container-fluid d-flex justify-content-between align-items-center">
     <div class="brand-logo">
       <a href="<%= dashboard_path %>">
-        <img src="vendors/images/zinger-logo.svg" alt="">
+        <img src="/vendors/images/zinger-logo.svg" alt="">
       </a>
     </div>
     <div class="login-menu">
       <ul>
-        <li><a href="register.html">Register</a></li>
+        <li>
+          <% if session[:authorization].present? %>
+            <%= link_to 'Logout', logout_auth_index_path, method: :delete %>
+          <% elsif "#{params['controller']}##{params['action']}" == 'admin/auth#index' %>
+            <%= link_to 'Register', register_auth_index_path %>
+          <% else %>
+            <%= link_to 'Login', auth_index_path %>
+          <% end %>
+        </li>
       </ul>
     </div>
   </div>
