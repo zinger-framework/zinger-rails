@@ -8,12 +8,12 @@ class Admin::AuthController < AdminController
 
   def login
     if params['email'].blank?
-      flash[:error] = I18n.t('validation.required', param: 'Email')
+      flash[:danger] = I18n.t('validation.required', param: 'Email')
       return redirect_to auth_index_path
     end
 
     if params['password'].to_s.length < PASSWORD_MIN_LENGTH
-      flash[:error] = I18n.t('validation.password.invalid', length: PASSWORD_MIN_LENGTH)
+      flash[:danger] = I18n.t('validation.password.invalid', length: PASSWORD_MIN_LENGTH)
       return redirect_to auth_index_path
     end
 
@@ -27,13 +27,13 @@ class Admin::AuthController < AdminController
     end
     
     if error_msg.present?
-      flash[:error] = error_msg
+      flash[:danger] = error_msg
       return redirect_to auth_index_path
     end
 
     emp_session = employee.employee_sessions.create!(login_ip: request.ip, user_agent: request.headers['User-Agent'])
     if employee.two_fa_enabled
-      session[:authorization] = emp_session.get_jwt_token({ 'status' => Employee::TWO_FA_STATUSES['UNVERIFIED'], 
+      session[:authorization] = emp_session.get_jwt_token({ 'status' => Employee::TWO_FA_STATUSES['UNVERIFIED'],
         'auth_token' => Employee.send_otp({ param: 'mobile', value: employee.mobile }) })
       flash[:success] = I18n.t('employee.otp_success')
       redirect_to otp_auth_index_path
@@ -50,7 +50,7 @@ class Admin::AuthController < AdminController
   def otp_login
     @token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: @payload['two_fa']['auth_token'] }, { type: Hash }) { nil }
     if @token.blank? || @token['token'] != @payload['two_fa']['auth_token'] || @token['code'] != params['otp']
-      flash[:error] = I18n.t('validation.param_expired', param: 'OTP')
+      flash[:danger] = I18n.t('validation.param_expired', param: 'OTP')
       return redirect_to otp_auth_index_path
     end
 
@@ -85,7 +85,7 @@ class Admin::AuthController < AdminController
     @employee, @payload = session[:authorization].present? ? EmployeeSession.fetch_employee(session[:authorization]) : nil
     if @employee.nil?
       session.delete(:authorization)
-      flash[:warn] = 'Please login to continue'
+      flash[:warning] = 'Please login to continue'
       return redirect_to auth_index_path
     end
 

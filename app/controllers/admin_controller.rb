@@ -16,13 +16,13 @@ class AdminController < ApplicationController
     employee, payload = session[:authorization].present? ? EmployeeSession.fetch_employee(session[:authorization]) : nil
     if employee.nil?
       session.delete(:authorization)
-      flash[:warn] = 'Please login to continue'
+      flash[:warning] = 'Please login to continue'
       return redirect_to auth_index_path
     end
 
     if employee.two_fa_enabled && payload['two_fa']['status'] != Employee::TWO_FA_STATUSES['VERIFIED'] &&
         "#{params['controller']}##{params['action']}" != 'admin/auth#logout'
-      flash[:warn] = 'Please verify OTP to continue'
+      flash[:warning] = 'Please verify OTP to continue'
       return redirect_to otp_auth_index_path
     end
     
@@ -32,7 +32,7 @@ class AdminController < ApplicationController
   def check_limit
     resp = Core::Ratelimit.reached?(request)
     if resp
-      flash[:error] = resp
+      flash[:danger] = resp
       return redirect_to request.referrer
     end
   end
