@@ -1,22 +1,42 @@
-<div class="login-header box-shadow">
-  <div class="container-fluid d-flex justify-content-between align-items-center">
-    <div class="brand-logo">
-      <a href="<%= dashboard_path %>">
-        <img src="/vendors/images/zinger-logo.svg" alt="">
-      </a>
-    </div>
-    <div class="login-menu">
-      <ul>
-        <li>
-          <% if session[:authorization].present? %>
-            <%= link_to 'Logout', auth_logout_path, method: :delete %>
-          <% elsif "#{params['controller']}##{params['action']}" == 'admin/auth/login#index' %>
-            <%= link_to 'Register', auth_signup_index_path %>
-          <% else %>
-            <%= link_to 'Login', auth_login_index_path %>
-          <% end %>
-        </li>
-      </ul>
+<% if session[:authorization].present? %>
+  <div class="header-white sidebar-light">
+    <div class="header">
+      <div class="header-left"></div>
+      <div class="header-right">
+        <div class="user-info-dropdown">
+          <div class="dropdown">
+            <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+              <span class="user-icon"><i class="dw dw-user1"></i></span>
+              <span class="user-name"><%= Employee.current.name %></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right dropdown-menu-icon-list">
+              <a class="dropdown-item" href="profile.html"><i class="dw dw-user1"></i> Profile</a>
+              <a class="dropdown-item" href="<%= auth_logout_path %>" data-method="delete"><i class="dw dw-logout"></i> Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+<% else %>
+  <div class="login-header box-shadow">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <div class="brand-logo">
+        <a href="<%= dashboard_path %>">
+          <img src="/vendors/images/zinger-logo.svg" alt="">
+        </a>
+      </div>
+      <div class="login-menu">
+        <ul>
+          <li>
+            <% if "#{params['controller']}##{params['action']}" == 'admin/auth/login#index' %>
+              <%= link_to 'Register', auth_signup_index_path %>
+            <% else %>
+              <%= link_to 'Login', auth_login_index_path %>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+<% end %>
