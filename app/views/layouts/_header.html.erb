@@ -9,11 +9,11 @@
       <ul>
         <li>
           <% if session[:authorization].present? %>
-            <%= link_to 'Logout', logout_auth_index_path, method: :delete %>
-          <% elsif "#{params['controller']}##{params['action']}" == 'admin/auth#index' %>
-            <%= link_to 'Register', register_auth_index_path %>
+            <%= link_to 'Logout', auth_logout_path, method: :delete %>
+          <% elsif "#{params['controller']}##{params['action']}" == 'admin/auth/login#index' %>
+            <%= link_to 'Register', auth_signup_index_path %>
           <% else %>
-            <%= link_to 'Login', auth_index_path %>
+            <%= link_to 'Login', auth_login_index_path %>
           <% end %>
         </li>
       </ul>

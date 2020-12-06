@@ -17,7 +17,7 @@ class AdminController < ApplicationController
     if employee.nil?
       session.delete(:authorization)
       flash[:warning] = 'Please login to continue'
-      return redirect_to auth_index_path
+      return redirect_to auth_login_index_path
     end
 
     if employee.two_fa_enabled && payload['two_fa']['status'] != Employee::TWO_FA_STATUSES['VERIFIED'] &&

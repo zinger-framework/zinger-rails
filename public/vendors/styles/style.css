@@ -2201,7 +2201,6 @@ body.IE .login-wrap .container, body.IE .register-page-wrap .container {
 .register-page-wrap .wizard-content .wizard > .content {
     overflow: hidden;
     padding: 15px 15px 0;
-    min-height: 320px
 }
 
 .register-page-wrap .wizard-content .wizard > .actions {

@@ -22,7 +22,7 @@ $(".tab-wizard2").steps({
 	labels: {
 		finish: "Submit",
 		next: "Next",
-		previous: "Previous",
+		previous: "Back",
 	},
 	onStepChanged: function(event, currentIndex, priorIndex) {
 		$('.steps .current').prevAll().addClass('disabled');

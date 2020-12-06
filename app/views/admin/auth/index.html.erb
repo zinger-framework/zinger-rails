@@ -9,7 +9,7 @@
           <div class="login-title">
             <h2 class="text-center text-primary">Login to <%= PlatformConfig['name'] %></h2>
           </div>
-          <%= form_tag login_auth_index_path do %>
+          <%= form_tag auth_login_index_path do %>
             <div class="select-role">
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
                 <label class="btn">
@@ -42,7 +42,7 @@
             </div>
 
             <div class="input-group custom">
-              <input type="text" name="otp" class="form-control form-control-lg" placeholder="123456">
+              <input type="text" name="otp" class="form-control form-control-lg" placeholder="OTP">
               <div class="input-group-append custom">
                 <span class="input-group-text"><i class="dw dw-key3"></i></span>
               </div>
@@ -51,7 +51,7 @@
             <div class="row pb-30">
               <div class="col-6"></div>
               <div class="col-6">
-                <div class="forgot-password"><%= link_to 'Forgot Password?', forgot_password_auth_index_path %></div>
+                <div class="forgot-password"><%= link_to 'Forgot Password?', auth_forgot_password_index_path %></div>
               </div>
             </div>
             <div class="input-group mb-0">

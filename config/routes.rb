@@ -51,19 +51,22 @@ Rails.application.routes.draw do
   scope module: 'admin', constraints: { subdomain: AppConfig['admin_subdomain'] } do
     get :dashboard
     resources :customer, only: [:index, :update, :destroy]
-    resources :auth, only: :index do
-      collection do
-        post :login
-        get :otp
-        post :otp, to: 'auth#otp_login'
-        post :resend_otp
-
-        get :register
-        post :signup
-        get :forgot_password
-        post :reset_password
+    namespace :auth do
+      resources :login, only: [:index, :create] do
+        collection do
+          post :resend_otp
+          post :verify_otp
+        end
+      end
         
-        delete :logout
+      resources :signup, only: [:index, :create]
+      delete :logout
+
+      resources :forgot_password, only: :index do
+        collection do
+          post :send_otp
+          post :reset_password
+        end
       end
     end
 

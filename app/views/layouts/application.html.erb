@@ -5,9 +5,9 @@
   <title>Zinger</title>
 
   <!-- Site favicon -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/vendors/images/zinger-logo.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/vendors/images/zinger-logo-16x16.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/vendors/images/zinger-logo-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/zinger-logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/zinger-logo-16x16.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/zinger-logo-32x32.png">
 
   <!-- Mobile Specific Metas -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -18,13 +18,14 @@
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="/vendors/styles/core.css">
   <link rel="stylesheet" type="text/css" href="/vendors/styles/icon-font.min.css">
+  <link rel="stylesheet" type="text/css" href="/plugins/jquery-steps/jquery.steps.css">
   <link rel="stylesheet" type="text/css" href="/vendors/styles/style.css">
 
   <!-- Scripts -->
   <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  <script src="/vendors/scripts/core.js"></script>
-  <script src="/vendors/scripts/script.min.js"></script>
-  <script src="/vendors/scripts/process.js"></script>
+  <%= javascript_include_tag '/vendors/scripts/core' %>
+  <%= javascript_include_tag '/vendors/scripts/script.min' %>
+  <%= javascript_include_tag '/vendors/scripts/process' %>
 
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
