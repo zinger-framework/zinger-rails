@@ -59,8 +59,11 @@ Rails.application.routes.draw do
         end
       end
         
-      resources :signup, only: [:index, :create]
-      delete :logout
+      resources :signup, only: [:index, :create] do
+        collection do
+          post :send_otp
+        end
+      end
 
       resources :forgot_password, only: :index do
         collection do
@@ -68,6 +71,8 @@ Rails.application.routes.draw do
           post :reset_password
         end
       end
+
+      delete :logout
     end
 
     resources :shop, only: [:index, :create, :update, :destroy] do
