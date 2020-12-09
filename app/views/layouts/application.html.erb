@@ -18,26 +18,27 @@
   <!-- CSS -->
   <link rel="stylesheet" type="text/css" href="/vendors/styles/core.css">
   <link rel="stylesheet" type="text/css" href="/vendors/styles/icon-font.min.css">
-  <link rel="stylesheet" type="text/css" href="/plugins/jquery-steps/jquery.steps.css">
-  <link rel="stylesheet" type="text/css" href="/vendors/styles/style.css">
   <link rel="stylesheet" type="text/css" href="/plugins/datatables/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" type="text/css" href="/plugins/datatables/css/responsive.bootstrap4.min.css">
+  <link rel="stylesheet" type="text/css" href="/vendors/styles/style.css">
 
   <!-- Scripts -->
   <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   <%= javascript_include_tag '/vendors/scripts/core' %>
   <%= javascript_include_tag '/vendors/scripts/script.min' %>
   <%= javascript_include_tag '/vendors/scripts/process' %>
+  <%= javascript_include_tag '/plugins/apexcharts/apexcharts.min' %>
   <%= javascript_include_tag '/plugins/datatables/js/jquery.dataTables.min' %>
   <%= javascript_include_tag '/plugins/datatables/js/dataTables.bootstrap4.min' %>
   <%= javascript_include_tag '/plugins/datatables/js/dataTables.responsive.min' %>
   <%= javascript_include_tag '/plugins/datatables/js/responsive.bootstrap4.min' %>
+  <script src="/vendors/scripts/dashboard.js"></script>
 
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 </head>
 
-  <body>
+  <body class="header-white sidebar-light">
     <%= render 'layouts/header' %>
     <% flash.each do |type, message| %>
       <div class="alert alert-<%= type %> alert-dismissible fade show text-center" role="alert">

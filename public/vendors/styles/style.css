@@ -1466,7 +1466,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td:first-child:before
     width: 48px;
     height: 48px;
     font-size: 24px;
-    color: #FF4141;
+    color: grey;
     line-height: 52px;
     text-align: center;
     display: inline-block;
