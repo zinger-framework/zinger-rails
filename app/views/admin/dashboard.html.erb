@@ -1,5 +1,3 @@
-
-
 <div class="left-side-bar">
   <div class="brand-logo">
     <a href="<%= dashboard_path %>">
@@ -13,18 +11,18 @@
     <div class="sidebar-menu">
       <ul id="accordion-menu">
         <li>
-          <a href="<%= shop_index_path %>" class="dropdown-toggle no-arrow">
-            <span class="micon dw dw-shop"></span><span class="mtext">Shops</span>
-          </a>
-        </li>
-        <li>
-          <a href="<%= customer_index_path %>" class="dropdown-toggle no-arrow">
-            <span class="micon dw dw-user"></span><span class="mtext">Customers</span>
+          <a href="" class="dropdown-toggle no-arrow">
+            <span class="micon dw dw-shopping-cart"></span><span class="mtext">Orders</span>
           </a>
         </li>
         <li>
           <a href="" class="dropdown-toggle no-arrow">
-            <span class="micon dw dw-shopping-cart"></span><span class="mtext">Orders</span>
+            <span class="micon dw dw-shop"></span><span class="mtext">Inventory</span>
+          </a>
+        </li>
+        <li>
+          <a href="" class="dropdown-toggle no-arrow">
+            <span class="micon dw dw-user-13"></span><span class="mtext">Employees</span>
           </a>
         </li>
         <li>
@@ -40,59 +38,58 @@
 
 <div class="main-container">
   <div class="pd-ltr-20">
-    <div class="row">
-      <div class="col-xl-3 mb-30">
-        <div class="card-box height-100-p widget-style1">
-          <div class="d-flex flex-wrap align-items-center">
-            <div class="progress-data">
-              <div id="chart"></div>
-            </div>
-            <div class="widget-data">
-              <div class="h4 mb-0">2020</div>
-              <div class="weight-600 font-14">Contact</div>
-            </div>
+    <div class="card-deck mb-30 text-center">
+      <div class="card card-box">
+        <div class="card-body">
+          <div class="widget-data">
+            <div class="h1 mb-1">8</div>
+            <div class="weight-600 font-14">Signup</div>
           </div>
         </div>
       </div>
-      <div class="col-xl-3 mb-30">
-        <div class="card-box height-100-p widget-style1">
-          <div class="d-flex flex-wrap align-items-center">
-            <div class="progress-data">
-              <div id="chart2"></div>
-            </div>
-            <div class="widget-data">
-              <div class="h4 mb-0">400</div>
-              <div class="weight-600 font-14">Deals</div>
-            </div>
+      <div class="card card-box">
+        <div class="card-body">
+          <div class="widget-data">
+            <div class="h1 mb-1">287</div>
+            <div class="weight-600 font-14">Orders</div>
           </div>
         </div>
       </div>
-      <div class="col-xl-3 mb-30">
-        <div class="card-box height-100-p widget-style1">
-          <div class="d-flex flex-wrap align-items-center">
-            <div class="progress-data">
-              <div id="chart3"></div>
-            </div>
-            <div class="widget-data">
-              <div class="h4 mb-0">350</div>
-              <div class="weight-600 font-14">Campaign</div>
-            </div>
+      <div class="card card-box">
+        <div class="card-body">
+          <div class="widget-data">
+            <div class="h1 mb-1">1,233</div>
+            <div class="weight-600 font-14">Transaction Cost</div>
           </div>
         </div>
       </div>
-      <div class="col-xl-3 mb-30">
-        <div class="card-box height-100-p widget-style1">
-          <div class="d-flex flex-wrap align-items-center">
-            <div class="progress-data">
-              <div id="chart4"></div>
-            </div>
-            <div class="widget-data">
-              <div class="h4 mb-0">$6060</div>
-              <div class="weight-600 font-14">Worth</div>
-            </div>
+      <div class="card card-box">
+        <div class="card-body">
+          <div class="widget-data">
+            <div class="h1 mb-1">233</div>
+            <div class="weight-600 font-14">Revenue</div>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="bg-white pd-20 card-box mb-30">
+      <h4 class="h4 text-blue">Transactions</h4>
+      <div id="chart5"></div>
+    </div>
+
+    <div class="bg-white pd-20 card-box mb-30">
+      <h4 class="h4 text-blue">New Registrations</h4>
+      <div id="chart1"></div>
+    </div>
+    <br>
   </div>
 </div>
+
+<%= javascript_include_tag '/plugins/apexcharts/apexcharts.min' %>
+<%= javascript_include_tag '/vendors/scripts/apexcharts-setting' %>
+<%= javascript_include_tag '/plugins/datatables/js/jquery.dataTables.min' %>
+<%= javascript_include_tag '/plugins/datatables/js/dataTables.bootstrap4.min' %>
+<%= javascript_include_tag '/plugins/datatables/js/dataTables.responsive.min' %>
+<%= javascript_include_tag '/plugins/datatables/js/responsive.bootstrap4.min' %>
+<%= javascript_include_tag '/vendors/scripts/dashboard' %>

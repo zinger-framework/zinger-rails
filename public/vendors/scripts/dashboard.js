@@ -309,10 +309,10 @@ var options5 = {
 		colors: ['transparent']
 	},
 	series: [{
-		name: 'In Progress',
+		name: 'Transaction Cost',
 		data: [40, 28, 47, 22, 34, 25]
 	}, {
-		name: 'Complete',
+		name: 'Profit',
 		data: [30, 20, 37, 10, 28, 11]
 	}],
 	xaxis: {
@@ -421,24 +421,23 @@ var options6 = {
 	labels: ['Achieve Goals'],
 };
 
-var chart = new ApexCharts(document.querySelector("#chart"), options);
-chart.render();
-
-var chart2 = new ApexCharts(document.querySelector("#chart2"), options2);
-chart2.render();
-
-var chart3 = new ApexCharts(document.querySelector("#chart3"), options3);
-chart3.render();
-
-var chart4 = new ApexCharts(document.querySelector("#chart4"), options4);
-chart4.render();
+// var chart = new ApexCharts(document.querySelector("#chart"), options);
+// chart.render();
+//
+// var chart2 = new ApexCharts(document.querySelector("#chart2"), options2);
+// chart2.render();
+//
+// var chart3 = new ApexCharts(document.querySelector("#chart3"), options3);
+// chart3.render();
+//
+// var chart4 = new ApexCharts(document.querySelector("#chart4"), options4);
+// chart4.render();
 
 var chart5 = new ApexCharts(document.querySelector("#chart5"), options5);
 chart5.render();
 
-var chart6 = new ApexCharts(document.querySelector("#chart6"), options6);
-chart6.render();
-
+// var chart6 = new ApexCharts(document.querySelector("#chart6"), options6);
+// chart6.render();
 
 // datatable init
 $('document').ready(function(){

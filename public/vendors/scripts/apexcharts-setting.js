@@ -1,6 +1,6 @@
 var options = {
 	series: [{
-		name: 'Likes',
+		name: 'Users',
 		data: [4, 3, 10, 9, 29, 19, 22, 9, 12, 7, 19, 5, 13, 9, 17, 2, 7, 5]
 	}],
 	chart: {
@@ -24,14 +24,6 @@ var options = {
 	xaxis: {
 		type: 'datetime',
 		categories: ['1/11/2020', '2/11/2020', '3/11/2020', '4/11/2020', '5/11/2020', '6/11/2020', '7/11/2020', '8/11/2020', '9/11/2020', '10/11/2020', '11/11/2020', '12/11/2020', '1/11/2021', '2/11/2021', '3/11/2021','4/11/2021' ,'5/11/2021' ,'6/11/2021'],
-	},
-	title: {
-		text: 'Social Media',
-		align: 'left',
-		style: {
-			fontSize: "16px",
-			color: '#666'
-		}
 	},
 	fill: {
 		type: 'gradient',
@@ -58,7 +50,7 @@ var options = {
 		min: -10,
 		max: 40,
 		title: {
-			text: 'Engagement',
+			text: 'Users',
 		},
 	}
 };
@@ -103,8 +95,8 @@ var options2 = {
 		},
 	},
 };
-var chart = new ApexCharts(document.querySelector("#chart2"), options2);
-chart.render();
+// var chart = new ApexCharts(document.querySelector("#chart2"), options2);
+// chart.render();
 
 var options3 = {
 	series: [{
@@ -158,8 +150,8 @@ var options3 = {
 		}
 	}
 };
-var chart = new ApexCharts(document.querySelector("#chart3"), options3);
-chart.render();
+// var chart = new ApexCharts(document.querySelector("#chart3"), options3);
+// chart.render();
 
 var options4 = {
 	series: [{
@@ -206,8 +198,8 @@ var options4 = {
 		categories: [2014, 2015, 2016, 2017, 2018, 2019, 2020],
 	},
 };
-var chart = new ApexCharts(document.querySelector("#chart4"), options4);
-chart.render();
+// var chart = new ApexCharts(document.querySelector("#chart4"), options4);
+// chart.render();
 
 var options5 = {
 	series: [{
@@ -288,8 +280,8 @@ var options5 = {
 		}
 	}
 };
-var chart = new ApexCharts(document.querySelector("#chart5"), options5);
-chart.render();
+// var chart = new ApexCharts(document.querySelector("#chart5"), options5);
+// chart.render();
 
 var options6 = {
 	series: [
@@ -442,8 +434,8 @@ var options6 = {
 		horizontalAlign: 'left'
 	}
 };
-var chart = new ApexCharts(document.querySelector("#chart6"), options6);
-chart.render();
+// var chart = new ApexCharts(document.querySelector("#chart6"), options6);
+// chart.render();
 
 var options7 = {
 	series: [{
@@ -583,8 +575,8 @@ var options7 = {
 		}
 	}
 };
-var chart = new ApexCharts(document.querySelector("#chart7"), options7);
-chart.render();
+// var chart = new ApexCharts(document.querySelector("#chart7"), options7);
+// chart.render();
 
 var options8 = {
 	series: [44, 55, 41, 17, 15],
@@ -603,8 +595,8 @@ var options8 = {
 		}
 	}]
 };
-var chart = new ApexCharts(document.querySelector("#chart8"), options8);
-chart.render();
+// var chart = new ApexCharts(document.querySelector("#chart8"), options8);
+// chart.render();
 
 var options9 = {
 	series: [76, 67, 61, 90],
@@ -664,5 +656,5 @@ var options9 = {
 		}
 	}]
 };
-var chart = new ApexCharts(document.querySelector("#chart9"), options9);
-chart.render();
+// var chart = new ApexCharts(document.querySelector("#chart9"), options9);
+// chart.render();
