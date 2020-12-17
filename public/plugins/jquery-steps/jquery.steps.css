@@ -162,7 +162,7 @@
 }
 
 .wizard-content .wizard>.actions>ul>li>a {
-	background: #009efb ;
+	background: #FF4141;
 	color: #fff;
 	display: block;
 	padding: 7px 12px;
@@ -185,8 +185,8 @@
 
 .wizard-content .wizard>.actions>ul>li>a[href="#previous"] {
 	background-color: #fff;
-	color: #009efb;
-	border: 1px solid #009efb;
+	color: #FF4141;
+	border: 1px solid #FF4141;
 }
 
 .wizard-content .wizard>.actions>ul>li>a[href="#previous"]:focus,
