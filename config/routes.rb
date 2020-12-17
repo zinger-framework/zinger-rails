@@ -51,6 +51,7 @@ Rails.application.routes.draw do
   scope module: 'admin', constraints: { subdomain: AppConfig['admin_subdomain'] } do
     get :dashboard
     resources :customer, only: [:index, :update, :destroy]
+    resources :profile, only: :index
     namespace :auth do
       resources :login, only: [:index, :create] do
         collection do
