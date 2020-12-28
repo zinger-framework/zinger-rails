@@ -1,3 +1,4 @@
+<% return if session[:authorization].blank? %>
 <div class="left-side-bar">
   <div class="brand-logo">
     <a href="<%= dashboard_path %>">

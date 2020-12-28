@@ -21,6 +21,7 @@
   <link rel="stylesheet" type="text/css" href="/plugins/datatables/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" type="text/css" href="/plugins/datatables/css/responsive.bootstrap4.min.css">
   <link rel="stylesheet" type="text/css" href="/vendors/styles/style.css">
+  <link rel="stylesheet" type="text/css" href="/plugins/switchery/switchery.min.css">
 
   <!-- Scripts -->
   <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
@@ -34,6 +35,8 @@
 
   <body class="header-white sidebar-light">
     <%= render 'layouts/header' %>
+    <%= render 'layouts/sidebar' %>
+
     <% flash.each do |type, message| %>
       <div class="alert alert-<%= type %> alert-dismissible fade show text-center" role="alert">
         <%= message %>
@@ -41,5 +44,12 @@
       </div>
     <% end %>
     <%= yield %>
+
+    <%= javascript_include_tag '/plugins/datatables/js/jquery.dataTables.min' %>
+    <%= javascript_include_tag '/plugins/datatables/js/dataTables.bootstrap4.min' %>
+    <%= javascript_include_tag '/plugins/datatables/js/dataTables.responsive.min' %>
+    <%= javascript_include_tag '/plugins/datatables/js/responsive.bootstrap4.min' %>
+    <%= javascript_include_tag '/plugins/switchery/switchery.min' %>
+    <%= javascript_include_tag '/vendors/scripts/advanced-components' %>
   </body>
 </html>

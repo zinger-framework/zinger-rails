@@ -38,7 +38,6 @@ class Admin::Auth::LoginController < Admin::AuthController
       redirect_to otp_auth_index_path
     else
       session[:authorization] = emp_session.get_jwt_token({ 'status' => Employee::TWO_FA_STATUSES['NOT_APPLICABLE'] })
-      flash[:success] = I18n.t('employee.login_success')
       redirect_to dashboard_path
     end
   end
@@ -60,7 +59,6 @@ class Admin::Auth::LoginController < Admin::AuthController
     @payload['two_fa']['status'] = Employee::TWO_FA_STATUSES['VERIFIED']
     session[:authorization] = @employee.employee_sessions.find_by_token(@payload['token']).get_jwt_token(@payload['two_fa'])
     Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: @payload['two_fa']['auth_token'] })
-    flash[:success] = I18n.t('employee.login_success')
     redirect_to dashboard_path
   end
 end
