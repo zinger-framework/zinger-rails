@@ -1,6 +1,5 @@
 class Admin::Auth::LoginController < Admin::AuthController
-  before_action :go_to_dashboard, except: [:resend_otp, :verify_otp]
-  before_action :verify_jwt_token, only: [:resend_otp, :verify_otp]
+  before_action :verify_jwt_token
 
   def index
   end
@@ -35,7 +34,7 @@ class Admin::Auth::LoginController < Admin::AuthController
       session[:authorization] = emp_session.get_jwt_token({ 'status' => Employee::TWO_FA_STATUSES['UNVERIFIED'],
         'auth_token' => Employee.send_otp({ param: 'mobile', value: employee.mobile }) })
       flash[:success] = I18n.t('employee.otp_success')
-      redirect_to otp_auth_index_path
+      redirect_to auth_login_index_path
     else
       session[:authorization] = emp_session.get_jwt_token({ 'status' => Employee::TWO_FA_STATUSES['NOT_APPLICABLE'] })
       redirect_to dashboard_path
@@ -46,14 +45,14 @@ class Admin::Auth::LoginController < Admin::AuthController
     @payload['two_fa']['auth_token'] = Employee.send_otp({ param: 'mobile', value: @employee.mobile })
     session[:authorization] = @employee.employee_sessions.find_by_token(@payload['token']).get_jwt_token(@payload['two_fa'])
     flash[:success] = I18n.t('employee.otp_success')
-    redirect_to otp_auth_index_path
+    redirect_to auth_login_index_path
   end
 
   def verify_otp
     @token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: @payload['two_fa']['auth_token'] }, { type: Hash }) { nil }
     if @token.blank? || @token['token'] != @payload['two_fa']['auth_token'] || @token['code'] != params['otp']
       flash[:danger] = I18n.t('validation.param_expired', param: 'OTP')
-      return redirect_to otp_auth_index_path
+      return redirect_to auth_login_index_path
     end
 
     @payload['two_fa']['status'] = Employee::TWO_FA_STATUSES['VERIFIED']

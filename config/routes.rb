@@ -55,7 +55,7 @@ Rails.application.routes.draw do
     namespace :auth do
       resources :login, only: [:index, :create] do
         collection do
-          post :resend_otp
+          get :resend_otp
           post :verify_otp
         end
       end

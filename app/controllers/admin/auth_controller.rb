@@ -10,18 +10,14 @@ class Admin::AuthController < AdminController
 
   private
 
-  def go_to_dashboard
-    return redirect_to dashboard_path if session[:authorization].present?
-  end
-
   def verify_jwt_token
     @employee, @payload = session[:authorization].present? ? EmployeeSession.fetch_employee(session[:authorization]) : nil
     if @employee.nil?
       session.delete(:authorization)
-      flash[:warning] = 'Please login to continue'
-      return redirect_to auth_login_index_path
+    elsif @payload['two_fa']['status'] == Employee::TWO_FA_STATUSES['UNVERIFIED']
+      @employee.make_current
+    else
+      return redirect_to dashboard_path
     end
-
-    return redirect_to dashboard_path if AUTHORIZED_2FA_STATUSES.include? @payload['two_fa']['status']
   end
 end

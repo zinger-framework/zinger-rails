@@ -1,4 +1,4 @@
-<% if session[:authorization].present? %>
+<% if session[:authorization].present? && AdminController::AUTHORIZED_2FA_STATUSES.include?(@payload['two_fa']['status']) %>
   <div class="header">
     <div class="header-left"></div>
     <div class="header-right">
@@ -28,7 +28,11 @@
         <ul>
           <li>
             <% if "#{params['controller']}##{params['action']}" == 'admin/auth/login#index' %>
-              <%= link_to 'Register', auth_signup_index_path %>
+              <% if @payload && @payload['two_fa']['status'] == Employee::TWO_FA_STATUSES['UNVERIFIED'] %>
+                <%= link_to 'Logout', auth_logout_path, method: :delete %>
+              <% else %>
+                <%= link_to 'Register', auth_signup_index_path %>
+              <% end %>
             <% else %>
               <%= link_to 'Login', auth_login_index_path %>
             <% end %>

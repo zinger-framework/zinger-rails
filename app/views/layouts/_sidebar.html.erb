@@ -1,4 +1,4 @@
-<% return if session[:authorization].blank? %>
+<% return if session[:authorization].blank? || !AdminController::AUTHORIZED_2FA_STATUSES.include?(@payload['two_fa']['status']) %>
 <div class="left-side-bar">
   <div class="brand-logo">
     <a href="<%= dashboard_path %>">
