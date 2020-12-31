@@ -13,13 +13,14 @@
             <div class="select-role">
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
                 <label class="btn">
-                  <input type="radio" name="user_type" id="user_type">
+                  <input type="radio" name="user_type" value="Admin" required <%= 'disabled' if session[:authorization].present? %>>
                   <div class="icon"><img src="/vendors/images/briefcase.svg" class="svg" alt=""></div>
                   <span>I'm <%= PlatformConfig['name'] %></span>
                   Admin
                 </label>
-                <label class="btn">
-                  <input type="radio" name="user_type" id="user_type">
+                <!-- TODO: Change logic when admin user login is integrated - Logesh -->
+                <label class="btn <%= 'active' if session[:authorization].present? %>">
+                  <input type="radio" name="user_type" value="Employee" required <%= 'checked disabled' if session[:authorization].present? %>>
                   <div class="icon"><img src="/vendors/images/person.svg" class="svg" alt=""></div>
                   <span>I'm <%= PlatformConfig['name'] %></span>
                   Employee
@@ -57,7 +58,7 @@
               </div>
 
               <div class="input-group custom">
-                <input type="text" name="otp" class="form-control form-control-lg" placeholder="OTP" required>
+                <input type="text" name="otp" class="form-control form-control-lg" placeholder="OTP" required minlength="<%= PlatformConfig['otp_length'] %>" maxlength="<%= PlatformConfig['otp_length'] %>">
                 <div class="input-group-append custom">
                   <span class="input-group-text"><i class="dw dw-key3"></i></span>
                 </div>

@@ -5,17 +5,26 @@ class Admin::Auth::LoginController < Admin::AuthController
   end
 
   def create
-    if params['email'].blank?
-      flash[:danger] = I18n.t('validation.required', param: 'Email')
+    error_msg = if params['user_type'].blank?
+      I18n.t('validation.required', param: 'User type')
+    elsif !%w(Admin Employee).include? params['user_type']
+      I18n.t('validation.invalid', param: 'user type')
+    elsif params['email'].blank?
+      I18n.t('validation.required', param: 'Email')
+    elsif params['password'].to_s.length < PASSWORD_MIN_LENGTH
+      I18n.t('validation.password.invalid', length: PASSWORD_MIN_LENGTH)
+    end
+
+    if error_msg.present?
+      flash[:danger] = error_msg
       return redirect_to auth_login_index_path
     end
 
-    if params['password'].to_s.length < PASSWORD_MIN_LENGTH
-      flash[:danger] = I18n.t('validation.password.invalid', length: PASSWORD_MIN_LENGTH)
-      return redirect_to auth_login_index_path
+    employee = case params['user_type']
+    when 'Employee'
+      Employee.find_by_email(params['email'])
     end
 
-    employee = Employee.find_by_email(params['email'])
     error_msg = if employee.nil?
       I18n.t('employee.not_found')
     elsif employee.is_blocked?
