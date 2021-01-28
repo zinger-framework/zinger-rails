@@ -28,6 +28,7 @@
   <%= javascript_include_tag '/vendors/scripts/core' %>
   <%= javascript_include_tag '/vendors/scripts/script.min' %>
   <%= javascript_include_tag '/vendors/scripts/process' %>
+  <%= javascript_include_tag '/plugins/jquery-steps/jquery.steps' %>
 
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
@@ -52,4 +53,24 @@
     <%= javascript_include_tag '/plugins/switchery/switchery.min' %>
     <%= javascript_include_tag '/vendors/scripts/advanced-components' %>
   </body>
+
+  <script>
+    $('div.form-group input').on('input',function(e) {
+      hide_error(e.currentTarget);
+    });
+
+    function hide_error(target) {
+      $(target).removeClass('has-danger');
+      $(target).removeClass('form-control-danger');
+      $("div#error-" + $(target).attr('name')).html('');
+    }
+
+    function show_error(param, reason) {
+      $("div.form-group-" + param).addClass('has-danger');
+      $("div.form-group input#" + param).addClass('form-control-danger');
+      $("div#error-" + param).html(reason.join(', '));
+      $("div.form-group input#" + param).focus();
+      return false;
+    }
+  </script>
 </html>
