@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row align-items-center">
       <div class="col-md-6 col-lg-7">
-        <img src="/vendors/images/login.svg" alt="">
+        <img src="/images/login.svg" alt="">
       </div>
       <div class="col-md-6 col-lg-5">
         <div class="login-box bg-white box-shadow border-radius-10">
@@ -14,14 +14,14 @@
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
                 <label class="btn">
                   <input type="radio" name="user_type" value="Admin" required <%= 'disabled' if session[:authorization].present? %>>
-                  <div class="icon"><img src="/vendors/images/briefcase.svg" class="svg" alt=""></div>
+                  <div class="icon"><img src="/images/briefcase.svg" class="svg" alt=""></div>
                   <span>I'm <%= PlatformConfig['name'] %></span>
                   Admin
                 </label>
                 <!-- TODO: Change logic when admin user login is integrated - Logesh -->
                 <label class="btn <%= 'active' if session[:authorization].present? %>">
                   <input type="radio" name="user_type" value="Employee" required <%= 'checked disabled' if session[:authorization].present? %>>
-                  <div class="icon"><img src="/vendors/images/person.svg" class="svg" alt=""></div>
+                  <div class="icon"><img src="/images/person.svg" class="svg" alt=""></div>
                   <span>I'm <%= PlatformConfig['name'] %></span>
                   Employee
                 </label>
