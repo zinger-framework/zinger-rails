@@ -48,4 +48,4 @@ services:
     depends_on:
       - db
       - redis
-      # - elasticsearchs
+      # - elasticsearch
