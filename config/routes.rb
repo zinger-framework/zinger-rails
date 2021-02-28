@@ -48,46 +48,47 @@ Rails.application.routes.draw do
     end
   end
 
-  scope module: 'admin', constraints: { subdomain: AppConfig['admin_subdomain'] } do
-    get :dashboard
-    resources :customer, only: [:index, :update, :destroy]
-    resources :profile, only: :index
-    namespace :auth do
-      resources :login, only: [:index, :create] do
+  namespace :v1 do
+    scope module: 'admin', constraints: { subdomain: AppConfig['admin_subdomain'] } do
+      namespace :auth do
+        resources :otp, only: :none do
+          collection do 
+            post :login
+            post :forgot_password
+          end
+        end
+      end
+
+      resources :auth, only: :none do
         collection do
-          get :resend_otp
+          post :login
           post :verify_otp
-        end
-      end
-        
-      resources :signup, only: [:index, :create] do
-        collection do
-          post :send_otp
-        end
-      end
-
-      resources :forgot_password, only: :index do
-        collection do
-          post :send_otp
           post :reset_password
+          delete :logout
         end
       end
 
-      delete :logout
-    end
-
-    resources :shop, only: [:index, :create, :update, :destroy] do
-      collection do 
-        get :add_shop
+      resources :user_profile, only: :index do
+        collection do
+          post :reset_password
+          post :enable_two_factor
+          post :disable_two_factor
+        end
       end
-      member do
-        put :location
-        put :icon
-        put :cover_photo
-        put :payment
-        put :meta
-        delete :icon, to: 'shop#delete_icon'
-        delete :cover_photo, to: 'shop#delete_cover_photo'
+
+      resources :shop, only: [:index, :create, :update, :destroy] do
+        collection do 
+          get :add_shop
+        end
+        member do
+          put :location
+          put :icon
+          put :cover_photo
+          put :payment
+          put :meta
+          delete :icon, to: 'shop#delete_icon'
+          delete :cover_photo, to: 'shop#delete_cover_photo'
+        end
       end
     end
   end

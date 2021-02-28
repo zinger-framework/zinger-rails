@@ -1,4 +1,4 @@
-class Admin::CustomerController < AdminController
+class V1::Admin::CustomerController < AdminController
   before_action :set_title
 
   def index

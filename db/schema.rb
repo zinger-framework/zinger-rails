@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_07_083221) do
+ActiveRecord::Schema.define(version: 2020_11_29_085502) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,13 +62,25 @@ ActiveRecord::Schema.define(version: 2020_11_07_083221) do
     t.index ["email"], name: "index_employees_on_email"
   end
 
-  create_table "employees_shops", id: false, force: :cascade do |t|
+  create_table "employments", id: false, force: :cascade do |t|
     t.bigint "employee_id"
     t.bigint "shop_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["employee_id"], name: "index_employees_shops_on_employee_id"
-    t.index ["shop_id"], name: "index_employees_shops_on_shop_id"
+    t.bigint "role_id"
+    t.bigint "privileges"
+    t.index ["employee_id"], name: "index_employments_on_employee_id"
+    t.index ["shop_id"], name: "index_employments_on_shop_id"
+  end
+
+  create_table "roles", force: :cascade do |t|
+    t.string "name"
+    t.bigint "shop_id"
+    t.integer "privileges", default: [], array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "shop_id"], name: "index_roles_on_id_and_shop_id"
+    t.index ["name", "shop_id"], name: "index_roles_on_name_and_shop_id"
   end
 
   create_table "shop_details", primary_key: "shop_id", id: :bigint, default: nil, force: :cascade do |t|

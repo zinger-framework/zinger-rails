@@ -6,62 +6,15 @@
 
   <link rel="icon" type="image/png" href="/images/zinger-logo-32x32.png">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
-  <link rel="stylesheet" type="text/css" href="/styles/core.css">
-  <link rel="stylesheet" type="text/css" href="/styles/icon-font.min.css">
-  <link rel="stylesheet" type="text/css" href="/styles/style.css">
-  <link rel="stylesheet" type="text/css" href="/plugins/switchery/switchery.min.css">
 
   <!-- Scripts -->
   <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  <%= javascript_include_tag '/scripts/core' %>
-  <%= javascript_include_tag '/scripts/script' %>
-  <%= javascript_include_tag '/plugins/jquery-steps/jquery.steps' %>
 
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 </head>
 
-<body class="header-white sidebar-light">
-  <%= render 'layouts/header' %>
-  <%= render 'layouts/sidebar' %>
-
-  <% flash.each do |type, message| %>
-    <div class="alert alert-<%= type %> alert-dismissible fade show text-center" role="alert">
-      <%= message %>
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    </div>
-  <% end %>
+<body>
   <%= yield %>
-
-  <%= javascript_include_tag '/plugins/switchery/switchery.min' %>
 </body>
-
-<script>
-  $('div.form-group input').on('input',function(e) {
-    hide_error(e.currentTarget);
-  });
-
-  function hide_error(target) {
-    $(target).removeClass('has-danger');
-    $(target).removeClass('form-control-danger');
-    $("div#error-" + $(target).attr('name')).html('');
-  }
-
-  function show_error(param, reason) {
-    $("div.form-group-" + param).addClass('has-danger');
-    $("div.form-group input#" + param).addClass('form-control-danger');
-    $("div#error-" + param).html(reason.join(', '));
-    $("div.form-group input#" + param).focus();
-    return false;
-  }
-
-  //Switchery
-  var elems = Array.prototype.slice.call(document.querySelectorAll('.switch-btn'));
-  $('.switch-btn').each(function() {
-    new Switchery($(this)[0], $(this).data());
-  });
-</script>
 </html>

@@ -1,5 +1,5 @@
 class Employee < ApplicationRecord
-  STATUSES = { 'ACTIVE' => 1, 'BLOCKED' => 2 }
+  STATUSES = { 'ACTIVE' => 1, 'BLOCKED' => 2, 'PENDING' => 3 }
   TWO_FA_STATUSES = { 'NOT_APPLICABLE' => 1, 'UNVERIFIED' => 2, 'VERIFIED' => 3 }
 
   has_secure_password(validations: false)
@@ -20,6 +20,13 @@ class Employee < ApplicationRecord
   has_many :employee_sessions
   has_and_belongs_to_many :shops
 
+  def as_json purpose = nil
+    case purpose
+    when 'ui_profile'
+      return { 'name' => self.name, 'email' => self.email, 'mobile' => self.mobile, 'two_fa_enabled' => self.two_fa_enabled }
+    end
+  end
+
   def self.send_otp options
     token = Base64.encode64("#{options[:value]}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
     options.merge!({ code: Employee.otp, token: token })
@@ -32,7 +39,11 @@ class Employee < ApplicationRecord
   end
 
   def is_blocked?
-    self.status != STATUSES['ACTIVE']
+    self.status == STATUSES['BLOCKED']
+  end
+
+  def is_pending?
+    self.status == STATUSES['PENDING']
   end
 
   def make_current
@@ -45,6 +56,18 @@ class Employee < ApplicationRecord
 
   def self.current
     Thread.current[:employee]
+  end
+
+  def enable_two_factor
+    return I18n.t('two_factor.already_enabled') if self.two_factor_enabled
+    self.update!(two_factor_enabled: true)
+    return true
+  end
+
+  def set_two_factor
+    return I18n.t('two_factor.already_enabled') if self.two_factor_enabled
+    self.update!(two_factor_enabled: true)
+    return true
   end
 
   private
