@@ -58,18 +58,6 @@ class Employee < ApplicationRecord
     Thread.current[:employee]
   end
 
-  def enable_two_factor
-    return I18n.t('two_factor.already_enabled') if self.two_factor_enabled
-    self.update!(two_factor_enabled: true)
-    return true
-  end
-
-  def set_two_factor
-    return I18n.t('two_factor.already_enabled') if self.two_factor_enabled
-    self.update!(two_factor_enabled: true)
-    return true
-  end
-
   private
 
   def self.otp
