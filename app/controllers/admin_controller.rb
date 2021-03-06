@@ -42,7 +42,7 @@ class AdminController < ApplicationController
   end
 
   def check_origin
-    if request.headers['Origin'] != request.base_url
+    if PlatformConfig['check_origin'] && request.headers['Origin'] != request.base_url
       render status: 403, json: { success: false, message: 'Unauthorized Origin', reason: 'UNAUTHORIZED' }
       return
     end
