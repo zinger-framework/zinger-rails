@@ -14,7 +14,7 @@ class V1::Admin::Auth::OtpController < V1::Admin::AuthController
 
       employee = Employee.find_by_email(params['email'])
       if employee.nil?
-        render status: 404, json: { success: false, message: I18n.t('employee.otp_failed'), reason: I18n.t('employee.not_found') }
+        render status: 404, json: { success: false, message: I18n.t('employee.otp_failed'), reason: { email: [ I18n.t('employee.not_found') ] } }
         return
       end
       raise I18n.t('employee.account_blocked', platform: PlatformConfig['name']) if employee.is_blocked?

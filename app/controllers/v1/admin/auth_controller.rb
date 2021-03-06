@@ -85,7 +85,7 @@ class V1::Admin::AuthController < AdminController
 
       employee = Employee.where(token['param'] => token['value']).first
       if employee.nil?
-        render status: 404, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: I18n.t('employee.not_found') }
+        render status: 404, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { token['param'] => [I18n.t('employee.not_found')] } }
         return
       end
       raise I18n.t('employee.account_blocked', platform: PlatformConfig['name']) if employee.is_blocked?
