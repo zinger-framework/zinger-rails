@@ -1,5 +1,5 @@
 class V1::Admin::AuthController < AdminController
-  skip_before_action :authenticate_request, except: [:logout, :resend_otp, :verify_otp]
+  skip_before_action :authenticate_request, except: [:logout, :verify_otp]
 
   def login
     error = if params['user_type'].blank?
