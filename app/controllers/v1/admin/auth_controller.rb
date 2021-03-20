@@ -28,7 +28,7 @@ class V1::Admin::AuthController < AdminController
       end
 
       if employee.nil?
-        render status: 404, json: { success: false, message: I18n.t('employee.login_failed'), reason: { email: [I18n.t('employee.not_found')] } }
+        render status: 404, json: { success: false, message: I18n.t('employee.login_failed'), reason: I18n.t('employee.not_found') }
         return
       end
 
