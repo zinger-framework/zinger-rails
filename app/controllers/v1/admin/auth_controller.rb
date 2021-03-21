@@ -18,7 +18,7 @@ class V1::Admin::AuthController < AdminController
 
       if params['password'].to_s.length < PASSWORD_MIN_LENGTH
         render status: 400, json: { success: false, message: I18n.t('employee.login_failed'), reason: { 
-          user_type: [I18n.t('validation.password.invalid', length: PASSWORD_MIN_LENGTH)] } }
+          password: [I18n.t('validation.password.invalid', length: PASSWORD_MIN_LENGTH)] } }
         return
       end
 
