@@ -71,8 +71,7 @@ Rails.application.routes.draw do
       resources :user_profile, only: :index do
         collection do
           post :reset_password
-          post :enable_two_factor
-          post :disable_two_factor
+          post :modify
         end
       end
 
