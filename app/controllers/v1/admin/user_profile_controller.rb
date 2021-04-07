@@ -5,6 +5,15 @@ class V1::Admin::UserProfileController < AdminController
 
   def modify
     Employee.current.name = params['name'] if params['name'].present?
+    if params['auth_token'].present?
+      token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }, { type: Hash }) { nil }
+      if token.blank? || token['token'] != params['auth_token'] || token['code'] != params['otp'] || token['employee_id'].to_i != Employee.current.id
+        render status: 400, json: { success: false, message: I18n.t('profile.update_failed'), 
+          reason: { otp: [I18n.t('validation.param_expired', param: 'OTP')] } }
+        return
+      end
+      Employee.current.mobile = token['value']
+    end
     Employee.current.two_fa_enabled = params['two_fa_enabled'].to_s == 'true' unless params['two_fa_enabled'].nil?
     Employee.current.save
 
@@ -13,6 +22,7 @@ class V1::Admin::UserProfileController < AdminController
       return
     end
 
+    Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }) if params['auth_token'].present?
     render status: 200, json: { success: true, message: I18n.t('profile.update_success'), data: Employee.current.as_json('ui_profile') }
   end
 

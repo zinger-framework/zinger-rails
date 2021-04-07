@@ -29,7 +29,7 @@ class Employee < ApplicationRecord
 
   def self.send_otp options
     token = Base64.encode64("#{options[:value]}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
-    options.merge!({ code: Employee.otp, token: token })
+    options.merge!({ code: Employee.otp, token: token, employee_id: options[:employee_id] })
     MailerWorker.perform_async(options.to_json)
     return token
   end
@@ -93,16 +93,6 @@ class Employee < ApplicationRecord
   end
 
   def update_validations
-    if self.email_changed?
-      if self.email.blank?
-        errors.add(:email, I18n.t('validation.required', param: 'Email address'))
-      else
-        self.email = self.email.to_s.strip.downcase
-        errors.add(:email, I18n.t('validation.invalid', param: 'email address')) unless self.email.match(EMAIL_REGEX)
-        errors.add(:email, I18n.t('auth.already_exist', key: :email, value: self.email)) if Employee.exists?(email: self.email)
-      end
-    end
-
     if self.mobile_changed?
       if self.mobile.blank?
         errors.add(:mobile, I18n.t('validation.required', param: 'Mobile number'))

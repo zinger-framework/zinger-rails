@@ -55,6 +55,7 @@ Rails.application.routes.draw do
           collection do 
             post :login
             post :forgot_password
+            post :update_mobile
           end
         end
       end
