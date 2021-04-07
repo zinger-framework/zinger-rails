@@ -1,5 +1,5 @@
 class V1::Admin::Auth::OtpController < V1::Admin::AuthController
-  before_action :authenticate_request, only: [:login, :update_mobile]
+  before_action :authenticate_request, only: [:login, :verify_mobile]
 
   def login
     @payload['two_fa']['auth_token'] = Employee.send_otp({ param: 'mobile', value: Employee.current.mobile })
@@ -28,7 +28,7 @@ class V1::Admin::Auth::OtpController < V1::Admin::AuthController
     return
   end
 
-  def update_mobile
+  def verify_mobile
     begin
       raise I18n.t('validation.required', param: 'Mobile number') if params['mobile'].blank?
       raise I18n.t('validation.invalid', param: 'mobile number') if params['mobile'].match(MOBILE_REGEX).nil?
