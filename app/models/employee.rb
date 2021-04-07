@@ -29,7 +29,7 @@ class Employee < ApplicationRecord
 
   def self.send_otp options
     token = Base64.encode64("#{options[:value]}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
-    options.merge!({ code: Employee.otp, token: token, employee_id: options[:employee_id] })
+    options.merge!({ code: Employee.otp, token: token })
     MailerWorker.perform_async(options.to_json)
     return token
   end
