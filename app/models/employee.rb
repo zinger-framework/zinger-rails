@@ -93,16 +93,6 @@ class Employee < ApplicationRecord
   end
 
   def update_validations
-    if self.email_changed?
-      if self.email.blank?
-        errors.add(:email, I18n.t('validation.required', param: 'Email address'))
-      else
-        self.email = self.email.to_s.strip.downcase
-        errors.add(:email, I18n.t('validation.invalid', param: 'email address')) unless self.email.match(EMAIL_REGEX)
-        errors.add(:email, I18n.t('auth.already_exist', key: :email, value: self.email)) if Employee.exists?(email: self.email)
-      end
-    end
-
     if self.mobile_changed?
       if self.mobile.blank?
         errors.add(:mobile, I18n.t('validation.required', param: 'Mobile number'))
