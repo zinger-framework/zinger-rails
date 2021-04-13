@@ -133,7 +133,7 @@ class V1::Admin::AuthController < AdminController
     
     emp_session = employee.employee_sessions.create!(login_ip: request.ip, user_agent: request.headers['User-Agent'])
     Core::Redis.delete(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] })
-    render status: 200, json: { success: true, message: I18n.t('employee.signup_failed'), data: { token: emp_session.get_jwt_token({ 
+    render status: 200, json: { success: true, message: I18n.t('employee.signup_success'), data: { token: emp_session.get_jwt_token({ 
       'status' => Employee::TWO_FA_STATUSES['NOT_APPLICABLE'] }), redirect_to: 'DASHBOARD' } }
   end
 end
