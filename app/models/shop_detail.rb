@@ -9,20 +9,21 @@ class ShopDetail < ApplicationRecord
       opening_time = self.opening_time.in_time_zone(PlatformConfig['time_zone'])
       closing_time = self.closing_time.in_time_zone(PlatformConfig['time_zone'])
       return { 'address' => self.address, 'telephone' => self.telephone, 'mobile' => self.mobile, 
-        'cover_photos' => aws_key_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) },
+        'cover_photos' => self.cover_photos_key_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) },
         'opening_time' => opening_time.strftime('%I:%M %p'), 'closing_time' => closing_time.strftime('%I:%M %p'),
         'open_now' => opening_time.strftime('%H:%M') <= time && time < closing_time.strftime('%H:%M') }
     when 'admin_shop_detail'
       return { 'address' => self.address.merge(options.slice(*%w(lat lng))), 'telephone' => self.telephone, 'mobile' => self.mobile, 
         'opening_time' => self.opening_time.present? ? self.opening_time.in_time_zone(PlatformConfig['time_zone']).strftime('%I:%M %p') : nil, 
         'closing_time' => self.closing_time.present? ? self.closing_time.in_time_zone(PlatformConfig['time_zone']).strftime('%I:%M %p') : nil,
-        'payment' => self.payment, 'cover_photos' => self.cover_photos.to_a, 'description' => self.description }
+        'payment' => self.payment, 'cover_photos' => self.cover_photos_key_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) }, 
+        'description' => self.description }
     end
   end
 
-  def aws_key_path index = nil
-    return "shop-cover/#{self.shop_id}/#{self.cover_photos.to_a[index]}" if index.present?
-    return self.cover_photos.to_a.map { |cover_photo| "shop-cover/#{self.shop_id}/#{cover_photo}" }
+  def cover_photos_key_path index = nil
+    return "shop/cover_photos/#{self.shop_id}/#{self.cover_photos.to_a[index]}" if index.present?
+    return self.cover_photos.to_a.map { |cover_photo| "shop/cover_photos/#{self.shop_id}/#{cover_photo}" }
   end
 
   private

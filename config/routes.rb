@@ -78,7 +78,14 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :shop, only: [:new, :update, :destroy, :show]
+      resources :shop, only: [:new, :update, :destroy, :show] do
+        member do
+          post :icon
+          post :cover_photo
+          delete :icon, to: 'shop#delete_icon'
+          delete :cover_photo, to: 'shop#delete_cover_photo'
+        end
+      end
     end
   end
 

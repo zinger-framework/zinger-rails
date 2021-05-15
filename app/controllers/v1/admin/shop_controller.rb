@@ -49,37 +49,64 @@ class V1::Admin::ShopController < AdminController
   end
 
   def icon
-    @shop.update!(icon: "shop-icon-#{Time.now.to_i}#{File.extname(params['file'].path)}")
-    File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(@shop.aws_key_path, file) }
-    flash[:success] = 'Icon upload is successful'
-    redirect_to shop_index_path(q: params['id'])
+    begin
+      raise I18n.t('shop.icon.already_exist') if @shop.icon.present?
+      resp = validate_image_file 'icon', params['icon_file'], '512x512'
+      raise resp if resp.class == String
+    rescue => e
+      render status: 400, json: { success: false, message: I18n.t('shop.icon.upload_failed'), reason: { icon: [e.message] } }
+      return
+    end
+
+    @shop.update!(icon: "#{Time.now.to_i}-#{params['icon_file'].original_filename}")
+    File.open(params['icon_file'].path, 'rb') { |file| Core::Storage.upload_file(@shop.icon_key_path, file) }
+    render status: 200, json: { success: true, message: I18n.t('shop.icon.upload_success'), data: { icon: Core::Storage.fetch_url(@shop.icon_key_path) } }
   end
 
   def cover_photo
-    @shop.shop_detail.update!(cover_photos: @shop.shop_detail.cover_photos.to_a << "shop-cover-#{Time.now.to_i}#{File.extname(params['file'].path)}")
-    @shop.update!(updated_at: Time.now.utc)
-    File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(@shop.shop_detail.aws_key_path(@shop.shop_detail.cover_photos.size - 1), file) }
-    flash[:success] = 'Cover photo upload is successful'
-    redirect_to shop_index_path(q: params['id'])
+    shop_detail = @shop.shop_detail
+    cover_photos = shop_detail.cover_photos.to_a
+    
+    begin
+      # TODO: Move limit to shop-level config - Logesh
+      raise I18n.t('shop.cover_photo.limit_exceeded', limit: cover_photos.length, platform: PlatformConfig['name']) if cover_photos.length >= 10
+      resp = validate_image_file 'cover_photo', params['cover_file'], '1024x500'
+      raise resp if resp.class == String
+    rescue => e
+      render status: 400, json: { success: false, message: I18n.t('shop.cover_photo.upload_failed'), reason: { cover_photo: [e.message] } }
+      return
+    end
+
+    shop_detail.update!(cover_photos: cover_photos << "#{Time.now.to_i}-#{params['cover_file'].original_filename}")
+    cover_photos_path = shop_detail.cover_photos_key_path
+    File.open(params['cover_file'].path, 'rb') { |file| Core::Storage.upload_file(cover_photos_path.last, file) }
+    render status: 200, json: { success: true, message: I18n.t('shop.cover_photo.upload_success'),
+      data: { cover_photos: cover_photos_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) } } }
   end
 
   def delete_icon
+    if @shop.icon.blank?
+      render status: 404, json: { success: false, message: I18n.t('shop.icon.not_found') }
+      return
+    end
+
+    Core::Storage.delete_file(@shop.icon_key_path)
     @shop.update!(icon: nil)
-    flash[:success] = 'Icon deletion is successful'
-    redirect_to shop_index_path(q: params['id'])
+    render status: 200, json: { success: true, message: I18n.t('shop.icon.delete_success') }
   end
 
   def delete_cover_photo
-    if @shop.shop_detail.cover_photos.blank?
-      flash[:danger] = 'Cover photo is already empty'
-      return redirect_to shop_index_path(q: params['id'])
+    shop_detail = @shop.shop_detail
+    cover_photos = shop_detail.cover_photos
+    if cover_photos.blank? || cover_photos[params['index'].to_i].blank?
+      render status: 404, json: { success: false, message: I18n.t('shop.cover_photo.not_found') }
+      return
     end
     
-    @shop.shop_detail.cover_photos.delete_at(params['index'].to_i)
-    @shop.shop_detail.update!(cover_photos: @shop.shop_detail.cover_photos)
-    @shop.update!(updated_at: Time.now.utc)
-    flash[:success] = 'Cover photo deletion is successful'
-    redirect_to shop_index_path(q: params['id'])
+    Core::Storage.delete_file(shop_detail.cover_photos_key_path(params['index'].to_i))
+    cover_photos.delete_at(params['index'].to_i)
+    shop_detail.update!(cover_photos: cover_photos)
+    render status: 200, json: { success: true, message: I18n.t('shop.cover_photo.delete_success') }
   end
 
   private
@@ -90,5 +117,13 @@ class V1::Admin::ShopController < AdminController
       render status: 400, json: { success: false, message: I18n.t('shop.not_found') }
       return
     end
+  end
+
+  def validate_image_file purpose, image_file, dimension
+    return I18n.t("shop.#{purpose}.invalid_file") if image_file.class != ActionDispatch::Http::UploadedFile ||
+      !%w(jpg jpeg png).include?(File.extname(image_file.path)[1..-1]) || `identify -format '%wx%h' #{image_file.path}` != dimension
+    return I18n.t("shop.#{purpose}.file_size_exceeded") if (File.size(image_file.path).to_i / 1000) > 1024
+    return I18n.t('validation.invalid', param: 'file name') if image_file.original_filename.split('.')[0].match(/^[a-zA-Z0-9\-_]{1,100}$/).nil?
+    return true
   end
 end
