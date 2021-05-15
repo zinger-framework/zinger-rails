@@ -16,7 +16,7 @@ class V1::Admin::ShopController < AdminController
 
     if Shop::PENDING_STATUSES.include? @shop.status
       missing_keys = %w(name description tags category street area city state pincode lat lng telephone mobile email opening_time 
-        closing_time account_number account_ifsc account_holder pan gst) - params.keys
+        closing_time account_number account_ifsc account_holder pan) - params.keys
       reason = missing_keys.inject({}) { |resp, key| resp[key] = [I18n.t('validation.required', param: key.humanize)]; resp }
       reason['icon'] = [I18n.t('shop.icon.invalid_file')] if @shop.icon.blank?
       reason['cover_photos'] = [I18n.t('shop.cover_photo.invalid_file')] if shop_detail.cover_photos.blank?
@@ -27,7 +27,7 @@ class V1::Admin::ShopController < AdminController
     end
 
     %w(name email).each { |key| @shop.send("#{key}=", params[key].to_s.strip) if params[key].present? }
-    @shop.tags = params['tags'].join(' ') if params['tags'].present?
+    @shop.tags = params['tags'].map{ |tag| tag.parameterize(separator: '_').upcase }.join(' ') if params['tags'].present?
     @shop.category = Shop::CATEGORIES[params['category'].to_s.strip.upcase]
     @shop.lat, @shop.lng = params['lat'].to_f, params['lng'].to_f if params['lat'].present? && params['lng'].present?
 
