@@ -1,6 +1,7 @@
 class Shop < ApplicationRecord
-  STATUSES = { 'PENDING' => 1, 'ACTIVE' => 2, 'BLOCKED' => 3 }
+  STATUSES = { 'DRAFT' => 1, 'PENDING' => 2, 'ACTIVE' => 3, 'BLOCKED' => 4, 'REJECTED' => 5, 'INACTIVE' => 6 }
   CATEGORIES = { 'GROCERY' => 1, 'PHARMACY' => 2, 'RESTAURANT' => 3, 'OTHERS' => 4 }
+  PENDING_STATUSES = [STATUSES['DRAFT'], STATUSES['PENDING'], STATUSES['REJECTED']]
 
   default_scope { where(deleted: false) }
   # searchkick word_start: ['name'], locations: ['location'], default_fields: ['status', 'deleted']
@@ -27,7 +28,7 @@ class Shop < ApplicationRecord
         .merge(self.shop_detail.as_json('ui_shop_detail'))
     when 'admin_shop'
       return { 'id' => self.id, 'name' => self.name, 'icon' => self.icon.present? ? Core::Storage.fetch_url(self.icon_key_path) : nil, 
-        'tags' => self.tags.to_s.split(' '), 'category' => CATEGORIES.key(self.category), 'email' => self.email }
+        'tags' => self.tags.to_s.split(' '), 'category' => CATEGORIES.key(self.category), 'email' => self.email, 'status' => STATUSES.key(self.status) }
         .merge(self.shop_detail.as_json('admin_shop_detail', { 'lat' => self.lat.to_f, 'lng' => self.lng.to_f }))
     end
   end
