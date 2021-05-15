@@ -10,7 +10,7 @@ class Shop < ApplicationRecord
   has_one :shop_detail
   has_and_belongs_to_many :employees
 
-  validate :validations
+  validate :update_validations, on: :update
   after_create :add_shop_detail
   after_commit :clear_cache
 
@@ -43,8 +43,8 @@ class Shop < ApplicationRecord
 
   private
 
-  def validations
-    errors.add(:category, I18n.t('validation.invalid', param: 'category')) if !self.new_record? && self.category.nil?
+  def update_validations
+    errors.add(:category, I18n.t('validation.invalid', param: 'category')) if self.category.nil?
     errors.add(:email, I18n.t('validation.invalid', param: 'email')) if self.email.present? && !self.email.match(EMAIL_REGEX)
   end
 

@@ -12,6 +12,20 @@ class V1::Admin::ShopController < AdminController
   end
 
   def update
+    shop_detail = @shop.shop_detail
+
+    if Shop::PENDING_STATUSES.include? @shop.status
+      missing_keys = %w(name description tags category street area city state pincode lat lng telephone mobile email opening_time 
+        closing_time account_number account_ifsc account_holder pan gst) - params.keys
+      reason = missing_keys.inject({}) { |resp, key| resp[key] = [I18n.t('validation.required', param: key.humanize)]; resp }
+      reason['icon'] = [I18n.t('shop.icon.invalid_file')] if @shop.icon.blank?
+      reason['cover_photos'] = [I18n.t('shop.cover_photo.invalid_file')] if shop_detail.cover_photos.blank?
+      if reason.present?
+        render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: reason }
+        return
+      end
+    end
+
     %w(name email).each { |key| @shop.send("#{key}=", params[key].to_s.strip) if params[key].present? }
     @shop.tags = params['tags'].join(' ') if params['tags'].present?
     @shop.category = Shop::CATEGORIES[params['category'].to_s.strip.upcase]
@@ -23,7 +37,6 @@ class V1::Admin::ShopController < AdminController
       return
     end
 
-    shop_detail = @shop.shop_detail
     shop_detail.payment = shop_detail.payment.merge(params.as_json.slice(*%w(account_number account_ifsc account_holder pan gst))
       .transform_values { |v| v.to_s.strip }.select { |key| params[key].present? })
     shop_detail.address = shop_detail.address.merge(params.as_json.slice(*%w(street area city state pincode))
@@ -73,7 +86,7 @@ class V1::Admin::ShopController < AdminController
       resp = validate_image_file 'cover_photo', params['cover_file'], '1024x500'
       raise resp if resp.class == String
     rescue => e
-      render status: 400, json: { success: false, message: I18n.t('shop.cover_photo.upload_failed'), reason: { cover_photo: [e.message] } }
+      render status: 400, json: { success: false, message: I18n.t('shop.cover_photo.upload_failed'), reason: { cover_photos: [e.message] } }
       return
     end
 
