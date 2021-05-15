@@ -1,89 +1,51 @@
 class V1::Admin::ShopController < AdminController
-  before_action :set_title
-  before_action :load_shop, except: [:index, :create, :add_shop]
+  before_action :load_shop, except: :new
 
-  def index
-    @header[:title] = 'Shops'
-    @header[:links].map{ |link| link[:active] = false }
-
-    @shop = Shop.unscoped.find_by_id(params['q']) if params['q'].present?
-    @error = nil
+  def new
+    shop = Employee.current.shops.where(status: Shop::STATUSES['PENDING']).first
+    shop = Employee.current.shops.create if shop.nil?
+    render status: 200, json: { success: true, message: 'success', data: { shop: shop.as_json('admin_shop') } }
   end
 
-  def create
-    shop = nil
-    begin
-      ActiveRecord::Base.transaction do
-        shop = Shop.create(name: params['name'], lat: params['lat'], lng: params['lng'], tags: params['tags'],
-          icon: "shop-icon-#{Time.now.to_i}#{File.extname(params['file'].path)}")
-        raise shop.errors.messages.values.flatten.first if shop.errors.any?
-
-        shop_detail = shop.create_shop_detail(address: { number: params['number'], street: params['street'], area: params['area'],
-          city: params['city'], pincode: params['pincode'] }, telephone: params['telephone'], mobile: params['mobile'],
-          opening_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['opening_time'], '%H:%M').utc,
-          closing_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['closing_time'], '%H:%M').utc)
-        raise shop_detail.errors.messages.values.flatten.first if shop_detail.errors.any?
-      end
-    rescue => e
-      flash[:danger] = e
-      return redirect_to add_shop_shop_index_path
-    end
-
-    File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(shop.aws_key_path, file) }
-    flash[:success] = 'Shop creation is successful'
-    redirect_to shop_index_path(q: shop.id)
-  end
-
-  def add_shop
-    @header[:title] = 'Add New Shop'
-    @header[:links].map{ |link| link[:active] = false }
-    @header[:links][0][:active] = true
+  def show
+    render status: 200, json: { success: true, message: 'success', data: { shop: @shop.as_json('admin_shop') } }
   end
 
   def update
-    begin
-      ActiveRecord::Base.transaction do
-        @shop.update(name: params['name'], status: params['status'], tags: params['tags'], updated_at: Time.now.utc)
-        raise @shop.errors.messages.values.flatten.first if @shop.errors.any?
+    %w(name email).each { |key| @shop.send("#{key}=", params[key].to_s.strip) if params[key].present? }
+    @shop.tags = params['tags'].join(' ') if params['tags'].present?
+    @shop.category = Shop::CATEGORIES[params['category'].to_s.strip.upcase]
+    @shop.lat, @shop.lng = params['lat'].to_f, params['lng'].to_f if params['lat'].present? && params['lng'].present?
 
-        shop_detail = @shop.shop_detail
-        shop_detail.update(mobile: params['mobile'], opening_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['opening_time'], '%H:%M').utc, 
-          closing_time: Time.find_zone(PlatformConfig['time_zone']).strptime(params['closing_time'], '%H:%M').utc)
-        raise shop_detail.errors.messages.values.flatten.first if shop_detail.errors.any?
-      end
-    rescue => e
-      flash[:danger] = e
-      return redirect_to shop_index_path(q: params['id'])
+    @shop.validate
+    if @shop.errors.any?
+      render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: @shop.errors }
+      return
     end
 
-    flash[:success] = 'Shop update is successful'
-    redirect_to shop_index_path(q: params['id'])
-  end
+    shop_detail = @shop.shop_detail
+    shop_detail.payment = shop_detail.payment.merge(params.as_json.slice(*%w(account_number account_ifsc account_holder pan gst))
+      .transform_values { |v| v.to_s.strip }.select { |key| params[key].present? })
+    shop_detail.address = shop_detail.address.merge(params.as_json.slice(*%w(street area city state pincode))
+      .transform_values { |v| v.to_s.strip }.select { |key| params[key].present? })
+    %w(telephone mobile description).each { |key| shop_detail.send("#{key}=", params[key].to_s.strip) if params[key].present? }
+    %w(opening_time closing_time).each { |key| shop_detail.send("#{key}=", 
+      Time.find_zone(PlatformConfig['time_zone']).strptime(params[key], '%H:%M').utc) if params[key].present? }
 
-  def location
-    begin
-      ActiveRecord::Base.transaction do
-        @shop.update(lat: params['lat'], lng: params['lng'], updated_at: Time.now.utc)
-        raise @shop.errors.messages.values.flatten.first if @shop.errors.any?
-
-        shop_detail = @shop.shop_detail
-        shop_detail.update(address: { number: params['number'], street: params['street'], area: params['area'],
-          city: params['city'], pincode: params['pincode'] }, telephone: params['telephone'])
-        raise shop_detail.errors.messages.values.flatten.first if shop_detail.errors.any?
-      end
-    rescue => e
-      flash[:danger] = e
-      return redirect_to shop_index_path(q: params['id'])
+    shop_detail.validate
+    if shop_detail.errors.any?
+      render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: shop_detail.errors }
+      return
     end
 
-    flash[:success] = 'Shop location update is successful'
-    redirect_to shop_index_path(q: params['id'])
+    shop_detail.save!(validate: false)
+    @shop.save!(validate: false)
+    render status: 200, json: { success: true, message: I18n.t('shop.update_success'), data: { shop: @shop.as_json('admin_shop') } }
   end
 
   def destroy
     @shop.update!(deleted: true)
-    flash[:success] = 'Deletion is successful'
-    redirect_to shop_index_path(q: params['id'])
+    render status: 200, json: { success: true, message: I18n.t('shop.delete_success') }
   end
 
   def icon
@@ -98,20 +60,6 @@ class V1::Admin::ShopController < AdminController
     @shop.update!(updated_at: Time.now.utc)
     File.open(params['file'].path, 'rb') { |file| Core::Storage.upload_file(@shop.shop_detail.aws_key_path(@shop.shop_detail.cover_photos.size - 1), file) }
     flash[:success] = 'Cover photo upload is successful'
-    redirect_to shop_index_path(q: params['id'])
-  end
-
-  def payment
-    @shop.shop_detail.update!(payment: JSON.parse(params['payment']))
-    @shop.update!(updated_at: Time.now.utc)
-    flash[:success] = 'Payment update is successful'
-    redirect_to shop_index_path(q: params['id'])
-  end
-
-  def meta
-    @shop.shop_detail.update!(meta: JSON.parse(params['meta']))
-    @shop.update!(updated_at: Time.now.utc)
-    flash[:success] = 'Meta update is successful'
     redirect_to shop_index_path(q: params['id'])
   end
 
@@ -136,15 +84,11 @@ class V1::Admin::ShopController < AdminController
 
   private
 
-  def set_title
-    @header = { links: [ { title: 'Add Shop', path: add_shop_shop_index_path } ] }
-  end
-
   def load_shop
     @shop = Shop.fetch_by_id(params['id'])
     if @shop.nil?
-      flash[:danger] = 'Shop is not found'
-      return redirect_to shop_index_path(q: params['id'])
+      render status: 400, json: { success: false, message: I18n.t('shop.not_found') }
+      return
     end
   end
 end

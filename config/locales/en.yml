@@ -81,6 +81,10 @@ en:
       reset_success: Password reset is successful
   shop:
     not_found: Unable to find the shop
+    update_success: Shop update is successful
+    update_failed: Shop update failed
+    delete_success: Shop delete is successful
+    description_long: Description should contain maximum of 250 characters
   ratelimit:
     exceeded: You have exceeded the number of attempts. Please try again after sometime
     login: You have exceeded the number of login attempts. Please try again after sometime

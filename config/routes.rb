@@ -78,20 +78,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :shop, only: [:index, :create, :update, :destroy] do
-        collection do 
-          get :add_shop
-        end
-        member do
-          put :location
-          put :icon
-          put :cover_photo
-          put :payment
-          put :meta
-          delete :icon, to: 'shop#delete_icon'
-          delete :cover_photo, to: 'shop#delete_cover_photo'
-        end
-      end
+      resources :shop, only: [:new, :update, :destroy, :show]
     end
   end
 
