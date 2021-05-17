@@ -1,4 +1,4 @@
-class V1::Admin::ShopController < AdminController
+class Admin::ShopController < AdminController
   before_action :load_shop, except: :new
 
   def new
