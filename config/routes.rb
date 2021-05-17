@@ -83,7 +83,7 @@ Rails.application.routes.draw do
           post :icon
           post :cover_photo
           delete :icon, to: 'shop#delete_icon'
-          delete :cover_photo, to: 'shop#delete_cover_photo'
+          delete 'cover_photo/:index', to: 'shop#delete_cover_photo'
         end
       end
     end
