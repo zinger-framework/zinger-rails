@@ -87,7 +87,7 @@ en:
     description_long: Description should contain maximum of 250 characters
     icon:
       invalid_file: Please upload a valid image file of 512 x 512 dimension
-      file_size_exceeded: Please upload a image file of less than 1 MB
+      file_size_exceeded: Please upload an image file of less than 1 MB
       already_exist: Icon is already uploaded
       upload_failed: Unable to upload Icon
       upload_success: Icon upload is successful
