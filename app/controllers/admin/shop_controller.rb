@@ -15,7 +15,7 @@ class Admin::ShopController < AdminController
     shop_detail = @shop.shop_detail
 
     if Shop::PENDING_STATUSES.include? @shop.status
-      missing_keys = %w(name description tags category street area city state pincode lat lng telephone mobile email opening_time 
+      missing_keys = %w(name description tags category street area city state pincode lat lng mobile email opening_time 
         closing_time account_number account_ifsc account_holder pan) - params.keys.select { |key| params[key].present? }
       reason = missing_keys.inject({}) { |resp, key| resp[key] = [I18n.t('validation.required', param: key.humanize)]; resp }
       reason['icon'] = [I18n.t('shop.icon.invalid_file')] if @shop.icon.blank?
