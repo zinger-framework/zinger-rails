@@ -9,21 +9,22 @@ class ShopDetail < ApplicationRecord
       opening_time = self.opening_time.in_time_zone(PlatformConfig['time_zone'])
       closing_time = self.closing_time.in_time_zone(PlatformConfig['time_zone'])
       return { 'address' => self.address, 'telephone' => self.telephone, 'mobile' => self.mobile, 
-        'cover_photos' => self.cover_photos_key_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) },
+        'cover_photos' => self.cover_photos.to_a.map { |cover_photo| { 'id' => cover_photo.split('-')[0].to_i, 
+          'url' => Core::Storage.fetch_url(self.cover_photo_key_path(cover_photo)) } },
         'opening_time' => opening_time.strftime('%H:%M'), 'closing_time' => closing_time.strftime('%H:%M'),
         'open_now' => opening_time.strftime('%H:%M') <= time && time < closing_time.strftime('%H:%M') }
     when 'admin_shop_detail'
       return { 'address' => self.address.merge(options.slice(*%w(lat lng))), 'telephone' => self.telephone, 'mobile' => self.mobile, 
         'opening_time' => self.opening_time.present? ? self.opening_time.in_time_zone(PlatformConfig['time_zone']).strftime('%H:%M') : nil, 
         'closing_time' => self.closing_time.present? ? self.closing_time.in_time_zone(PlatformConfig['time_zone']).strftime('%H:%M') : nil,
-        'payment' => self.payment, 'cover_photos' => self.cover_photos_key_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) }, 
-        'description' => self.description }
+        'payment' => self.payment, 'description' => self.description,
+        'cover_photos' => self.cover_photos.to_a.map { |cover_photo| { 'id' => cover_photo.split('-')[0].to_i, 
+          'url' => Core::Storage.fetch_url(self.cover_photo_key_path(cover_photo)) } } }
     end
   end
 
-  def cover_photos_key_path index = nil
-    return "shop/cover_photos/#{self.shop_id}/#{self.cover_photos.to_a[index]}" if index.present?
-    return self.cover_photos.to_a.map { |cover_photo| "shop/cover_photos/#{self.shop_id}/#{cover_photo}" }
+  def cover_photo_key_path cover_photo
+    "shop/cover_photos/#{self.shop_id}/#{cover_photo}"
   end
 
   private

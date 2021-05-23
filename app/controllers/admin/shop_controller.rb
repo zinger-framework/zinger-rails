@@ -90,11 +90,13 @@ class Admin::ShopController < AdminController
       return
     end
 
-    shop_detail.update!(cover_photos: cover_photos << "#{Time.now.to_i}-#{params['cover_file'].original_filename}")
-    cover_photos_path = shop_detail.cover_photos_key_path
-    File.open(params['cover_file'].path, 'rb') { |file| Core::Storage.upload_file(cover_photos_path.last, file) }
-    render status: 200, json: { success: true, message: I18n.t('shop.cover_photo.upload_success'),
-      data: { cover_photos: cover_photos_path.map { |cover_photo_key| Core::Storage.fetch_url(cover_photo_key) } } }
+    cover_photo = "#{Time.now.to_i}-#{params['cover_file'].original_filename}"
+    cover_photos << cover_photo
+    shop_detail.update!(cover_photos: cover_photos)
+    File.open(params['cover_file'].path, 'rb') { |file| Core::Storage.upload_file(shop_detail.cover_photo_key_path(cover_photo), file) }
+    render status: 200, json: { success: true, message: I18n.t('shop.cover_photo.upload_success'), 
+      data: { cover_photos: cover_photos.map { |cover_photo| { 'id' => cover_photo.split('-')[0].to_i, 
+        'url' => Core::Storage.fetch_url(shop_detail.cover_photo_key_path(cover_photo)) } } } }
   end
 
   def delete_icon
@@ -110,16 +112,19 @@ class Admin::ShopController < AdminController
 
   def delete_cover_photo
     shop_detail = @shop.shop_detail
-    cover_photos = shop_detail.cover_photos
-    if cover_photos.blank? || cover_photos[params['index'].to_i].blank?
+    cover_photos = shop_detail.cover_photos.to_a
+    cover_photo = cover_photos.find { |cover_photo| cover_photo.split('-')[0] == params['cover_photo_id'].to_s }
+    if cover_photo.nil?
       render status: 404, json: { success: false, message: I18n.t('shop.cover_photo.not_found') }
       return
     end
     
-    Core::Storage.delete_file(shop_detail.cover_photos_key_path(params['index'].to_i))
-    cover_photos.delete_at(params['index'].to_i)
+    Core::Storage.delete_file(shop_detail.cover_photo_key_path(cover_photo))
+    cover_photos.delete(cover_photo)
     shop_detail.update!(cover_photos: cover_photos)
-    render status: 200, json: { success: true, message: I18n.t('shop.cover_photo.delete_success') }
+    render status: 200, json: { success: true, message: I18n.t('shop.cover_photo.delete_success'), 
+      data: { cover_photos: cover_photos.map { |cover_photo| { 'id' => cover_photo.split('-')[0].to_i, 
+        'url' => Core::Storage.fetch_url(shop_detail.cover_photo_key_path(cover_photo)) } } } }
   end
 
   private
