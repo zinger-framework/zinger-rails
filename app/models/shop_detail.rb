@@ -32,7 +32,7 @@ class ShopDetail < ApplicationRecord
     errors.add(:description, I18n.t('shop.description_long')) if self.description.present? && self.description.length > 250
     errors.add(:pincode, I18n.t('validation.invalid', param: 'pincode')) if self.address['pincode'].present? && self.address['pincode'].length != 6
     errors.add(:mobile, I18n.t('validation.invalid', param: 'mobile number')) if self.mobile.present? && !self.mobile.match(MOBILE_REGEX)
-    errors.add(:telephone, I18n.t('validation.invalid', param: 'telephone')) if self.telephone.present? && !self.telephone.match(PHONE_REGEX)
+    errors.add(:telephone, I18n.t('validation.invalid', param: 'telephone')) if self.telephone.present? && !self.telephone.match(TELEPHONE_REGEX)
     errors.add(:account_number, I18n.t('validation.invalid', param: 'account number')) if self.payment['account_number'].present? && 
       !self.payment['account_number'].match(ACCOUNT_NUMBER_REGEX)
     errors.add(:account_ifsc, I18n.t('validation.invalid', param: 'account IFSC')) if self.payment['account_ifsc'].present? && 
