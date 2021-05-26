@@ -73,6 +73,8 @@ en:
       reset_success: Password is changed successfully
   shop:
     not_found: Unable to find the shop
+    create_success: Shop is registered successfully
+    create_failed: Unable to register shop
     update_success: Shop is updated successfully
     update_failed: Unable to update shop
     delete_success: Shop is deleted successfully

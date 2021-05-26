@@ -12,7 +12,7 @@ class Shop < ApplicationRecord
 
   validate :validations
   after_create :add_shop_detail
-  after_commit :clear_cache
+  after_commit :commit_callbacks
 
   def search_data
     { name: self.name, location: { lat: self.lat, lon: self.lng }, tags: self.tags, status: self.status, deleted: self.deleted }
@@ -50,6 +50,14 @@ class Shop < ApplicationRecord
 
   def add_shop_detail
     self.create_shop_detail
+  end
+
+  def commit_callbacks
+    if self.saved_change_to_status? && self.status == STATUSES['PENDING']
+      PlatformMailer.notify('Shop Approval is PENDING', { 'id' => self.id, 'name' => self.name, 
+        'link' => Rails.application.routes.url_helpers.shop_detail_url(host: AppConfig['admin_ui_endpoint'], id: self.id) }).deliver!
+    end
+    self.clear_cache
   end
 
   def clear_cache

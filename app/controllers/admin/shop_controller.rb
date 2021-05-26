@@ -12,7 +12,7 @@ class Admin::ShopController < AdminController
   end
 
   def update
-    shop_detail = @shop.shop_detail
+    shop_detail, err_key = @shop.shop_detail, @shop.status == Shop::STATUSES['DRAFT'] ? 'create' : 'update'
 
     if Shop::PENDING_STATUSES.include? @shop.status
       missing_keys = %w(name description tags category street area city state pincode lat lng mobile email opening_time 
@@ -21,7 +21,7 @@ class Admin::ShopController < AdminController
       reason['icon'] = [I18n.t('shop.icon.invalid_file')] if @shop.icon.blank?
       reason['cover_photos'] = [I18n.t('shop.cover_photo.invalid_file')] if shop_detail.cover_photos.blank?
       if reason.present?
-        render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: reason }
+        render status: 400, json: { success: false, message: I18n.t("shop.#{err_key}_failed"), reason: reason }
         return
       end
     end
@@ -33,7 +33,7 @@ class Admin::ShopController < AdminController
 
     @shop.validate
     if @shop.errors.any?
-      render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: @shop.errors }
+      render status: 400, json: { success: false, message: I18n.t("shop.#{err_key}_failed"), reason: @shop.errors }
       return
     end
 
@@ -47,13 +47,14 @@ class Admin::ShopController < AdminController
 
     shop_detail.validate
     if shop_detail.errors.any?
-      render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: shop_detail.errors }
+      render status: 400, json: { success: false, message: I18n.t("shop.#{err_key}_failed"), reason: shop_detail.errors }
       return
     end
 
+    @shop.status = Shop::STATUSES['PENDING'] if [Shop::STATUSES['DRAFT'], Shop::STATUSES['REJECTED']].include?(@shop.status)
     shop_detail.save!(validate: false)
     @shop.save!(validate: false)
-    render status: 200, json: { success: true, message: I18n.t('shop.update_success'), data: { shop: @shop.as_json('admin_shop') } }
+    render status: 200, json: { success: true, message: I18n.t("shop.#{err_key}_success"), data: { shop: @shop.as_json('admin_shop') } }
   end
 
   def destroy
