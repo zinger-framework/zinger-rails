@@ -1,6 +1,7 @@
 class AdminController < ApplicationController
   before_action :reset_thread, :authenticate_request, :check_limit, :check_version
   TWO_FACTOR_SCREENS = ['admin/auth#verify_otp', 'admin/auth/otp#login']
+  LIMIT = 25
 
   private
 

@@ -1,5 +1,20 @@
 class Admin::ShopController < AdminController
-  before_action :load_shop, except: :new
+  before_action :load_shop, except: [:index, :new]
+
+  def index
+    conditions = ValidateParam::Shop.load_conditions(params)
+    if conditions.class == String
+      render status: 400, json: { success: false, message: I18n.t('shop.fetch_failed'), reason: conditions }
+      return
+    end
+
+    query, shops = Shop.all.where(conditions), []
+    total = query.count
+    shops = query.offset(params['offset'].to_i).limit(LIMIT).order("created_at #{params['sort_order'].to_s.upcase == 'DESC' ? 'DESC' : 'ASC'}")
+      .map { |shop| shop.as_json('admin_shop') } if total > 0
+
+    render status: 200, json: { success: true, message: 'success', data: { shops: shops, total: total, page_size: LIMIT } }
+  end
 
   def new
     shop = AdminUser.current.shops.where(status: Shop::PENDING_STATUSES).first
