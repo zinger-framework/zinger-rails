@@ -27,9 +27,11 @@ class Shop < ApplicationRecord
       return { 'id' => self.id, 'name' => self.name, 'icon' => Core::Storage.fetch_url(self.icon_key_path), 'tags' => self.tags.to_s.split(' ').map(&:titlecase) }
         .merge(self.shop_detail.as_json('ui_shop_detail'))
     when 'admin_shop'
-      return { 'id' => self.id, 'name' => self.name, 'icon' => self.icon.present? ? Core::Storage.fetch_url(self.icon_key_path) : nil, 
+      resp = { 'id' => self.id, 'name' => self.name, 'icon' => self.icon.present? ? Core::Storage.fetch_url(self.icon_key_path) : nil, 
         'tags' => self.tags.to_s.split(' ').map(&:titlecase), 'category' => CATEGORIES.key(self.category), 'email' => self.email, 'status' => STATUSES.key(self.status) }
         .merge(self.shop_detail.as_json('admin_shop_detail', { 'lat' => self.lat.to_f, 'lng' => self.lng.to_f }))
+      resp['approval_comments'] = self.meta['approval_comments'].to_a.reverse if [STATUSES['PENDING'], STATUSES['REJECTED']].include?(self.status)
+      return resp
     end
   end
 
