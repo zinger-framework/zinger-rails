@@ -1,5 +1,5 @@
 class PlatformMailer < ApplicationMailer
-  TO_ADDRS = 'ddlogesh@zinger.pw, admin@zinger.pw'
+  TO_ADDRS = 'admin@zinger.pw'
 
   def notify subject, payload = {}
     @payload = payload.except('attachments')

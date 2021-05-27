@@ -27,11 +27,10 @@ class Shop < ApplicationRecord
       return { 'id' => self.id, 'name' => self.name, 'icon' => Core::Storage.fetch_url(self.icon_key_path), 'tags' => self.tags.to_s.split(' ').map(&:titlecase) }
         .merge(self.shop_detail.as_json('ui_shop_detail'))
     when 'admin_shop'
-      resp = { 'id' => self.id, 'name' => self.name, 'icon' => self.icon.present? ? Core::Storage.fetch_url(self.icon_key_path) : nil, 
-        'tags' => self.tags.to_s.split(' ').map(&:titlecase), 'category' => CATEGORIES.key(self.category), 'email' => self.email, 'status' => STATUSES.key(self.status) }
+      return { 'id' => self.id, 'name' => self.name, 'icon' => self.icon.present? ? Core::Storage.fetch_url(self.icon_key_path) : nil, 
+        'tags' => self.tags.to_s.split(' ').map(&:titlecase), 'category' => CATEGORIES.key(self.category), 'email' => self.email, 
+        'status' => STATUSES.key(self.status), 'updated_at' => self.updated_at.in_time_zone(PlatformConfig['time_zone']).strftime('%Y-%m-%d %H:%M:%S') }
         .merge(self.shop_detail.as_json('admin_shop_detail', { 'lat' => self.lat.to_f, 'lng' => self.lng.to_f }))
-      resp['approval_comments'] = self.meta['approval_comments'].to_a.reverse if [STATUSES['PENDING'], STATUSES['REJECTED']].include?(self.status)
-      return resp
     end
   end
 
@@ -46,6 +45,21 @@ class Shop < ApplicationRecord
   private
 
   def validations
+    if self.status_changed?
+      invalid_status = case self.status
+      when STATUSES['ACTIVE']
+        true unless [STATUSES['PENDING'], STATUSES['BLOCKED'], STATUSES['INACTIVE']].include? self.status_was
+      when STATUSES['BLOCKED']
+        true unless [STATUSES['ACTIVE'], STATUSES['INACTIVE']].include? self.status_was
+      when STATUSES['REJECTED']
+        true if self.status_was != STATUSES['PENDING']
+      when STATUSES['INACTIVE']
+        true if self.status_was != STATUSES['ACTIVE']
+      else
+        true
+      end
+      errors.add(:status, I18n.t('validation.invalid', param: 'status')) if invalid_status.present?
+    end
     errors.add(:category, I18n.t('validation.invalid', param: 'category')) if self.category.nil?
     errors.add(:email, I18n.t('validation.invalid', param: 'email')) if self.email.present? && !self.email.match(EMAIL_REGEX)
   end

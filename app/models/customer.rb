@@ -18,7 +18,7 @@ class Customer < ApplicationRecord
       return { name: self.name, email: self.email, mobile: self.mobile }
     when 'admin_profile'
       return { id: self.id, name: self.name, email: self.email, mobile: self.mobile, status: self.status, deleted: self.deleted,
-      updated_at: self.updated_at.in_time_zone(PlatformConfig['time_zone']).strftime('%d-%m-%Y %H:%M') }
+      updated_at: self.updated_at.in_time_zone(PlatformConfig['time_zone']).strftime('%Y-%m-%d %H:%M:%S') }
     end
   end
 
