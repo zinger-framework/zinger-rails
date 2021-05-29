@@ -43,6 +43,10 @@ en:
     mobile_otp_success: OTP is sent successfully to your registered mobile number
     password:
       update_failed: Unable to update password
+  platform_user:
+    mobile_otp_success: OTP is sent successfully to your registered mobile number
+    password:
+      update_failed: Unable to update password
   profile:
     update_success: Profile is updated successfully
     update_failed: Unable to update profile

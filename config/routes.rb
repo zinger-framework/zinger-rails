@@ -89,6 +89,36 @@ Rails.application.routes.draw do
     end
   end
 
+  scope module: 'platform', constraints: { subdomain: AppConfig['platform_subdomain'] } do
+    scope 'v:api_version' do
+      namespace :auth do
+        resources :otp, only: :none do
+          collection do 
+            post :login
+            post :forgot_password
+            post :verify_mobile
+          end
+        end
+      end
+
+      resources :auth, only: :none do
+        collection do
+          post :login
+          post :verify_otp
+          post :reset_password
+          delete :logout
+        end
+      end
+
+      resources :user_profile, only: :index do
+        collection do
+          post :reset_password
+          post :modify
+        end
+      end
+    end
+  end
+
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
   get '/*path', to: 'application#home'
 end

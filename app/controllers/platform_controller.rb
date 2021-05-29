@@ -5,7 +5,7 @@ class PlatformController < ApplicationController
   private
 
   def authenticate_request
-    platform, @payload = PlatformUserSession.fetch_platform_user(request.headers['Authorization'])
+    platform_user, @payload = PlatformUserSession.fetch_platform_user(request.headers['Authorization'])
     error_msg = if platform_user.nil?
       I18n.t('validation.invalid', param: 'authorization')
     elsif platform_user.is_blocked?

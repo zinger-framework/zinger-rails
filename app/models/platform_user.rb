@@ -87,6 +87,9 @@ class PlatformUser < ApplicationRecord
   end
 
   def update_validations
+    errors.add(:mobile, I18n.t('validation.required', param: 'Mobile number')) if self.two_fa_enabled_changed? && 
+      self.two_fa_enabled && self.mobile.blank?
+    
     if self.mobile_changed?
       if self.mobile.blank?
         errors.add(:mobile, I18n.t('validation.required', param: 'Mobile number'))
