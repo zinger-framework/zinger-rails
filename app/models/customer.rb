@@ -65,7 +65,7 @@ class Customer < ApplicationRecord
 
     token = Base64.encode64("#{options[:value]}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
     options.merge!({ code: Customer.otp, token: token }).except!(:action)
-    MailerWorker.perform_async(options.to_json)
+    MailerWorker.perform_async('send_otp', options.to_json)
 
     return { token: token }
   end
