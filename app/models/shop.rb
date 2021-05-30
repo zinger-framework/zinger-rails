@@ -48,7 +48,7 @@ class Shop < ApplicationRecord
     if self.status_changed?
       invalid_status = case self.status
       when STATUSES['ACTIVE']
-        true unless [STATUSES['PENDING'], STATUSES['BLOCKED'], STATUSES['INACTIVE']].include? self.status_was
+        true unless [STATUSES['PENDING'], STATUSES['BLOCKED'], STATUSES['INACTIVE'], STATUSES['REJECTED']].include? self.status_was
       when STATUSES['BLOCKED']
         true unless [STATUSES['ACTIVE'], STATUSES['INACTIVE']].include? self.status_was
       when STATUSES['REJECTED']
