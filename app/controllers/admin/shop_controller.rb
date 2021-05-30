@@ -49,7 +49,8 @@ class Admin::ShopController < AdminController
       @shop.status = Shop::STATUSES[params['status'].to_s.strip.upcase]
       if @shop.status == Shop::STATUSES['REJECTED']
         if params['comment'].present?
-          shop_detail.meta['approval_comments'].to_a << { 'message' => params['comment'], 'time' => Time.now.utc.strftime('%Y-%m-%d %H:%M:%S'), 
+          shop_detail.meta['approval_comments'] ||= []
+          shop_detail.meta['approval_comments'] << { 'message' => params['comment'], 'time' => Time.now.utc.strftime('%Y-%m-%d %H:%M:%S'), 
             'user_id' => 1, 'type' => 'Platform' } # TODO: Set user_id as current loggedin user id - Logesh
         else
           reason = reason.merge({ status: [I18n.t('validation.required', param: 'Comment')] })
