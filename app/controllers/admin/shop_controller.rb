@@ -27,9 +27,10 @@ class Admin::ShopController < AdminController
   end
 
   def update
-    shop_detail, reason, err_key = @shop.shop_detail, {}, @shop.status == Shop::STATUSES['DRAFT'] ? 'create' : 'update'
+    shop_detail, reason, err_key = @shop.shop_detail, {}, 'update'
 
-    if Shop::PENDING_STATUSES.include? @shop.status
+    if @shop.status == Shop::STATUSES['DRAFT']
+      err_key = 'create'
       missing_keys = %w(name description tags category street area city state pincode lat lng mobile email opening_time 
         closing_time account_number account_ifsc account_holder pan) - params.keys.select { |key| params[key].present? }
       reason = missing_keys.inject({}) { |resp, key| resp[key] = [I18n.t('validation.required', param: key.humanize)]; resp }
