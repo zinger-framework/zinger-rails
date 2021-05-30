@@ -43,7 +43,7 @@ class Admin::ShopController < AdminController
 
     %w(name email).each { |key| @shop.send("#{key}=", params[key].to_s.strip) if params[key].present? }
     @shop.tags = params['tags'].map{ |tag| tag.parameterize(separator: '_').upcase }.join(' ') if params['tags'].present?
-    @shop.category = Shop::CATEGORIES[params['category'].to_s.strip.upcase]
+    @shop.category = Shop::CATEGORIES[params['category'].to_s.strip.upcase] if params['category'].present?
     @shop.lat, @shop.lng = params['lat'].to_f, params['lng'].to_f if params['lat'].present? && params['lng'].present?
     if params['status'].present?
       @shop.status = Shop::STATUSES[params['status'].to_s.strip.upcase]
