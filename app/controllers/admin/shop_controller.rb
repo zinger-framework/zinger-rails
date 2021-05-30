@@ -75,7 +75,7 @@ class Admin::ShopController < AdminController
       return
     end
 
-    @shop.status = Shop::STATUSES['PENDING'] if [Shop::STATUSES['DRAFT'], Shop::STATUSES['REJECTED']].include?(@shop.status_was)
+    @shop.status = Shop::STATUSES['PENDING'] if params['status'].blank? && [Shop::STATUSES['DRAFT'], Shop::STATUSES['REJECTED']].include?(@shop.status_was)
     shop_detail.save!(validate: false)
     @shop.save!(validate: false)
     render status: 200, json: { success: true, message: I18n.t("shop.#{err_key}_success"), data: { shop: @shop.as_json('admin_shop') } }
