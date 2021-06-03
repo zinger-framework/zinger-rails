@@ -1,5 +1,20 @@
 class Admin::ShopController < AdminController
-  before_action :load_shop, except: :new
+  before_action :load_shop, except: [:index, :new]
+
+  def index
+    conditions = ValidateParam::Shop.load_conditions(params)
+    if conditions.class == String
+      render status: 400, json: { success: false, message: I18n.t('shop.fetch_failed'), reason: conditions }
+      return
+    end
+
+    query, shops = Shop.all.preload(:shop_detail).where(conditions), []
+    total = query.count
+    shops = query.offset(params['offset'].to_i).limit(LIMIT).order("id #{params['sort_order'].to_s.upcase == 'DESC' ? 'DESC' : 'ASC'}")
+      .map { |shop| shop.as_json('admin_shop') } if total > 0
+
+    render status: 200, json: { success: true, message: 'success', data: { shops: shops, total: total, page_size: LIMIT } }
+  end
 
   def new
     shop = AdminUser.current.shops.where(status: Shop::PENDING_STATUSES).first
@@ -12,30 +27,39 @@ class Admin::ShopController < AdminController
   end
 
   def update
-    shop_detail = @shop.shop_detail
+    shop_detail, reason, err_key = @shop.shop_detail, {}, 'update'
 
-    if Shop::PENDING_STATUSES.include? @shop.status
+    if @shop.status == Shop::STATUSES['DRAFT']
+      err_key = 'create'
       missing_keys = %w(name description tags category street area city state pincode lat lng mobile email opening_time 
         closing_time account_number account_ifsc account_holder pan) - params.keys.select { |key| params[key].present? }
       reason = missing_keys.inject({}) { |resp, key| resp[key] = [I18n.t('validation.required', param: key.humanize)]; resp }
       reason['icon'] = [I18n.t('shop.icon.invalid_file')] if @shop.icon.blank?
       reason['cover_photos'] = [I18n.t('shop.cover_photo.invalid_file')] if shop_detail.cover_photos.blank?
       if reason.present?
-        render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: reason }
+        render status: 400, json: { success: false, message: I18n.t("shop.#{err_key}_failed"), reason: reason }
         return
       end
     end
 
     %w(name email).each { |key| @shop.send("#{key}=", params[key].to_s.strip) if params[key].present? }
     @shop.tags = params['tags'].map{ |tag| tag.parameterize(separator: '_').upcase }.join(' ') if params['tags'].present?
-    @shop.category = Shop::CATEGORIES[params['category'].to_s.strip.upcase]
+    @shop.category = Shop::CATEGORIES[params['category'].to_s.strip.upcase] if params['category'].present?
     @shop.lat, @shop.lng = params['lat'].to_f, params['lng'].to_f if params['lat'].present? && params['lng'].present?
-
-    @shop.validate
-    if @shop.errors.any?
-      render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: @shop.errors }
-      return
+    if params['status'].present?
+      @shop.status = Shop::STATUSES[params['status'].to_s.strip.upcase]
+      if @shop.status == Shop::STATUSES['REJECTED']
+        if params['comment'].present?
+          shop_detail.meta['approval_comments'] ||= []
+          shop_detail.meta['approval_comments'] << { 'message' => params['comment'], 'time' => Time.now.utc.strftime('%Y-%m-%d %H:%M:%S'), 
+            'user_id' => 1, 'type' => 'Platform' } # TODO: Set user_id as current loggedin user id - Logesh
+        else
+          reason = reason.merge({ status: [I18n.t('validation.required', param: 'Comment')] })
+        end
+      end
     end
+    @shop.validate
+    reason = reason.merge(@shop.errors) if @shop.errors.any?
 
     shop_detail.payment = shop_detail.payment.merge(params.as_json.slice(*%w(account_number account_ifsc account_holder pan gst))
       .transform_values { |v| v.to_s.strip }.select { |key| params[key].present? })
@@ -44,16 +68,18 @@ class Admin::ShopController < AdminController
     %w(telephone mobile description).each { |key| shop_detail.send("#{key}=", params[key].to_s.strip) if params[key].present? }
     %w(opening_time closing_time).each { |key| shop_detail.send("#{key}=", 
       Time.find_zone(PlatformConfig['time_zone']).strptime(params[key], '%H:%M').utc) if params[key].present? }
-
     shop_detail.validate
-    if shop_detail.errors.any?
-      render status: 400, json: { success: false, message: I18n.t('shop.update_failed'), reason: shop_detail.errors }
+    reason = reason.merge(shop_detail.errors) if shop_detail.errors.any?
+
+    if reason.present?
+      render status: 400, json: { success: false, message: I18n.t("shop.#{err_key}_failed"), reason: reason }
       return
     end
 
+    @shop.status = Shop::STATUSES['PENDING'] if params['status'].blank? && [Shop::STATUSES['DRAFT'], Shop::STATUSES['REJECTED']].include?(@shop.status_was)
     shop_detail.save!(validate: false)
     @shop.save!(validate: false)
-    render status: 200, json: { success: true, message: I18n.t('shop.update_success'), data: { shop: @shop.as_json('admin_shop') } }
+    render status: 200, json: { success: true, message: I18n.t("shop.#{err_key}_success"), data: { shop: @shop.as_json('admin_shop') } }
   end
 
   def icon

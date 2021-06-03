@@ -13,7 +13,7 @@ class Admin::AuthController < AdminController
 
       admin_user = AdminUser.find_by_email(params['email'])
       if admin_user.nil?
-        render status: 404, json: { success: false, message: I18n.t('auth.login_failed'), reason: I18n.t('auth.not_found') }
+        render status: 404, json: { success: false, message: I18n.t('auth.login_failed'), reason: I18n.t('auth.user.not_found') }
         return
       end
 

@@ -78,7 +78,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :shop, only: [:new, :update, :show] do
+      resources :shop, only: [:index, :new, :update, :show] do
         member do
           post :icon
           post :cover_photo
@@ -122,5 +122,7 @@ Rails.application.routes.draw do
   end
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
+
+  get '/shop/:id' => 'application#home', :as => :shop_detail, subdomain: AppConfig['platform_subdomain']
   get '/*path', to: 'application#home'
 end
