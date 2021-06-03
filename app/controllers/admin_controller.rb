@@ -21,7 +21,7 @@ class AdminController < ApplicationController
 
     if TWO_FACTOR_SCREENS.include?("#{params['controller']}##{params['action']}")
       if !admin_user.two_fa_enabled
-        render status: 200, json: { success: false, reason: 'ALREADY_LOGGED_IN', message: I18n.t('admin_user.two_factor.already_disabled') }
+        render status: 200, json: { success: false, reason: 'ALREADY_LOGGED_IN', message: I18n.t('auth.two_factor.already_disabled') }
         return
       elsif @payload['two_fa']['status'] != AdminUser::TWO_FA_STATUSES['UNVERIFIED']
         render status: 200, json: { success: false, reason: 'ALREADY_LOGGED_IN', message: I18n.t('auth.otp.already_verified') }

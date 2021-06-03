@@ -56,11 +56,6 @@ class Admin::ShopController < AdminController
     render status: 200, json: { success: true, message: I18n.t('shop.update_success'), data: { shop: @shop.as_json('admin_shop') } }
   end
 
-  def destroy
-    @shop.update!(deleted: true)
-    render status: 200, json: { success: true, message: I18n.t('shop.delete_success') }
-  end
-
   def icon
     begin
       raise I18n.t('shop.icon.already_exist') if @shop.icon.present?
@@ -132,7 +127,7 @@ class Admin::ShopController < AdminController
   def load_shop
     @shop = Shop.fetch_by_id(params['id'])
     if @shop.nil?
-      render status: 400, json: { success: false, message: I18n.t('shop.not_found') }
+      render status: 404, json: { success: false, message: I18n.t('shop.not_found') }
       return
     end
   end

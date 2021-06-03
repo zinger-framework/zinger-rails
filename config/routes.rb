@@ -78,7 +78,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :shop, only: [:new, :update, :destroy, :show] do
+      resources :shop, only: [:new, :update, :show] do
         member do
           post :icon
           post :cover_photo
@@ -116,6 +116,8 @@ Rails.application.routes.draw do
           post :modify
         end
       end
+
+      resources :shop, only: [:update, :destroy, :show]
     end
   end
 

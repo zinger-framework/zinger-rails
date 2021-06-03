@@ -63,6 +63,8 @@ en:
     login_success: Logged in successfully
     signup_failed: Unable to create account
     signup_success: Account is created successfully
+    two_factor:
+      already_disabled: 2FA has been already disabled
     user:
       not_found: Unable to find the user
     otp:
@@ -79,6 +81,7 @@ en:
     not_found: Unable to find the shop
     update_success: Shop is updated successfully
     update_failed: Unable to update shop
+    delete_failed: Shop is already deleted
     delete_success: Shop is deleted successfully
     description_long: Description should contain maximum of 250 characters
     icon:
