@@ -1,7 +1,9 @@
 api_subdomain: api
 admin_subdomain: admin
+platform_subdomain: platform
 
-admin_ui_endpoint: http://localhost:4200
+admin_ui_endpoint: http://admin.zinger.pw:4200
+platform_ui_endpoint: http://platform.zinger.pw:4200
 
 api_auth: lMkjDvjgc8r5dt2fY2gu13iX0kdjSXiBt6GfHihj
 google_client_id: 1045854179918-k05hppi6h6ghdpkkg7mjjk6g82ae2bbo.apps.googleusercontent.com

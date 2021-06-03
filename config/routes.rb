@@ -91,6 +91,6 @@ Rails.application.routes.draw do
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
 
-  get '/shop/:id' => 'application#home', :as => :shop_detail
+  get '/shop/:id' => 'application#home', :as => :shop_detail, subdomain: AppConfig['platform_subdomain']
   get '/*path', to: 'application#home'
 end
