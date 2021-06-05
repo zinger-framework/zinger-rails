@@ -117,7 +117,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :shop, only: [:update, :destroy, :show]
+      resources :shop, only: [:index, :show, :update, :destroy]
     end
   end
 

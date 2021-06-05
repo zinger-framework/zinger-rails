@@ -1,6 +1,7 @@
 class PlatformController < ApplicationController
   before_action :reset_thread, :authenticate_request, :check_limit, :check_version
   TWO_FACTOR_SCREENS = ['platform/auth#verify_otp', 'platform/auth/otp#login']
+  LIMIT = 25
 
   private
 

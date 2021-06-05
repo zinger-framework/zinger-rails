@@ -47,15 +47,10 @@ class Admin::ShopController < AdminController
     @shop.category = Shop::CATEGORIES[params['category'].to_s.strip.upcase] if params['category'].present?
     @shop.lat, @shop.lng = params['lat'].to_f, params['lng'].to_f if params['lat'].present? && params['lng'].present?
     if params['status'].present?
-      @shop.status = Shop::STATUSES[params['status'].to_s.strip.upcase]
-      if @shop.status == Shop::STATUSES['REJECTED']
-        if params['comment'].present?
-          shop_detail.meta['approval_comments'] ||= []
-          shop_detail.meta['approval_comments'] << { 'message' => params['comment'], 'time' => Time.now.utc.strftime('%Y-%m-%d %H:%M:%S'), 
-            'user_id' => 1, 'type' => 'Platform' } # TODO: Set user_id as current loggedin user id - Logesh
-        else
-          reason = reason.merge({ status: [I18n.t('validation.required', param: 'Comment')] })
-        end
+      if !%w(ACTIVE INACTIVE).include?(params['status']) || (params['status'] == 'ACTIVE' && @shop.status_was != Shop::STATUSES['INACTIVE'])
+        reason = reason.merge({ status: [I18n.t('validation.invalid', param: 'status')] })
+      else
+        @shop.status = Shop::STATUSES[params['status'].to_s.strip.upcase]
       end
     end
     @shop.validate
@@ -76,7 +71,7 @@ class Admin::ShopController < AdminController
       return
     end
 
-    @shop.status = Shop::STATUSES['PENDING'] if params['status'].blank? && [Shop::STATUSES['DRAFT'], Shop::STATUSES['REJECTED']].include?(@shop.status_was)
+    @shop.status = Shop::STATUSES['PENDING'] if [Shop::STATUSES['DRAFT'], Shop::STATUSES['REJECTED']].include?(@shop.status_was)
     shop_detail.save!(validate: false)
     @shop.save!(validate: false)
     render status: 200, json: { success: true, message: I18n.t("shop.#{err_key}_success"), data: { shop: @shop.as_json('admin_shop') } }
