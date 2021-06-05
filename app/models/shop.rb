@@ -44,6 +44,10 @@ class Shop < ApplicationRecord
     "shop/icon/#{self.id}/#{self.icon}"
   end
 
+  def is_blocked?
+    self.status == STATUSES['BLOCKED']
+  end
+
   private
 
   def validations

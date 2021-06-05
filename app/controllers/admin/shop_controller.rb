@@ -150,6 +150,9 @@ class Admin::ShopController < AdminController
     if @shop.nil?
       render status: 404, json: { success: false, message: I18n.t('shop.not_found') }
       return
+    elsif params['action'] != 'show' && @shop.is_blocked?
+      render status: 400, json: { success: false, message: I18n.t('shop.blocked', platform: PlatformConfig['name']) }
+      return
     end
   end
 

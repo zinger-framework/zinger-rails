@@ -89,6 +89,7 @@ en:
     delete_success: Shop is deleted successfully
     description_long: Description should contain maximum of 250 characters
     fetch_failed: Unable to fetch shops
+    blocked: "Your shop has been blocked. Please contact %{platform} team"
     icon:
       invalid_file: Please upload a valid image file of 512 x 512 dimension
       file_size_exceeded: Please upload an image file of less than 1 MB
