@@ -151,7 +151,8 @@ class Admin::ShopController < AdminController
       render status: 404, json: { success: false, message: I18n.t('shop.not_found') }
       return
     elsif params['action'] != 'show' && @shop.is_blocked?
-      render status: 400, json: { success: false, message: I18n.t('shop.blocked', platform: PlatformConfig['name']) }
+      render status: 403, json: { success: false, message: I18n.t('validation.invalid_request'), reason: I18n.t('shop.blocked', 
+        platform: PlatformConfig['name']) }
       return
     end
   end
