@@ -13,11 +13,11 @@ class Platform::AuthController < PlatformController
 
       platform_user = PlatformUser.find_by_email(params['email'])
       if platform_user.nil?
-        render status: 404, json: { success: false, message: I18n.t('auth.login_failed'), reason: I18n.t('platform_user.not_found') }
+        render status: 404, json: { success: false, message: I18n.t('auth.login_failed'), reason: I18n.t('auth.user.not_found') }
         return
       end
 
-      raise I18n.t('platform_user.account_blocked', platform: PlatformConfig['name']) if platform_user.is_blocked?
+      raise I18n.t('auth.user.account_blocked', platform: PlatformConfig['name']) if platform_user.is_blocked?
     rescue => e
       render status: 400, json: { success: false, message: I18n.t('auth.login_failed'), reason: { email: [e.message] } }
       return

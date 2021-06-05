@@ -35,6 +35,8 @@ en:
     too_many_params: Please provide any one of the params - %{param}
     invalid: "Invalid %{param}"
     param_expired: "%{param} is expired or invalid"
+    invalid_time_format: Invalid time format. Please use YYYY-MM-DD HH:MM:SS
+    invalid_time_range: Start time cannot be greater than end time
     password:
       invalid: "Password should contain atleast %{length} characters"
       mismatch: "Confirm Password doesn't match"

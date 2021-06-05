@@ -1,6 +1,29 @@
 class ValidateParam::Shop
+  DEFAULT_START_TIME = Time.strptime('2020-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+
   def self.load_conditions params
-    conditions = {}
+    conditions, start_time, end_time = {}, DEFAULT_START_TIME, Time.now
+
+    if params['start_time'].present?
+      begin
+        start_time = Time.strptime(params['start_time'], '%Y-%m-%d %H:%M:%S')
+      rescue ArgumentError => e
+        return I18n.t('validation.invalid_time_format')
+      end
+    end
+
+    if params['end_time'].present?
+      begin
+        end_time = Time.strptime("#{params['end_time']}.999999999", '%Y-%m-%d %H:%M:%S.%N')
+      rescue ArgumentError => e
+        return I18n.t('validation.invalid_time_format')
+      end
+    end
+
+    if params['start_time'].present? || params['end_time'].present?
+      return I18n.t('validation.invalid_time_range') if start_time > end_time
+      conditions['created_at'] = start_time..end_time
+    end
 
     if params['statuses'].class == String
       status = ::Shop::STATUSES[params['statuses']]
