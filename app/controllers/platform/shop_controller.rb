@@ -35,7 +35,7 @@ class Platform::ShopController < PlatformController
           shop_detail.meta['approval_comments'] << { 'message' => params['comment'], 'time' => Time.now.utc.strftime('%Y-%m-%d %H:%M:%S'), 
             'user_id' => PlatformUser.current.id, 'type' => 'Platform' }
         else
-          reason = reason.merge({ status: [I18n.t('validation.required', param: 'Comment')] })
+          reason = reason.merge({ comment: [I18n.t('validation.required', param: 'Comment')] })
         end
       end
     end
@@ -70,7 +70,7 @@ class Platform::ShopController < PlatformController
 
   def is_shop_deleted?
     if @shop.deleted
-      render status: 400, json: { success: false, message: I18n.t('shop.delete_failed') }
+      render status: 400, json: { success: false, message: I18n.t('validation.invalid_request'), reason: I18n.t('shop.delete_failed') }
       return
     end
   end
