@@ -73,7 +73,7 @@ class Shop < ApplicationRecord
   def commit_callbacks
     if self.saved_change_to_status? && self.status == STATUSES['PENDING']
       MailerWorker.perform_async('platform', { 'subject' => 'Shop Approval is PENDING', 'id' => self.id, 'name' => self.name, 
-        'link' => Rails.application.routes.url_helpers.shop_detail_url(host: AppConfig['admin_ui_endpoint'], id: self.id) }.to_json)
+        'link' => Rails.application.routes.url_helpers.pl_shop_detail_url(host: AppConfig['platform_ui_endpoint'], id: self.id) }.to_json)
     end
     self.clear_cache
   end

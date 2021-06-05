@@ -48,7 +48,7 @@ Rails.application.routes.draw do
     end
   end
 
-  scope module: 'admin', constraints: { subdomain: AppConfig['admin_subdomain'] } do
+  namespace 'admin', constraints: { subdomain: AppConfig['api_subdomain'] } do
     scope 'v:api_version' do
       namespace :auth do
         resources :otp, only: :none do
@@ -89,7 +89,7 @@ Rails.application.routes.draw do
     end
   end
 
-  scope module: 'platform', constraints: { subdomain: AppConfig['platform_subdomain'] } do
+  namespace 'platform', constraints: { subdomain: AppConfig['api_subdomain'] } do
     scope 'v:api_version' do
       namespace :auth do
         resources :otp, only: :none do
@@ -123,6 +123,6 @@ Rails.application.routes.draw do
 
   mount Sidekiq::Web => '/sidekiq', subdomain: SidekiqSettings['subdomain']
 
-  get '/shop/:id' => 'application#home', :as => :shop_detail, subdomain: AppConfig['platform_subdomain']
+  get '/shop/:id' => 'application#home', :as => :pl_shop_detail, subdomain: AppConfig['platform_subdomain']
   get '/*path', to: 'application#home'
 end
