@@ -30,12 +30,12 @@ class Platform::ShopController < PlatformController
         @shop.status = Shop::STATUSES[params['status'].to_s.strip.upcase]
       end
       if params['status'] == 'REJECTED'
-        if params['comment'].present?
+        if params['reason'].present?
           shop_detail.meta['approval_comments'] ||= []
-          shop_detail.meta['approval_comments'] << { 'message' => params['comment'], 'time' => Time.now.utc.strftime('%Y-%m-%d %H:%M:%S'), 
+          shop_detail.meta['approval_comments'] << { 'message' => params['reason'], 'time' => Time.now.utc.strftime('%Y-%m-%d %H:%M:%S'), 
             'user_id' => PlatformUser.current.id, 'type' => 'Platform' }
         else
-          reason = reason.merge({ comment: [I18n.t('validation.required', param: 'Comment')] })
+          reason = reason.merge({ reason: [I18n.t('validation.required', param: 'Reason')] })
         end
       end
     end
