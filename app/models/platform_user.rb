@@ -43,10 +43,6 @@ class PlatformUser < ApplicationRecord
     self.status == STATUSES['BLOCKED']
   end
 
-  def is_pending?
-    self.status == STATUSES['PENDING']
-  end
-
   def make_current
     Thread.current[:platform_user] = self
   end
