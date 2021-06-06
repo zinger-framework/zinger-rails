@@ -7,14 +7,11 @@ class AdminController < ApplicationController
 
   def authenticate_request
     admin_user, @payload = AdminUserSession.fetch_admin_user(request.headers['Authorization'])
-    error_msg = if admin_user.nil?
-      I18n.t('validation.invalid', param: 'authorization')
+    if admin_user.nil?
+      render status: 401, json: { success: false, message: I18n.t('validation.invalid', param: 'authorization'), reason: 'UNAUTHORIZED' }
+      return
     elsif admin_user.is_blocked?
-      I18n.t('auth.account_blocked', platform: PlatformConfig['name'])
-    end
-    
-    if error_msg.present?
-      render status: 401, json: { success: false, message: error_msg, reason: 'UNAUTHORIZED' }
+      render status: 403, json: { success: false, message: I18n.t('auth.account_blocked', platform: PlatformConfig['name']), reason: 'UNAUTHORIZED' }
       return
     end
 
