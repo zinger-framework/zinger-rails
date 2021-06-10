@@ -25,18 +25,20 @@ class Api::Auth::SignupController < Api::AuthController
 
   def validate_user_agent
     if request.headers['User-Agent'].blank?
-      render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'User-Agent') }
+      render status: 400, json: { success: false, message: I18n.t('auth.signup_failed'), 
+        reason: I18n.t('validation.required', param: 'User-Agent') }
       return
     end
   end
 
   def validate_params
     if params['auth_token'].blank?
-      render status: 400, json: { success: false, message: I18n.t('validation.required', param: 'Authentication token') }
+      render status: 400, json: { success: false, message: I18n.t('auth.signup_failed'), 
+        reason: I18n.t('validation.required', param: 'Authentication token') }
       return
     elsif params['otp'].blank?
-      render status: 400, json: { success: false, message: I18n.t('auth.signup_failed'), 
-        reason: { otp: [ I18n.t('validation.required', param: 'OTP') ] } }
+      render status: 400, json: { success: false, message: I18n.t('auth.signup_failed'), reason: { 
+        otp: [ I18n.t('validation.required', param: 'OTP') ] } }
       return
     end
   end
@@ -44,8 +46,8 @@ class Api::Auth::SignupController < Api::AuthController
   def signup
     token = Core::Redis.fetch(Core::Redis::OTP_VERIFICATION % { token: params['auth_token'] }, { type: Hash }) { nil }
     if token.blank? || params['auth_token'] != token['token'] || token['code'] != params['otp']
-      render status: 401, json: { success: false, message: I18n.t('auth.signup_failed'), 
-        reason: { otp: [ I18n.t('validation.param_expired', param: 'OTP') ] } }
+      render status: 401, json: { success: false, message: I18n.t('auth.signup_failed'), reason: { 
+        otp: [ I18n.t('validation.param_expired', param: 'OTP') ] } }
       return
     end
 

@@ -11,15 +11,18 @@ class Admin::Auth::OtpController < Admin::AuthController
     begin
       raise I18n.t('validation.required', param: 'Email address') if params['email'].blank?
       raise I18n.t('validation.invalid', param: 'email address') if params['email'].match(EMAIL_REGEX).nil?
-
-      admin_user = AdminUser.find_by_email(params['email'])
-      if admin_user.nil?
-        render status: 404, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { email: [ I18n.t('auth.user.not_found') ] } }
-        return
-      end
-      raise I18n.t('auth.account_blocked', platform: PlatformConfig['name']) if admin_user.is_blocked?
     rescue => e
       render status: 400, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { email: [e.message] } }
+      return
+    end
+
+    admin_user = AdminUser.find_by_email(params['email'])
+    if admin_user.nil?
+      render status: 404, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { email: [ I18n.t('auth.user.not_found') ] } }
+      return
+    elsif admin_user.is_blocked?
+      render status: 403, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { 
+        email: [I18n.t('auth.account_blocked', platform: PlatformConfig['name'])] } }
       return
     end
 

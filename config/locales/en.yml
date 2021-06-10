@@ -56,8 +56,10 @@ en:
     mobile_update_success: Mobile number is updated successfully
     mobile_update_failed: Unable to update mobile number
   session:
+    not_found: Unable to find the session
     delete_success: Session is deleted successfully
-    delete_failed: Your current session cannot be deleted
+    delete_failed: Unable to delete the session
+    current_delete_failed: Your current session cannot be deleted
   auth:
     required: Please provide any one of the params - %{param}
     logout_success: Logged out successfully
@@ -97,6 +99,7 @@ en:
       already_exist: Icon is already uploaded
       upload_failed: Unable to upload Icon
       upload_success: Icon is uploaded successfully
+      delete_failed: Unable to remove Icon
       delete_success: Icon is removed successfully
       not_found: Unable to find Icon
     cover_photo:
@@ -105,6 +108,7 @@ en:
       limit_exceeded: "You have already uploaded %{limit} images. Please contact %{platform} team to increase limit"
       upload_failed: Unable to upload Cover photo
       upload_success: Cover photo is uploaded successfully
+      delete_failed: Unable to remove Cover photo
       delete_success: Cover photo is removed successfully
       not_found: Unable to find Cover photo
   ratelimit:
