@@ -85,7 +85,7 @@ class Api::AuthController < ApiController
       return
     end
 
-    customer = self.send("login_with_#{params['purpose'].downcase}", params)
+    customer = self.send("login_with_#{params['purpose'].downcase}")
     return if customer.class != Customer
 
     session = customer.customer_sessions.create!(meta: { auth_mode: CustomerSession::AUTH_MODE["#{params['purpose']}_AUTH"] }, 
@@ -140,7 +140,7 @@ class Api::AuthController < ApiController
 
   private
 
-  def login_with_password params
+  def login_with_password
     params_present = AUTH_PARAMS.select { |key| params[key].present? }
     if params_present.length != 1
       render status: 400, json: { success: false, message: I18n.t('auth.login_failed'), 
@@ -172,7 +172,7 @@ class Api::AuthController < ApiController
     return customer
   end
 
-  def login_with_otp params
+  def login_with_otp
     if params['auth_token'].blank?
       render status: 400, json: { success: false, message: I18n.t('auth.login_failed'), 
         reason: I18n.t('validation.required', param: 'Authentication token') }
@@ -203,7 +203,7 @@ class Api::AuthController < ApiController
     return customer
   end
 
-  def login_with_google params
+  def login_with_google
     email = verify_id_token params['id_token']
     return if email.class != String
     customer = Customer.where(email: email).first
