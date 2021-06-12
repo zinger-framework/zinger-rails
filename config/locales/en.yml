@@ -42,6 +42,9 @@ en:
       mismatch: "Confirm Password doesn't match"
     name_long: Name should have maximum of 100 characters
     invalid_request: Unable to process your request
+  customer:
+    password:
+      update_failed: Unable to update password
   admin_user:
     mobile_otp_success: OTP is sent successfully to your registered mobile number
     password:

@@ -39,10 +39,9 @@ class Admin::UserProfileController < AdminController
       return
     end
 
-    admin_user = AdminUser.current
-    admin_user.update(password: params['new_password'].to_s, password_confirmation: params['confirm_password'].to_s)
-    if admin_user.errors.any?
-      render status: 401, json: { success: false, message: I18n.t('admin_user.password.update_failed'), reason: admin_user.errors }
+    AdminUser.current.update(password: params['new_password'].to_s, password_confirmation: params['confirm_password'].to_s)
+    if AdminUser.current.errors.any?
+      render status: 401, json: { success: false, message: I18n.t('admin_user.password.update_failed'), reason: AdminUser.current.errors }
       return
     end
 
