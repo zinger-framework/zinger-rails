@@ -1,9 +1,9 @@
-class Api::CustomerController < ApiController
-  def profile
+class Api::UserProfileController < ApiController
+  def index
     render status: 200, json: { success: true, message: 'success', data: { profile: Customer.current.as_json('ui_profile') } }
   end
 
-  def update_profile
+  def modify
     Customer.current.update(name: params['name'])
     if Customer.current.errors.any?
       render status: 400, json: { success: false, message: I18n.t('profile.update_failed'), reason: Customer.current.errors.messages }
@@ -40,20 +40,15 @@ class Api::CustomerController < ApiController
     render status: 200, json: { success: true, message: I18n.t('profile.mobile_update_success'), data: { profile: Customer.current.as_json('ui_profile') } }
   end
 
-  def password
-    if params['current_password'].blank?
-      render status: 400, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { 
-        current_password: [ I18n.t('validation.required', param: 'Current password') ] } }
+  def reset_password
+    if params['current_password'].blank? || Customer.current.auth_mode != Customer::AUTH_MODE['PASSWORD_AUTH'] || 
+        !Customer.current.authenticate(params['current_password'])
+      render status: 401, json: { success: false, message: I18n.t('admin_user.password.update_failed'), reason: { 
+        current_password: [I18n.t('validation.invalid', param: 'password')] } }
       return
     end
 
-    if Customer.current.auth_mode != Customer::AUTH_MODE['PASSWORD_AUTH'] || Customer.current.authenticate(params['current_password']) == false
-      render status: 401, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: { 
-        current_password: [ I18n.t('validation.invalid', param: 'current password') ] } }
-      return
-    end
-
-    Customer.current.update(password: params['password'])
+    Customer.current.update(password: params['new_password'].to_s, password_confirmation: params['confirm_password'].to_s)
     if Customer.current.errors.any?
       render status: 401, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: Customer.current.errors.messages }
       return

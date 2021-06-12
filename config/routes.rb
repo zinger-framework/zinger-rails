@@ -4,42 +4,21 @@ Rails.application.routes.draw do
   scope module: 'api', constraints: { subdomain: AppConfig['api_subdomain'] } do
     scope 'v:api_version' do
       # Modify CONFIGS in ratelimit.rb when any action is added/changed
-      namespace :auth do
-        resources :otp, only: :none do
-          collection do
-            post :signup
-            post :login
-            post :reset_password
-            post :reset_profile
-          end
+      resources :auth, only: :none do
+        collection do
+          post :otp
+          post :signup
+          post :login
+          post :reset_password
+          delete :logout
         end
-
-        resources :signup, only: :none do
-          collection do
-            post :password
-            post :otp
-            post :google
-          end
-        end
-
-        resources :login, only: :none do
-          collection do
-            post :password
-            post :otp
-            post :google
-          end
-        end
-
-        delete :logout
-        post :reset_password
       end
 
-      resources :customer, only: :none do
+      resources :user_profile, only: :index do
         collection do
-          get :profile
-          put :profile, to: 'customer#update_profile'
+          put :modify
           put :reset_profile
-          put :password
+          put :reset_password
           resources :session, only: [:index, :destroy]
         end
       end
