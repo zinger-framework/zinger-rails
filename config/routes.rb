@@ -60,18 +60,9 @@ Rails.application.routes.draw do
 
   namespace 'platform', constraints: { subdomain: AppConfig['api_subdomain'] } do
     scope 'v:api_version' do
-      namespace :auth do
-        resources :otp, only: :none do
-          collection do 
-            post :login
-            post :forgot_password
-            post :verify_mobile
-          end
-        end
-      end
-
       resources :auth, only: :none do
         collection do
+          post :otp
           post :login
           post :verify_otp
           post :reset_password
