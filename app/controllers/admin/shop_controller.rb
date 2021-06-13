@@ -133,7 +133,7 @@ class Admin::ShopController < AdminController
     cover_photo = cover_photos.find { |cover_photo| cover_photo.split('-')[0] == params['cover_photo_id'].to_s }
     if cover_photo.nil?
       render status: 404, json: { success: false, message: I18n.t('shop.cover_photo.delete_failed'), reason: {
-        cover_photo: [I18n.t('shop.cover_photo.not_found')] } }
+        cover_photos: [I18n.t('shop.cover_photo.not_found')] } }
       return
     end
     
