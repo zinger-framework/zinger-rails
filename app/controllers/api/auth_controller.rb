@@ -128,7 +128,7 @@ class Api::AuthController < ApiController
       return
     end
 
-    customer.update(password: params['password'])
+    customer.update(password: params['password'], password_confirmation: params['password_confirmation'])
     if customer.errors.any?
       render status: 401, json: { success: false, message: I18n.t('auth.reset_password.trigger_failed'), reason: customer.errors.messages }
       return
