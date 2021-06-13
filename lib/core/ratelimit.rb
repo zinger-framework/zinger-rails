@@ -1,8 +1,8 @@
 class Core::Ratelimit
   CONFIGS = [
     { 'pattern' => 'api/auth#otp', 'per_ip' => true, 'params' => %w(purpose), 'limit' => 5, 'window' => 1800, 'message' => 'exceeded' },
-    { 'pattern' => 'api/auth#signup', 'per_ip' => true, 'limit' => 5, 'window' => 600, 'message' => 'registration' },
-    { 'pattern' => 'api/auth#login', 'per_ip' => true, 'limit' => 5, 'window' => 600, 'message' => 'login' },
+    { 'pattern' => 'api/auth#signup', 'per_ip' => true, 'params' => %w(purpose), 'limit' => 5, 'window' => 600, 'message' => 'registration' },
+    { 'pattern' => 'api/auth#login', 'per_ip' => true, 'params' => %w(purpose), 'limit' => 5, 'window' => 600, 'message' => 'login' },
     { 'pattern' => 'api/auth#reset_password', 'per_ip' => true, 'limit' => 5, 'window' => 600, 'message' => 'reset_password' },
     { 'pattern' => 'api/user_profile#reset_profile', 'per_customer' => true, 'limit' => 5, 'window' => 600, 'message' => 'reset_profile' },
     { 'pattern' => 'api/user_profile#reset_password', 'per_customer' => true, 'limit' => 5, 'window' => 600, 'message' => 'exceeded' },
