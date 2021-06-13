@@ -52,31 +52,10 @@ class Customer < ApplicationRecord
   end
 
   def self.send_otp options
-    return I18n.t('validation.invalid', param: 'email address') if options[:param] == 'email' && !options[:value].match(EMAIL_REGEX)
-    return I18n.t('validation.invalid', param: 'mobile number') if options[:param] == 'mobile' && !options[:value].match(MOBILE_REGEX)
-
-    case options[:action]
-    when 'SIGNUP'
-      return I18n.t('auth.already_exist', key: options[:param], value: options[:value]) if Customer.exists?(options[:param] => options[:value])
-    when 'LOGIN'
-      customer = Customer.where(options[:param] => options[:value]).first
-      return I18n.t('auth.user.not_found') if customer.blank? || (!PlatformConfig['flexible_auth'] && 
-        customer.auth_mode != Customer::AUTH_MODE['OTP_AUTH'])
-      return I18n.t('auth.account_blocked', platform: PlatformConfig['name']) if customer.is_blocked?
-    when 'RESET_PASSWORD'
-      customer = Customer.where(options[:param] => options[:value]).first
-      return I18n.t('auth.user.not_found') if customer.blank? || customer.auth_mode != Customer::AUTH_MODE['PASSWORD_AUTH']
-      return I18n.t('auth.account_blocked', platform: PlatformConfig['name']) if customer.is_blocked?
-    when 'VERIFY_ACCOUNT'
-      return I18n.t('auth.already_exist', key: options[:param], value: options[:value]) if Customer.exists?(options[:param] => options[:value])
-      options[:customer_id] = Customer.current.id
-    end
-
     token = Base64.encode64("#{options[:value]}-#{Time.now.to_i}-#{rand(1000..9999)}").strip.gsub('=', '')
-    options = options.merge({ code: Customer.otp, token: token }).except(:action)
+    options = options.merge({ code: AdminUser.otp, token: token })
     MailerWorker.perform_async('send_otp', options.to_json)
-
-    return { token: token }
+    return token
   end
 
   private

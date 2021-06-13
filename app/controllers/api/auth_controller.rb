@@ -7,23 +7,47 @@ class Api::AuthController < ApiController
 
   def otp
     begin
-      params_present = AUTH_PARAMS.select { |key| params[key].present? }
-      raise I18n.t('validation.too_many_params', param: AUTH_PARAMS.join(', ')) if params_present.length != 1
       raise I18n.t('validation.required', param: 'Purpose') if params['purpose'].blank?
       raise I18n.t('validation.invalid', param: 'purpose') unless OTP_PURPOSES.include? params['purpose']
+      params_present = AUTH_PARAMS.select { |key| params[key].present? }
+      raise I18n.t('validation.too_many_params', param: AUTH_PARAMS.join(', ')) if params_present.length != 1
     rescue => e
       render status: 400, json: { success: false, message: I18n.t('auth.otp.failed'), reason: e.message }
       return
     end
+    
+    begin
+      key = params_present.first
+      case key
+      when 'email'
+        raise I18n.t('validation.invalid', param: 'email address') unless params['email'].match(EMAIL_REGEX)
+      when 'mobile'
+        raise I18n.t('validation.invalid', param: 'mobile number') unless params['mobile'].match(MOBILE_REGEX)
+      end
 
-    key = params_present.first
-    resp = Customer.send_otp({ param: key, value: params[key], action: params['purpose'] })
-    if resp.class == String
-      render status: 400, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { key => [resp] } }
+      options = { param: key, value: params[key] }
+      case params['purpose']
+      when 'SIGNUP', 'VERIFY_ACCOUNT'
+        raise I18n.t('auth.already_exist', key: key, value: params[key]) if Customer.exists?(key => params[key])
+        options[:customer_id] = Customer.current.id if params['purpose'] == 'VERIFY_ACCOUNT'
+      when 'LOGIN', 'RESET_PASSWORD'
+        customer = Customer.where(key => params[key]).first
+        if customer.blank? || (params['purpose'] == 'LOGIN' && !PlatformConfig['flexible_auth'] && customer.auth_mode != Customer::AUTH_MODE['OTP_AUTH']) ||
+            (params['purpose'] == 'RESET_PASSWORD' && customer.auth_mode != Customer::AUTH_MODE['PASSWORD_AUTH'])
+          render status: 404, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { key => [I18n.t('auth.user.not_found')] } }
+          return
+        elsif customer.is_blocked?
+          render status: 403, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { 
+            key => [I18n.t('auth.account_blocked', platform: PlatformConfig['name'])] } }
+          return
+        end
+      end
+    rescue => e
+      render status: 400, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { key => [e.message] } }
       return
     end
 
-    render status: 200, json: { success: true, message: I18n.t('auth.otp.success'), data: resp }
+    render status: 200, json: { success: true, message: I18n.t('auth.otp.success'), data: { auth_token: Customer.send_otp(options) } }
   end
 
   def signup
