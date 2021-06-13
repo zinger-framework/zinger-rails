@@ -1,7 +1,7 @@
 class Platform::AuthController < PlatformController
   AUTH_PARAMS = %w(email mobile)
-  OTP_PURPOSES = %w(LOGIN FORGOT_PASSWORD VERIFY_ACCOUNT)
-  SKIP_AUTHENTICATE_PARAMS = %w(LOGIN VERIFY_ACCOUNT)
+  OTP_PURPOSES = %w(TWO_FA FORGOT_PASSWORD VERIFY_ACCOUNT)
+  SKIP_AUTHENTICATE_PARAMS = %w(TWO_FA VERIFY_ACCOUNT)
 
   skip_before_action :authenticate_request, except: [:otp, :verify_otp, :logout], 
     unless: -> { params['action'] != 'otp' || SKIP_AUTHENTICATE_PARAMS.include?(params['purpose']) }
@@ -118,7 +118,7 @@ class Platform::AuthController < PlatformController
 
   private
 
-  def send_login_otp
+  def send_two_fa_otp
     @payload['two_fa']['auth_token'] = PlatformUser.send_otp({ param: 'mobile', value: PlatformUser.current.mobile })
     render status: 200, json: { success: true, message: I18n.t('auth.two_factor.otp_success'), 
       data: { token: PlatformUser.current.platform_user_sessions.find_by_token(@payload['token']).get_jwt_token(@payload['two_fa']) } }
