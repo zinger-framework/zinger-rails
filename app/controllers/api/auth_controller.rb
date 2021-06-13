@@ -83,9 +83,9 @@ class Api::AuthController < ApiController
         return
       end
 
-      customer = Customer.new(token['param'] => token['value'], auth_mode: Customer::AUTH_MODE["#{params['purpose']}_AUTH"])
-      customer.password = params['password'] if params['purpose'] == 'PASSWORD'
-      customer.save
+      data = { token['param'] => token['value'], auth_mode: Customer::AUTH_MODE["#{params['purpose']}_AUTH"] }
+      data = data.merge({ password: params['password'], password_confirmation: params['password_confirmation'] }) if params['purpose'] == 'PASSWORD'
+      customer = Customer.create(data)
     end
 
     if customer.errors.any?
