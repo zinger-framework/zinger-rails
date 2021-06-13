@@ -17,7 +17,7 @@ class AdminController < ApplicationController
     admin_user.make_current
 
     request_pattern = "#{params['controller']}##{params['action']}"
-    if request_pattern == 'admin/auth#verify_otp' || (request_pattern == 'admin/auth#otp' && params['purpose'] == 'LOGIN')
+    if request_pattern == 'admin/auth#verify_otp' || (request_pattern == 'admin/auth#otp' && params['purpose'] == 'TWO_FA')
       if !admin_user.two_fa_enabled
         render status: 200, json: { success: false, message: I18n.t('auth.two_factor.already_disabled'), reason: 'ALREADY_LOGGED_IN' }
         return
