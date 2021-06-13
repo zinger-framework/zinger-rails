@@ -28,20 +28,20 @@ class Admin::UserProfileController < AdminController
 
   def reset_password
     if params['current_password'].blank? || !AdminUser.current.authenticate(params['current_password'])
-      render status: 401, json: { success: false, message: I18n.t('admin_user.password.update_failed'), reason: { 
+      render status: 401, json: { success: false, message: I18n.t('auth.password.update_failed'), reason: { 
         current_password: [I18n.t('validation.invalid', param: 'password')] } }
       return
     end
 
     if params['new_password'].blank?
-      render status: 400, json: { success: false, message: I18n.t('admin_user.password.update_failed'), reason: { 
+      render status: 400, json: { success: false, message: I18n.t('auth.password.update_failed'), reason: { 
         password: [I18n.t('validation.password.invalid', length: PASSWORD_MIN_LENGTH)] } }
       return
     end
 
     AdminUser.current.update(password: params['new_password'].to_s, password_confirmation: params['confirm_password'].to_s)
     if AdminUser.current.errors.any?
-      render status: 401, json: { success: false, message: I18n.t('admin_user.password.update_failed'), reason: AdminUser.current.errors }
+      render status: 401, json: { success: false, message: I18n.t('auth.password.update_failed'), reason: AdminUser.current.errors }
       return
     end
 

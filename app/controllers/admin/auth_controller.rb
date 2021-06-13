@@ -48,7 +48,7 @@ class Admin::AuthController < AdminController
     if admin_user.two_fa_enabled
       data = { token: session.get_jwt_token({ 'status' => AdminUser::TWO_FA_STATUSES['UNVERIFIED'],
         'auth_token' => AdminUser.send_otp({ param: 'mobile', value: admin_user.mobile }) }), redirect_to: 'OTP' }
-      message = I18n.t('admin_user.mobile_otp_success')
+      message = I18n.t('auth.two_factor.otp_success')
     else
       data = { token: session.get_jwt_token({ 'status' => AdminUser::TWO_FA_STATUSES['NOT_APPLICABLE'] }), redirect_to: 'DASHBOARD' }
       message = I18n.t('auth.login_success')
@@ -147,7 +147,7 @@ class Admin::AuthController < AdminController
 
   def send_login_otp
     @payload['two_fa']['auth_token'] = AdminUser.send_otp({ param: 'mobile', value: AdminUser.current.mobile })
-    render status: 200, json: { success: true, message: I18n.t('admin_user.mobile_otp_success'), 
+    render status: 200, json: { success: true, message: I18n.t('auth.two_factor.otp_success'), 
       data: { token: AdminUser.current.admin_user_sessions.find_by_token(@payload['token']).get_jwt_token(@payload['two_fa']) } }
   end
 

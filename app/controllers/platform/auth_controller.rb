@@ -46,7 +46,7 @@ class Platform::AuthController < PlatformController
     if platform_user.two_fa_enabled
       data = { token: session.get_jwt_token({ 'status' => PlatformUser::TWO_FA_STATUSES['UNVERIFIED'],
         'auth_token' => PlatformUser.send_otp({ param: 'mobile', value: platform_user.mobile }) }), redirect_to: 'OTP' }
-      message = I18n.t('platform_user.mobile_otp_success')
+      message = I18n.t('auth.two_factor.otp_success')
     else
       data = { token: session.get_jwt_token({ 'status' => PlatformUser::TWO_FA_STATUSES['NOT_APPLICABLE'] }), redirect_to: 'DASHBOARD' }
       message = I18n.t('auth.login_success')
@@ -118,7 +118,7 @@ class Platform::AuthController < PlatformController
 
   def send_login_otp
     @payload['two_fa']['auth_token'] = PlatformUser.send_otp({ param: 'mobile', value: PlatformUser.current.mobile })
-    render status: 200, json: { success: true, message: I18n.t('platform_user.mobile_otp_success'), 
+    render status: 200, json: { success: true, message: I18n.t('auth.two_factor.otp_success'), 
       data: { token: PlatformUser.current.platform_user_sessions.find_by_token(@payload['token']).get_jwt_token(@payload['two_fa']) } }
   end
 
