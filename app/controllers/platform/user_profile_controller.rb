@@ -39,10 +39,9 @@ class Platform::UserProfileController < PlatformController
       return
     end
 
-    platform_user = PlatformUser.current
-    platform_user.update(password: params['new_password'].to_s, password_confirmation: params['confirm_password'].to_s)
-    if platform_user.errors.any?
-      render status: 401, json: { success: false, message: I18n.t('platform_user.password.update_failed'), reason: platform_user.errors }
+    PlatformUser.current.update(password: params['new_password'].to_s, password_confirmation: params['confirm_password'].to_s)
+    if PlatformUser.current.errors.any?
+      render status: 401, json: { success: false, message: I18n.t('platform_user.password.update_failed'), reason: PlatformUser.current.errors }
       return
     end
 
