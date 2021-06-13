@@ -1,8 +1,10 @@
 class Platform::AuthController < PlatformController
-  OTP_PURPOSES = %w(LOGIN FORGOT_PASSWORD VERIFY_MOBILE)
+  AUTH_PARAMS = %w(email mobile)
+  OTP_PURPOSES = %w(LOGIN FORGOT_PASSWORD VERIFY_ACCOUNT)
+  SKIP_AUTHENTICATE_PARAMS = %w(LOGIN VERIFY_ACCOUNT)
 
   skip_before_action :authenticate_request, except: [:otp, :verify_otp, :logout], 
-    unless: -> { params['action'] != 'otp' || %w(LOGIN VERIFY_MOBILE).include?(params['purpose']) }
+    unless: -> { params['action'] != 'otp' || SKIP_AUTHENTICATE_PARAMS.include?(params['purpose']) }
 
   def otp
     begin
@@ -145,16 +147,29 @@ class Platform::AuthController < PlatformController
       data: { auth_token: PlatformUser.send_otp({ param: 'email', value: params['email'] }) } }
   end
 
-  def send_verify_mobile_otp
+  def send_verify_account_otp
+    params_present = AUTH_PARAMS.select { |key| params[key].present? }
+    if params_present.length != 1
+      render status: 400, json: { success: false, message: I18n.t('auth.otp.failed'), 
+        reason: I18n.t('validation.too_many_params', param: AUTH_PARAMS.join(', ')) }
+      return
+    end
+
     begin
-      raise I18n.t('validation.required', param: 'Mobile number') if params['mobile'].blank?
-      raise I18n.t('validation.invalid', param: 'mobile number') if params['mobile'].match(MOBILE_REGEX).nil?
+      key = params_present.first
+      case key
+      when 'email'
+        raise I18n.t('validation.invalid', param: 'email address') unless params['email'].match(EMAIL_REGEX)
+        raise I18n.t('auth.already_exist', key: 'email', value: params['email']) if PlatformUser.exists?(email: params['email'])
+      when 'mobile'
+        raise I18n.t('validation.invalid', param: 'mobile number') unless params['mobile'].match(MOBILE_REGEX)
+      end
     rescue => e
-      render status: 400, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { mobile: [e.message] } }
+      render status: 400, json: { success: false, message: I18n.t('auth.otp.failed'), reason: { key => [e.message] } }
       return
     end
 
     render status: 200, json: { success: true, message: I18n.t('auth.otp.success'), 
-      data: { auth_token: PlatformUser.send_otp({ param: 'mobile', value: params['mobile'], platform_user_id: PlatformUser.current.id }) } }
+      data: { auth_token: PlatformUser.send_otp({ param: key, value: params[key], platform_user_id: PlatformUser.current.id }) } }
   end
 end
