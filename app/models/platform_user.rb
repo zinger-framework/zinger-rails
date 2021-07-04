@@ -26,7 +26,7 @@ class PlatformUser < ApplicationRecord
     when 'ui_profile'
       return { 'name' => self.name, 'email' => self.email, 'mobile' => self.mobile, 'two_fa_enabled' => self.two_fa_enabled }
     when 'conversation'
-      return { 'id' => self.id, 'name' => self.name, 'email' => self.email }
+      return { 'id' => self.id, 'name' => self.name, 'profile_url' => "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email.downcase)}.png" }
     end
   end
 
