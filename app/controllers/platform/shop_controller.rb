@@ -1,6 +1,6 @@
 class Platform::ShopController < PlatformController
   before_action :load_shop, except: :index
-  before_action :is_shop_deleted?, only: [:update, :destroy]
+  before_action :is_shop_deleted?, only: [:update, :delete]
 
   def index
     conditions = ValidateParam::Shop.load_conditions(params)
@@ -52,7 +52,7 @@ class Platform::ShopController < PlatformController
     render status: 200, json: { success: true, message: I18n.t('shop.update_success'), data: { shop: @shop.as_json('platform_shop') } }
   end
 
-  def delete_shop
+  def delete
     if params['reason'].blank?
       render status: 400, json: { success: false, message: I18n.t('validation.invalid_request'), reason: { 
         reason: [I18n.t('validation.required', param: 'Reason')] } }
