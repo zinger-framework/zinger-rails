@@ -8,10 +8,10 @@ class Admin::ShopController < AdminController
       return
     end
 
-    query, shops = Shop.all.preload(:shop_detail).where(conditions), []
+    query, shops = Shop.all.undeleted.preload(:shop_detail).where(conditions), []
     total = query.count
     shops = query.offset(params['offset'].to_i).limit(LIMIT).order("id #{params['sort_order'].to_s.upcase == 'DESC' ? 'DESC' : 'ASC'}")
-      .map { |shop| shop.as_json('admin_shop') } if total > 0
+      .map { |shop| shop.as_json('admin_shop_list') } if total > 0
 
     render status: 200, json: { success: true, message: 'success', data: { shops: shops, total: total, per_page: LIMIT } }
   end
