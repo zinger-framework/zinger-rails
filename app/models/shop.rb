@@ -4,8 +4,7 @@ class Shop < ApplicationRecord
   PENDING_STATUSES = [STATUSES['DRAFT'], STATUSES['PENDING'], STATUSES['REJECTED']]
 
   scope :undeleted, -> { where(deleted: false) }
-  # searchkick word_start: ['name'], locations: ['location'], default_fields: ['status', 'deleted']
-  # TODO: Uncomment when elastic search is integrated - Logesh
+  searchkick word_start: ['name'], locations: ['location'], default_fields: ['status', 'deleted']
 
   has_one :shop_detail
   has_and_belongs_to_many :admin_users
