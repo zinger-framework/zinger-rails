@@ -17,7 +17,7 @@ class Shop < ApplicationRecord
   after_commit :commit_callbacks
 
   def search_data
-    { name: self.name, location: { lat: self.lat, lon: self.lng }, tags: self.tags, status: self.status, deleted: self.deleted }
+    { id: self.id, name: self.name, location: { lat: self.lat, lon: self.lng }, tags: self.tags, status: self.status, deleted: self.deleted }
   end
 
   def as_json purpose = nil

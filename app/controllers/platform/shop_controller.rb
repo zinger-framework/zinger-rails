@@ -3,16 +3,17 @@ class Platform::ShopController < PlatformController
   before_action :is_shop_deleted?, only: [:update, :delete]
 
   def index
+    params['sort_order'] ||= 'DESC'
     conditions = ValidateParam::Shop.load_conditions(params)
     if conditions.class == String
       render status: 400, json: { success: false, message: I18n.t('shop.fetch_failed'), reason: conditions }
       return
     end
 
-    query, shops = Shop.all.preload(:shop_detail).where(conditions), []
-    total = query.count
-    shops = query.offset(params['offset'].to_i).limit(LIMIT).order("id #{params['sort_order'].to_s.upcase == 'DESC' ? 'DESC' : 'ASC'}")
-      .map { |shop| shop.as_json('platform_shop_list') } if total > 0
+    options = { where: conditions, limit: LIMIT, offset: params['offset'].to_i, order: { id: params['sort_order'].to_s.downcase } }
+    query, shops = Shop.search(options), []
+    total = query.total_count
+    shops = query.map { |shop| shop.as_json('platform_shop_list') } if total > 0
 
     render status: 200, json: { success: true, message: 'success', data: { shops: shops, total: total, per_page: LIMIT } }
   end
